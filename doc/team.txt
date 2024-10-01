@@ -1,7 +1,4 @@
 stephuofa
-<<<<<<< HEAD
 kgarbutt
 mshaban
-=======
-Kattily-eng
->>>>>>> bb7738f3b0dac54e7aca92ad52a12351cd93b588
+
