@@ -3,7 +3,7 @@ package com.example.pickme_nebula0;
 /**
  * AdminRole
  */
-public class AdminRole {
+public class AdminRole extends User {
     private String adminID;
 
     /**
