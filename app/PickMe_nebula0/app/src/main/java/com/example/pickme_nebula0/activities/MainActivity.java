@@ -1,5 +1,6 @@
 package com.example.pickme_nebula0.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -9,6 +10,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -18,6 +20,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends AppCompatActivity {
     private FirebaseFirestore db;
+
+    String deviceID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,5 +58,18 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        // Check if the user has registered
+        deviceID = DeviceManager.getDeviceId(this);
+        // TODO: query DB to see if user has registered or if its their first time
+        boolean registered = false;
+        if (!registered){ // if not registered, send them to enter their user info
+            Intent intent = new Intent(MainActivity.this, UserInfoActivity.class);
+            intent.putExtra("newUser", true);
+            startActivity(intent);
+        }
+
+        // User is registered, render homepage
+        // TODO
+
     }
 }
