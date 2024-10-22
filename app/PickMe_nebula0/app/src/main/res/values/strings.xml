@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">PickMe_nebula0</string>
+    <string name="user_info_header_first_time">Enter Your Info</string>
+    <string name="user_info_header_returning">Update Your Info</string>
+    <string name="user_info_require_field">* denotes a required field</string>
+    <string name="user_info_notif_checkbox">I want to receive notifications from organizers and administrators</string>
 </resources>
