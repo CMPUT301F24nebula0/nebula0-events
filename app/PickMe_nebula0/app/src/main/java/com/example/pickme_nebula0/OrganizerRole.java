@@ -4,7 +4,7 @@ import java.util.ArrayList;
 /**
  * OrganizerRole
  */
-public class OrganizerRole {
+public class OrganizerRole extends User {
     private String organizerID;
     private ArrayList<Event> events = new ArrayList<Event>();
 
