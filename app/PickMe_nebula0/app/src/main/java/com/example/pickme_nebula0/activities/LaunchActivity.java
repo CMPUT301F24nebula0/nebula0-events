@@ -18,8 +18,9 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class MainActivity extends AppCompatActivity {
+public class LaunchActivity extends AppCompatActivity {
     private FirebaseFirestore db;
+    private boolean returning = false;
 
     String deviceID;
 
@@ -27,49 +28,74 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_launch);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        // Initialize Firestore
+        // Initialize Firestore and get device ID
         db = FirebaseFirestore.getInstance();
+        deviceID = DeviceManager.getDeviceId(this);
 
-        // Reference the document in the 'user' collection
-        DocumentReference docRef = db.collection("User").document("7DkUTlD2uTzXP1eBeUfb");
+        checkUserRegistration();
+    }
 
-        // Get the document and print userID
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (returning) { // only go to home page when returning from registration, not on launch
+            registeredCallback();
+            returning = false;
+        }
+    }
+
+    /**
+     * Checks for user with this device ID in the database
+     * If no such user exists, launches UserInfoActivity
+     * If user already exists, launches HomePageActivity
+     */
+    private void checkUserRegistration(){
+
+        DocumentReference docRef = db.collection("User").document(deviceID);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
-                        // Retrieve and log the userID field
                         String userID = document.getString("userID");
                         Log.d("Firestore", "UserID: " + userID);
+                        registeredCallback();
                     } else {
                         Log.d("Firestore", "No such document");
+                        unregisteredCallback();
                     }
                 } else {
                     Log.d("Firestore", "get failed with ", task.getException());
                 }
             }
         });
-        // Check if the user has registered
-        deviceID = DeviceManager.getDeviceId(this);
-        // TODO: query DB to see if user has registered or if its their first time
-        boolean registered = false;
-        if (!registered){ // if not registered, send them to enter their user info
-            Intent intent = new Intent(MainActivity.this, UserInfoActivity.class);
-            intent.putExtra("newUser", true);
-            startActivity(intent);
-        }
-
-        // User is registered, render homepage
-        // TODO
-
     }
+
+    /**
+     * Action to take if the user is not yet in the database
+     */
+    private void unregisteredCallback(){
+        Intent intent = new Intent(LaunchActivity.this, UserInfoActivity.class);
+        intent.putExtra("newUser", true);
+        startActivity(intent);
+        returning = true;
+    }
+
+    /**
+     * Action to take if the user is already in the database
+     */
+    private void registeredCallback(){
+        Intent intent = new Intent(LaunchActivity.this, HomePageActivity.class);
+        startActivity(intent);
+        returning = true;
+    }
+
 }
