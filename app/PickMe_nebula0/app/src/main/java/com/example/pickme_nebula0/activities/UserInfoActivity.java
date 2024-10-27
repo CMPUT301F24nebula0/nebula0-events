@@ -16,6 +16,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
+import com.example.pickme_nebula0.SharedDialogue;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
@@ -72,9 +73,17 @@ public class UserInfoActivity extends AppCompatActivity {
                 // TODO: verify data validity (require Name,Email; verify phone,email format)
                 String name = nameField.getText().toString();
                 String email = emailField.getText().toString();
-                String phone = phoneField.getText().toString();
-                boolean notifEnabled = enableNotifBox.isEnabled();
+                String phone = phoneField.getText().toString().replaceAll("[^0-9]", "");;
 
+
+                String warning = validateUserInfo(name,email,phone);
+                if (!warning.isBlank()){
+                    // user had entered invalid data, warn them about it and don't update DB
+                    SharedDialogue.showInvalidDataAlert(warning,UserInfoActivity.this);
+                    return;
+                }
+
+                boolean notifEnabled = enableNotifBox.isEnabled();
                 createUpdateUser(name,email,phone,notifEnabled);
                 finish();
             }
@@ -128,6 +137,43 @@ public class UserInfoActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public static String validateUserInfo(String name, String email, String phone){
+
+        String warning = "";
+        // verify name is non-numeric
+        if (name.matches(".*\\d.*")){
+            warning = "Name cannot contain numbers";
+        }
+        // verify email address has proper format
+        if (!email.matches(".+@.+\\..+")){
+            String errString = "Email must be in format like name@mail.com";
+            if (warning.isBlank()){
+                warning = errString;
+            } else{
+                warning += "\n\n" + errString;
+            }
+        }
+        if(name.isBlank() || email.isBlank()){
+            String errString = "Must provide both Name and Email";
+            if (warning.isBlank()){
+                warning = errString;
+            } else{
+                warning += "\n\n" + errString;
+            }
+        }
+        // verify that, if provided, is 10 numbers (e.g. xxx-xxx-xxxx)
+        if (phone.length() != 0 && phone.length() != 10){
+            String errString = "Phone number must be 10 digits";
+            if (warning.isBlank()){
+                warning = errString;
+            } else{
+                warning += "\n\n" + errString;
+            }
+        }
+
+        return warning;
     }
 
     private void createUpdateUser(String name, String email, String phone, boolean notifEnabled) {
