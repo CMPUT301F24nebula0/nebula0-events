@@ -3,6 +3,7 @@ package com.example.pickme_nebula0;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+// comment to test git remove functionality
 
 /**
  * User class
