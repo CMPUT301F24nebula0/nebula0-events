@@ -122,10 +122,9 @@ public class AdminRole extends User {
         // remove facility from organizer who owns it
         // should be possible for an organizer to have no facility
 
-        return null;
     }
 
-}
+
     //US 03.04.01 As an administrator, I want to be able to browse events.
     public void browseEvents() {
         // in future, browse events
