@@ -55,6 +55,9 @@ public class AdminRole extends User {
         this.adminID = adminID;
     }
 
+    // all functions below will require db access to view/remove events
+    // access DB manager object
+
     // US 03.01.01 As an administrator, I want to be able to remove events.
     public void removeEvent(Event event) {
         if(event != null && eventsList.contains(event)){
@@ -107,6 +110,22 @@ public class AdminRole extends User {
             // handle the case where the hash data does not exist
         }
     }
+    // US 03.04.01 As an administrator, I want to be able to browse events.
+
+    // US 03.05.01 As an administrator, I want to be able to browse profiles.
+
+    // US 03.06.01 As an administrator, I want to be able to browse images.
+
+    // US 03.07.01 As an administrator I want to remove facilities that violate app policy
+    public void removeFacility(Facility facility) {
+        // update firebase to remove facility from db
+        // remove facility from organizer who owns it
+        // should be possible for an organizer to have no facility
+
+        return null;
+    }
+
+}
     //US 03.04.01 As an administrator, I want to be able to browse events.
     public void browseEvents() {
         // in future, browse events
