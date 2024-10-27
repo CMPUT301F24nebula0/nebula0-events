@@ -31,10 +31,14 @@ public class User {
 
     /**
      * Constructor for User class
-     * @param   firstName   the first name of the user
-     * @param   lastName    the last name of the user
+     *
+     * @param firstName   the first name of the user
+     * @param lastName    the last name of the user
+     * @param name
+     * @param email
+     * @param phoneNumber
      */
-    public User(String firstName, String lastName) {
+    public User(String firstName, String lastName, String name, String email, String phoneNumber) {
         this.userID = null;
         this.firstName = firstName;
         this.lastName = lastName;

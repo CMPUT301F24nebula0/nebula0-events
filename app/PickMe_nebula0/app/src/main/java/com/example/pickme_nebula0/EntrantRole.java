@@ -36,22 +36,22 @@ public class EntrantRole extends User {
         this.entrantID = entrantID;
     }
 
-    // US 01.01.01 As an entrant, I want to join the waiting list for a specific event
+   // US 01.01.01 As an entrant, I want to join the waiting list for a specific event
     public boolean joinWaitingList(Event event) {
-        boolean isJoined = false;
+        event.getEntrantsInWaitingList().add(this);
+        boolean isJoined = true;
         // in future, add the user to the event
-
         return isJoined;
     }
 
     // US 01.01.02 As an entrant, I want to unjoin a waiting list for a specific event 
     public boolean unjoinWaitingList(Event event) {
-        boolean isUnjoined = false;
+        boolean isUnjoined = true;
+        event.removeEntrantFromWaitingList(this);
         // in future, remove the user from the event
-
         return isUnjoined;
     }
-
+    
     // US 01.03.03 As an entrant I want my profile picture to be deterministically generated from my profile name if I haven't uploaded a profile image yet.
     public String generateProfilePicture() {
         // in future, generate a profile picture for the user based on profile name

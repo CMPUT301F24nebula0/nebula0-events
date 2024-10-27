@@ -16,6 +16,7 @@ public class Event {
     protected ArrayList<EntrantRole> entrantsDeclined = new ArrayList<EntrantRole>();
     protected ArrayList<EntrantRole> entrantsCancelled = new ArrayList<EntrantRole>();
     protected ArrayList<EntrantRole> entrantsEnrolled = new ArrayList<EntrantRole>();
+
     /**
      * Constructor
      */
