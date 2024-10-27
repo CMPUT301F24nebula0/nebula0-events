@@ -32,6 +32,7 @@ public class AdminRole extends User {
     // US 03.01.01 As an administrator, I want to be able to remove events.
     public void removeEvent(Event event) {
         // in future, remove event
+
     }
 
     //US 03.02.01 As an administrator, I want to be able to remove profiles.
