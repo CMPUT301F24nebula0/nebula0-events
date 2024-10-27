@@ -4,4 +4,9 @@
     <string name="user_info_header_returning">Update Your Info</string>
     <string name="user_info_require_field">* denotes a required field</string>
     <string name="user_info_notif_checkbox">I want to receive notifications from organizers and administrators</string>
+    <string name="manage_events">Manage Events</string>
+    <string name="manage_profile">Manage Profile</string>
+    <string name="manage_image">Manage Image</string>
+    <string name="manage_qr_code">Manage QR Code</string>
+    <string name="manage_facilities">Manage Facilities</string>
 </resources>

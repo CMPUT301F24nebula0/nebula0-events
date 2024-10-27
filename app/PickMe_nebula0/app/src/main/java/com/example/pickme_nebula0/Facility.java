@@ -13,8 +13,10 @@ public class Facility {
     /**
      * Constructor
      */
-    public Facility() {
+    public Facility()
+    {
         String facilityID = null;
+
     }
 
     /**
