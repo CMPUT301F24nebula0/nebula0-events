@@ -3,6 +3,7 @@ package com.example.pickme_nebula0.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,6 +14,7 @@ public class HomePageActivity extends AppCompatActivity {
     Button adminButton;
     Button entrantButton;
     Button organizerButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,5 +60,15 @@ public class HomePageActivity extends AppCompatActivity {
     private void navigateToOrganizerHomePage() {
         Intent intent = new Intent(HomePageActivity.this, OrganizerHomeActivity.class);
         startActivity(intent);
+
+      final Button  QRbtn=findViewById(R.id.QRbtn);
+      QRbtn.setOnClickListener(new View.OnClickListener() {
+              public void onClick (View view) {
+
+              Intent i = new Intent(HomePageActivity.this, QRcodeActivity.class);
+              startActivity(i);
+          }
+      });
+
     }
 }
