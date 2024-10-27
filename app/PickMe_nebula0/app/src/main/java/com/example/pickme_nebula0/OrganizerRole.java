@@ -104,6 +104,7 @@ public class OrganizerRole extends User {
     }
 
     // US 02.05.01 As an organizer I want to send a notification to chosen entrants to sign up for events
+    // update entrant info in firebase?
     public boolean sendNotificationToEntrantsChosen(Event event) {
         boolean notificationSent = false;
 
@@ -112,22 +113,45 @@ public class OrganizerRole extends User {
         return notificationSent;
     }
 
-    // US 02.07.02 As an organizer I want to send notifications to all selected entrants
-    public boolean sendNotificationToAllSelectedEntrants(Event event) {
-        boolean notificationSent = false;
+    // US 02.05.02
+    // As an organizer I want to set the system to sample a specified number of attendees to register for the event
+    public ArrayList<EntrantRole> sampleEntrants(Event event, int entrantNum) {
+        // get all entrants from an event
+        // randomly select entrant_num entrants from the Event's entrants
+        // then update Event's chosen entrants
 
         ArrayList<EntrantRole> entrantsChosen = event.getEntrantsChosen();
-        // Send notification
-        return notificationSent;
+        return entrantsChosen;
     }
 
-    //US 02.07.03 As an organizer I want to send a notification to all canceled entrants
-    public boolean sendNotificationToAllCanceledEntrants(Event event) {
-        boolean notificationSent = false;
+    // US 02.05.03
+    // As an organizer I want to be able to draw a replacement applicant from the pooling system
+    // when a previously selected applicant cancels or rejects the invitation
+    public EntrantRole resampleEntrant(Event event) {
+        // remove cancelled applicant from invitation list (if found)
 
-        ArrayList<EntrantRole> entrantsCanceled = event.getEntrantsCancelled();
-        // Send notification
-        return notificationSent;
+        // fetch list of Entrants who elected to be resampled
+        // randomly select one of these entrants
+        // add entrant to list of invited entrants
+
+
+        EntrantRole resampled_entrant = null;
+        return resampled_entrant;
+    }
+
+    // US 02.06.01 As an organizer I want to view a list of all chosen entrants who are invited to apply
+    public ArrayList<EntrantRole> getInvitedEntrants(Event event) {
+        return event.getEntrantsChosen();
+    }
+
+    // US 02.06.02 As an organizer I want to see a list of all the cancelled entrants
+    public ArrayList<EntrantRole> getCancelledEntrants(Event event) {
+        return event.getEntrantsCancelled();
+    }
+
+    // US 02.06.03 As an organizer I want to see a final list of entrants who enrolled for the event
+    public ArrayList<EntrantRole> getEnrolledEntrants(Event event) {
+        return event.getEntrantsEnrolled();
     }
 
     // US 02.06.05 As an organizer I want to cancel entrants that declined signing up for the event
@@ -137,6 +161,32 @@ public class OrganizerRole extends User {
         // in future, cancel entrants that declined signing up for the event
     }
 
+    // US 02.07.01 As an organizer I want to send notifications to all entrants on the waiting list
+    public boolean notifyWaitingEntrants(Event event) {
+        boolean notificationSent = false;
+
+        ArrayList<EntrantRole> entrantsWaiting = event.getEntrantsInWaitingList();
+        // Send notification
+        return notificationSent;
+    }
+
+    // US 02.07.02 As an organizer I want to send notifications to all selected entrants
+    public boolean notifySelectedEntrants(Event event) {
+        boolean notificationSent = false;
+
+        ArrayList<EntrantRole> entrantsChosen = event.getEntrantsChosen();
+        // Send notification
+        return notificationSent;
+    }
+
+    // US 02.07.03 As an organizer I want to send a notification to all canceled entrants
+    public boolean notifyCancelledEntrants(Event event) {
+        boolean notificationSent = false;
+
+        ArrayList<EntrantRole> entrantsCanceled = event.getEntrantsCancelled();
+        // Send notification
+        return notificationSent;
+    }
 
 
 }
