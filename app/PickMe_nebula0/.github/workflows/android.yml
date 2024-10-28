@@ -22,10 +22,10 @@ jobs:
       run: cd 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-      working-directory: .\app\PickMe_nebula0\
+      working-directory: ./app/PickMe_nebula0/
     - name: Build with Gradle
       run: ./gradlew build
-      working-directory: .\app\PickMe_nebula0\
+      working-directory: ./app/PickMe_nebula0/
     - name: Run Unit Tests
       run: ./gradlew test
-      working-directory: .\app\PickMe_nebula0\
+      working-directory: ./app/PickMe_nebula0/
