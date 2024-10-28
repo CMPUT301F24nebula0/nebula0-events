@@ -1,5 +1,6 @@
 package com.example.pickme_nebula0.activities;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,16 +11,13 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.pickme_nebula0.DBManager;
 import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 
+@SuppressLint("CustomSplashScreen")
 public class LaunchActivity extends AppCompatActivity {
-    private FirebaseFirestore db;
+    private DBManager dbManager;
     private boolean returning = false;
 
     String deviceID;
@@ -35,11 +33,9 @@ public class LaunchActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Initialize Firestore and get device ID
-        db = FirebaseFirestore.getInstance();
         deviceID = DeviceManager.getDeviceId(this);
-
-        checkUserRegistration();
+        dbManager = new DBManager();
+        dbManager.checkUserRegistration(deviceID,this::registeredCallback,this::unregisteredCallback);
     }
 
     @Override
@@ -49,34 +45,6 @@ public class LaunchActivity extends AppCompatActivity {
             registeredCallback();
             returning = false;
         }
-    }
-
-    /**
-     * Checks for user with this device ID in the database
-     * If no such user exists, launches UserInfoActivity
-     * If user already exists, launches HomePageActivity
-     */
-    private void checkUserRegistration(){
-
-        DocumentReference docRef = db.collection("User").document(deviceID);
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        String userID = document.getString("userID");
-                        Log.d("Firestore", "UserID: " + userID);
-                        registeredCallback();
-                    } else {
-                        Log.d("Firestore", "No such document");
-                        unregisteredCallback();
-                    }
-                } else {
-                    Log.d("Firestore", "get failed with ", task.getException());
-                }
-            }
-        });
     }
 
     /**
