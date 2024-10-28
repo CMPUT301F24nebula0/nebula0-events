@@ -4,8 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
+<<<<<<< HEAD
 import android.widget.Button;
 import android.view.View;
+=======
+>>>>>>> dbdb4a82d216dd9c6831e20dc8c30a0cd7941cbd
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,12 +20,16 @@ public class HomePageActivity extends AppCompatActivity {
     Button entrantButton;
     Button organizerButton;
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> dbdb4a82d216dd9c6831e20dc8c30a0cd7941cbd
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
+<<<<<<< HEAD
         final Button QRbtn=findViewById(R.id.QRbtn);
         QRbtn.setOnClickListener(new View.OnClickListener() {
                 public void onClick (View view) {
@@ -31,6 +38,8 @@ public class HomePageActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
+=======
+>>>>>>> dbdb4a82d216dd9c6831e20dc8c30a0cd7941cbd
 
         adminButton = findViewById(R.id.adminButton);
         entrantButton = findViewById(R.id.entrantButton);
@@ -71,5 +80,18 @@ public class HomePageActivity extends AppCompatActivity {
     private void navigateToOrganizerHomePage() {
         Intent intent = new Intent(HomePageActivity.this, OrganizerHomeActivity.class);
         startActivity(intent);
+<<<<<<< HEAD
+=======
+
+      final Button  QRbtn=findViewById(R.id.QRbtn);
+      QRbtn.setOnClickListener(new View.OnClickListener() {
+              public void onClick (View view) {
+
+              Intent i = new Intent(HomePageActivity.this, QRcodeActivity.class);
+              startActivity(i);
+          }
+      });
+
+>>>>>>> dbdb4a82d216dd9c6831e20dc8c30a0cd7941cbd
     }
 }

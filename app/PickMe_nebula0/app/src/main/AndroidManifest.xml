@@ -26,10 +26,17 @@
         </activity>
         <activity android:name=".activities.UserInfoActivity"></activity>
         <activity android:name=".activities.HomePageActivity"></activity>
+<<<<<<< HEAD
         <activity android:name=".activities.QRcodeActivity"></activity>
         <activity android:name=".activities.AdminHomeActivity"></activity>
         <activity android:name=".activities.EntrantHomeActivity"></activity>
         <activity android:name=".activities.OrganizerHomeActivity"></activity>
+=======
+        <activity android:name=".activities.AdminHomeActivity"></activity>
+        <activity android:name=".activities.EntrantHomeActivity"></activity>
+        <activity android:name=".activities.OrganizerHomeActivity"></activity>
+        <activity android:name=".activities.QRcodeActivity"></activity>
+>>>>>>> dbdb4a82d216dd9c6831e20dc8c30a0cd7941cbd
     </application>
 
 </manifest>
