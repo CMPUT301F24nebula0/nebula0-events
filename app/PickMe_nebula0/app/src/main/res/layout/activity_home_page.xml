@@ -16,7 +16,6 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-<<<<<<< HEAD
         android:id="@+id/QRbtn"
         android:layout_width="180dp"
         android:layout_height="wrap_content"
@@ -30,8 +29,6 @@
 
 
     <Button
-=======
->>>>>>> dbdb4a82d216dd9c6831e20dc8c30a0cd7941cbd
         android:id="@+id/entrantButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -54,20 +51,5 @@
         android:text="Admin"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-<<<<<<< HEAD
-=======
 
-    <Button
-        android:id="@+id/QRbtn"
-        android:layout_width="180dp"
-        android:layout_height="wrap_content"
-        android:text="scan QRcode"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.558"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
-        app:layout_constraintVertical_bias="0.948" />
-
->>>>>>> dbdb4a82d216dd9c6831e20dc8c30a0cd7941cbd
 </androidx.constraintlayout.widget.ConstraintLayout>
