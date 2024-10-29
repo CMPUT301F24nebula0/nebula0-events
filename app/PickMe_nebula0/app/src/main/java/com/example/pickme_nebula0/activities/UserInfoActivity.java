@@ -1,6 +1,5 @@
 package com.example.pickme_nebula0.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -8,27 +7,14 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.example.pickme_nebula0.DBManager;
 import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.SharedDialogue;
 import com.example.pickme_nebula0.User;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.HashMap;
-import java.util.Map;
-
-// TODO: integrate changes with DB
 // TODO: add profile image LATER
 public class UserInfoActivity extends AppCompatActivity {
     private String deviceID;
@@ -76,8 +62,8 @@ public class UserInfoActivity extends AppCompatActivity {
 
                 String name = nameField.getText().toString();
                 String email = emailField.getText().toString();
-                String phone = phoneField.getText().toString().replaceAll("[^0-9]", "");;
-
+                String phone = phoneField.getText().toString().replaceAll("[^0-9]", "");
+                boolean notifEnabled = enableNotifBox.isChecked();
 
                 String warning = validateUserInfo(name,email,phone);
                 if (!warning.isBlank()){
@@ -86,7 +72,6 @@ public class UserInfoActivity extends AppCompatActivity {
                     return;
                 }
 
-                boolean notifEnabled = enableNotifBox.isEnabled();
                 User u = new User(deviceID,name,email,phone,notifEnabled);
                 dbManager.addUpdateUserProfile(u);
                 finish();
@@ -117,7 +102,7 @@ public class UserInfoActivity extends AppCompatActivity {
         nameField.setText(user.getName());
         emailField.setText(user.getEmail());
         phoneField.setText(user.getPhoneNumber());
-        enableNotifBox.setActivated(user.notifEnabled());
+        enableNotifBox.setChecked(user.notifEnabled());
     }
 
     private void failedToPopulateFieldsFromDB(){
