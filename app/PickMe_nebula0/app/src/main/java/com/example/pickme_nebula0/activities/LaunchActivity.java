@@ -21,8 +21,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class LaunchActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private boolean returning = false;
-
-    String deviceID;
+    private String deviceID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +56,6 @@ public class LaunchActivity extends AppCompatActivity {
      * If user already exists, launches HomePageActivity
      */
     private void checkUserRegistration(){
-
         DocumentReference docRef = db.collection("User").document(deviceID);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override

@@ -27,6 +27,9 @@
         <activity android:name=".activities.UserInfoActivity"></activity>
         <activity android:name=".activities.HomePageActivity"></activity>
         <activity android:name=".activities.QRcodeActivity"></activity>
+        <activity android:name=".activities.AdminHomeActivity"></activity>
+        <activity android:name=".activities.EntrantHomeActivity"></activity>
+        <activity android:name=".activities.OrganizerHomeActivity"></activity>
     </application>
 
 </manifest>
