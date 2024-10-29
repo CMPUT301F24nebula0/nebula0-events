@@ -1,18 +1,10 @@
 *.iml
 .gradle
 .log
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-.idea/
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
 /build
-app/build
 /captures
 .externalNativeBuild
 .cxx
+
+# Local configuration file (sdk path, etc)
 local.properties
