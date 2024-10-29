@@ -14,6 +14,10 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.pickme_nebula0.DBManager;
 import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 @SuppressLint("CustomSplashScreen")
 public class LaunchActivity extends AppCompatActivity {
@@ -47,7 +51,6 @@ public class LaunchActivity extends AppCompatActivity {
     }
 
     /**
-
      * Checks for user with this device ID in the database
      * If no such user exists, launches UserInfoActivity
      * If user already exists, launches HomePageActivity
