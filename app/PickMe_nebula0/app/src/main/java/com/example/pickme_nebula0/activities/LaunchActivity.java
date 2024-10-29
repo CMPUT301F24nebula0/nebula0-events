@@ -19,8 +19,7 @@ import com.example.pickme_nebula0.R;
 public class LaunchActivity extends AppCompatActivity {
     private DBManager dbManager;
     private boolean returning = false;
-
-    String deviceID;
+    private String deviceID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +44,34 @@ public class LaunchActivity extends AppCompatActivity {
             registeredCallback();
             returning = false;
         }
+    }
+
+    /**
+
+     * Checks for user with this device ID in the database
+     * If no such user exists, launches UserInfoActivity
+     * If user already exists, launches HomePageActivity
+     */
+    private void checkUserRegistration(){
+        DocumentReference docRef = db.collection("User").document(deviceID);
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        String userID = document.getString("userID");
+                        Log.d("Firestore", "UserID: " + userID);
+                        registeredCallback();
+                    } else {
+                        Log.d("Firestore", "No such document");
+                        unregisteredCallback();
+                    }
+                } else {
+                    Log.d("Firestore", "get failed with ", task.getException());
+                }
+            }
+        });
     }
 
     /**
