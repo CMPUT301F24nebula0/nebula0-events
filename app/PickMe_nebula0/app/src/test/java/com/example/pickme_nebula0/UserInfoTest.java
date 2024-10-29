@@ -1,6 +1,6 @@
 package com.example.pickme_nebula0;
 
-import com.example.pickme_nebula0.activities.UserInfoActivity;
+import com.example.pickme_nebula0.user.activities.UserInfoActivity;
 
 import org.junit.Test;
 
