@@ -17,11 +17,21 @@ public class HomePageActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
+
         final Button  QRbtn=findViewById(R.id.QRbtn);
         QRbtn.setOnClickListener(new View.OnClickListener() {
                 public void onClick (View view) {
 
                 Intent i = new Intent(HomePageActivity.this, QRcodeActivity.class);
+                startActivity(i);
+            }
+        });
+
+        final Button profileBtn = findViewById(R.id.profile_button);
+        profileBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(HomePageActivity.this,UserInfoActivity.class);
                 startActivity(i);
             }
         });

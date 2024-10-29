@@ -14,9 +14,11 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.pickme_nebula0.DBManager;
 import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.SharedDialogue;
+import com.example.pickme_nebula0.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
@@ -30,7 +32,7 @@ import java.util.Map;
 // TODO: add profile image LATER
 public class UserInfoActivity extends AppCompatActivity {
     private String deviceID;
-    private FirebaseFirestore db;
+    private DBManager dbManager;
 
     // UI Elements
     TextView headerTextView;
@@ -49,6 +51,7 @@ public class UserInfoActivity extends AppCompatActivity {
 
         boolean newUser = getIntent().getBooleanExtra("newUser",false);
         deviceID = DeviceManager.getDeviceId(this);
+        dbManager = new DBManager();
 
         headerTextView = findViewById(R.id.textViewUserInfoHeader);
         nameField = findViewById(R.id.editTextUserInfoName);
@@ -70,7 +73,7 @@ public class UserInfoActivity extends AppCompatActivity {
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: verify data validity (require Name,Email; verify phone,email format)
+
                 String name = nameField.getText().toString();
                 String email = emailField.getText().toString();
                 String phone = phoneField.getText().toString().replaceAll("[^0-9]", "");;
@@ -84,7 +87,8 @@ public class UserInfoActivity extends AppCompatActivity {
                 }
 
                 boolean notifEnabled = enableNotifBox.isEnabled();
-                createUpdateUser(name,email,phone,notifEnabled);
+                User u = new User(deviceID,name,email,phone,notifEnabled);
+                dbManager.addUpdateUserProfile(u);
                 finish();
             }
         });
@@ -104,41 +108,23 @@ public class UserInfoActivity extends AppCompatActivity {
             facilityButton.setVisibility(View.GONE);
         } else{ // returning users need to see their stored info, read it from DB
             headerTextView.setText(R.string.user_info_header_returning);
-            populateFieldsFromDB();
+            dbManager.getUser(deviceID,this::populateFieldsFromDB,this::failedToPopulateFieldsFromDB);
         }
 
     }
 
-    private void populateFieldsFromDB(){
-        DocumentReference docRef = db.collection("User").document(deviceID);
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        // Show user the data we have about them
-                        try {
-                            nameField.setText(document.getString("name"));
-                            emailField.setText(document.getString("email"));
-                            phoneField.setText(document.getString("phone"));
-                            enableNotifBox.setActivated(document.getBoolean("notificationsEnabled"));
-                        }
-                        catch (Exception e){
-                            System.out.printf("Failded to populate fields for user with deviceID-%s: %s",deviceID,e.getMessage());
-                        }
-                    } else {
-                        // Document does not exist
-                        System.out.printf("Document with deviceID-%s DNE in 'User' collection%n",deviceID);
-                    }
-                } else {
-                    // Failed to get the document
-                    System.out.printf("Failed to get document with deviceID-%s: %s",deviceID, task.getException().getMessage());
-                }
-            }
-        });
+    private void populateFieldsFromDB(User user){
+        nameField.setText(user.getName());
+        emailField.setText(user.getEmail());
+        phoneField.setText(user.getPhoneNumber());
+        enableNotifBox.setActivated(user.notifEnabled());
     }
 
+    private void failedToPopulateFieldsFromDB(){
+        SharedDialogue.showInvalidDataAlert("Fields could not be populated from DB, the data shown may not match what is in the DB",UserInfoActivity.this);
+    }
+
+    // TODO: data valildation should probably be done within the User Class, but this will work for now
     public static String validateUserInfo(String name, String email, String phone){
 
         String warning = "";
@@ -176,35 +162,5 @@ public class UserInfoActivity extends AppCompatActivity {
         return warning;
     }
 
-    private void createUpdateUser(String name, String email, String phone, boolean notifEnabled) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        // Reference to the document
-        DocumentReference docRef = db.collection("User").document(deviceID);
-
-        // Check if the document exists
-        docRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) { // Create or overwrite user info
-                DocumentSnapshot document = task.getResult();
-
-                Map<String, Object> userData = new HashMap<>();
-                userData.put("name", name);
-                userData.put("email", email);
-                userData.put("phone", phone);
-                userData.put("notificationsEnabled",notifEnabled);
-
-                docRef.set(userData)
-                        .addOnSuccessListener(aVoid -> {
-                            System.out.println("Document created/updated successfully.");
-                        })
-                        .addOnFailureListener(e -> {
-                            System.out.println("Error creating document: " + e.getMessage());
-                        });
-            } else {
-                // Failed to check document existence
-                System.out.println("Failed to create/update document: " + task.getException().getMessage());
-            }
-        });
-    }
 
 }

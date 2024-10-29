@@ -9,61 +9,57 @@ import java.util.Arrays;
  */
 public class User {
     protected String userID;
-    protected String firstName;
-    protected String lastName;
+    protected String name;
     protected String email;
     protected String phoneNumber;
     protected String role;
     protected String profilePicture;
+    protected Boolean notifEnabled;
     private final ArrayList<String> roles = new ArrayList<String>(Arrays.asList("admin", "entrant", "organizer"));
 
-    /**
-     * Constructor for User class
-     */
-    public User() {
-        this.userID = null;
-        this.firstName = null;
-        this.lastName = null;
-        this.email = null;
-        this.phoneNumber = null;
-        this.profilePicture = null;
+    public User(){
+
     }
 
     /**
-     * Constructor for User class
+     * Minimum constructor for this class
      *
-     * @param firstName   the first name of the user
-     * @param lastName    the last name of the user
+     * @param deviceID
+     * @param name
+     * @param email
+     */
+    public User(String deviceID, String name, String email) {
+        this.userID = deviceID;
+        this.name = name;
+        this.email = email;
+        this.notifEnabled = true;
+    }
+
+    /**
+     * Additional parameterized constructor
+     *
+     * @param deviceID
      * @param name
      * @param email
      * @param phoneNumber
+     * @param notifEnabled
      */
-    public User(String firstName, String lastName, String name, String email, String phoneNumber) {
-        this.userID = null;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = null;
-        this.phoneNumber = null;
-        this.profilePicture = null;
+    public User(String deviceID, String name, String email, String phoneNumber ,Boolean notifEnabled) {
+        this.userID = deviceID;
+        this.name = name;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.notifEnabled = notifEnabled;
     }
 
-    /**
-     * Constructor for User class
-     * @param   userID          the userID of the user
-     * @param   firstName       the first name of the user
-     * @param   lastName        the last name of the user
-     * @param   email           the email of the user
-     * @param   phoneNumber     the phone number of the user
-     * @param   profilePicture  the profile picture of the user
-     */
-    public User(String userID, String firstName, String lastName, String email, String phoneNumber, String profilePicture) {
-        this.userID = userID;
-        this.firstName = firstName;
-        this.lastName = lastName;
+    public User(String deviceID, String name, String email, String phoneNumber ,String profilePicture) {
+        this.userID = deviceID;
+        this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.profilePicture = profilePicture;
     }
+
 
     /**
      * Returns the user ID
@@ -72,6 +68,10 @@ public class User {
      */
     public String getUserID() {
         return this.userID;
+    }
+
+    public Boolean notifEnabled(){
+        return notifEnabled;
     }
 
     /**
@@ -88,8 +88,8 @@ public class User {
      *
      * @return  firstName  the first name of the user
      */
-    public String getFirstName() {
-        return this.firstName;
+    public String getName() {
+        return this.name;
     }
 
     /**
@@ -97,26 +97,8 @@ public class User {
      *
      * @param  firstName  the first name of the user
      */
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    /**
-     * Returns the last name of the user
-     *
-     * @return  lastName  the last name of the user
-     */
-    public String getLastName() {
-        return this.lastName;
-    }
-
-    /**
-     * Sets the last name of the user
-     *
-     * @param  lastName  the last name of the user
-     */
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setName(String firstName) {
+        this.name = name;
     }
 
     /**

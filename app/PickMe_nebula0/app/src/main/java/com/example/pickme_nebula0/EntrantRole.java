@@ -14,9 +14,9 @@ public class EntrantRole extends User {
     /**
      * Constructor
      */
-    public EntrantRole(String userID, String firstName, String lastName, String email, String phoneNumber, String profilePicture) {
+    public EntrantRole(String userID, String name, String email, String phoneNumber, String profilePicture) {
         // Call the superclass constructor (User) with parameters
-        super(userID, firstName, lastName, email, phoneNumber, profilePicture);
+        super(userID, name, email, phoneNumber, profilePicture);
         this.entrantID = null; // Initialize entrantID as null or another value
     }
 
@@ -55,7 +55,7 @@ public class EntrantRole extends User {
     // US 01.03.03 As an entrant I want my profile picture to be deterministically generated from my profile name if I haven't uploaded a profile image yet.
     public String generateProfilePicture() {
         // in future, generate a profile picture for the user based on profile name
-        String initial = this.firstName.charAt(0) + "" + this.lastName.charAt(0);
+        String initial = this.name.charAt(0) + "";
         initial = initial.toUpperCase();
 
         // in future, return the generated profile picture
