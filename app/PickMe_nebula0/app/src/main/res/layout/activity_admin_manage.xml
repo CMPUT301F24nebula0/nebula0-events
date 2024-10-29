@@ -128,7 +128,10 @@
                         android:id="@+id/eventListView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:divider="@android:color/darker_gray"
+                        android:textColor="#000000"
+
+                        android:background="#FFFFFF"
+                        android:divider="@color/black"
                         android:dividerHeight="1dp" />
 
                     <!-- Search Bar for filtering events -->
