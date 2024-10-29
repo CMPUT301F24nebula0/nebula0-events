@@ -35,6 +35,8 @@ android {
 
 dependencies {
     // Import the Firebase BoM
+    testImplementation ("org.robolectric:robolectric:4.7.3") // Use the latest version available
+
     implementation(platform("com.google.firebase:firebase-bom:32.7.1"))
     implementation("com.google.firebase:firebase-firestore")
     implementation(libs.appcompat)

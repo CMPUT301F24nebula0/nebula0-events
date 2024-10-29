@@ -123,8 +123,17 @@ public class AdminRole extends User {
     // US 03.07.01 As an administrator I want to remove facilities that violate app policy
     public void removeFacility(Facility facility) {
         // update firebase to remove facility from db
+
         // remove facility from organizer who owns it
-        // should be possible for an organizer to have no facility
+        if(facility != null && facilitiesList.contains(facility)){
+            facilitiesList.remove(facility);
+            facilityAdapter.notifyDataSetChanged(); // Update UI if using an adapter
+        }else {
+            // handle the case where the facility does not exist
+            // should be possible for an organizer to have no facility
+        }
+
+
 
     }
 
@@ -176,7 +185,7 @@ public class AdminRole extends User {
 
 
     //US 03.07.01 As an administrator I want to remove facilities that violate app policy
-    public void removeFacility() {
+    public void DisplayFacility() {
         // in future, remove facility
         if(!facilitiesList.isEmpty()){
             for(Facility facility : facilitiesList){
