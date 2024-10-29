@@ -22,15 +22,6 @@ public class HomePageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
 
-        final Button QRbtn=findViewById(R.id.QRbtn);
-        QRbtn.setOnClickListener(new View.OnClickListener() {
-                public void onClick (View view) {
-
-                Intent i = new Intent(HomePageActivity.this, QRcodeActivity.class);
-                startActivity(i);
-            }
-        });
-
 
         final Button profileBtn = findViewById(R.id.profile_button);
         profileBtn.setOnClickListener(new View.OnClickListener() {
