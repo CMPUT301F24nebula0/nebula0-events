@@ -1,3 +1,9 @@
 # Default ignored files
 /shelf/
 /workspace.xml
+
+# IntelliJ/Android Studio IDE settings
+*.iml
+misc.xml
+deploymentTargetDropDown.xml
+render.experimental.xml
