@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
@@ -17,28 +18,32 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 public class OrganizerHomeActivity extends AppCompatActivity {
-    Button createEventButton;
 
-    private ViewPager2 viewPager;
-    private FragmentStateAdapter pagerAdapter;
-    private TabLayout tabLayout;
-    private String[] tabTitles = new String[]{"Past", "Ongoing"};
+    // tabs
+    private final String[] tabTitles = new String[]{"Past", "Ongoing"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // attach screen layout xml file
         setContentView(R.layout.activity_organizer_home);
 
-        viewPager = findViewById(R.id.view_pager);
-        pagerAdapter = new ScreensSlidePagerAdapter(this);
+        // binding elements
+        ViewPager2 viewPager = findViewById(R.id.view_pager);
+        TabLayout tabLayout = findViewById(R.id.tab_layout);
+        FragmentStateAdapter pagerAdapter = new ScreensSlidePagerAdapter(this);
+        final Button backButton = findViewById(R.id.backButton);
+        final Button createEventButton = findViewById(R.id.createEventButton);
+
         viewPager.setAdapter(pagerAdapter);
 
-        tabLayout = findViewById(R.id.tab_layout);
+        // Initialize TabLayout and link it with ViewPager2
         new TabLayoutMediator(tabLayout, viewPager,
                 (tab, position) -> tab.setText(tabTitles[position])
         ).attach();
 
-        final Button backButton = findViewById(R.id.backButton);
+        // back button
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -46,46 +51,41 @@ public class OrganizerHomeActivity extends AppCompatActivity {
             }
         });
 
-        createEventButton = findViewById(R.id.createEventButton);
+        // once create event button pressed
+        createEventButton.setOnClickListener(view -> navigateTo(OrganizerCreateEventActivity.class));
 
-        createEventButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) { navigateToCreateEventPage(); }
-        });
-
+        // to keep track of which tab is selected
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
-                if (position == 0) {
-                    createEventButton.setVisibility(View.GONE);
-                } else {
-                    createEventButton.setVisibility(View.VISIBLE);
-                }
+                // if "Past" selected
+                if (position == 0) { createEventButton.setVisibility(View.GONE); }
+                // if "Ongoing" selected
+                else { createEventButton.setVisibility(View.VISIBLE); }
             }
         });
     }
 
-    private void navigateToCreateEventPage() {
-        Intent intent = new Intent(OrganizerHomeActivity.this, OrganizerCreateEventActivity.class);
+    // function for switching screens through intent
+    private void navigateTo(Class<?> targetActivity) {
+        Intent intent = new Intent(OrganizerHomeActivity.this, targetActivity);
         startActivity(intent);
     }
 
+    // Adapter for ViewPager2
     private class ScreensSlidePagerAdapter extends FragmentStateAdapter {
         public ScreensSlidePagerAdapter(AppCompatActivity fa) {
             super(fa);
         }
 
+        @NonNull
         @Override
         public Fragment createFragment(int position) {
-            switch (position) {
-                case 0:
-                    return new OrganizerPastFragment();
-                case 1:
-                    return new OrganizerOngoingFragment();
-                default:
-                    return new OrganizerPastFragment();
-            }
+            // past tab selected
+            if (position == 0) { return new OrganizerPastFragment(); }
+            // ongoing tab selected
+            else { return new OrganizerOngoingFragment(); }
         }
 
         @Override

@@ -12,8 +12,11 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // attach screen layout xml file
         setContentView(R.layout.activity_organizer_create_event);
 
+        // back button
         final Button backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override

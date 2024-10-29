@@ -1,4 +1,4 @@
-package com.example.pickme_nebula0.activities;
+package com.example.pickme_nebula0.start.activities;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
