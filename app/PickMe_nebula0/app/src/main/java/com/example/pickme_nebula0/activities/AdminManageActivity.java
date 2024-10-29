@@ -35,6 +35,7 @@ public class AdminManageActivity extends AppCompatActivity {
         btnManageImages = findViewById(R.id.manage_image);
         btnManageFacilities = findViewById(R.id.manage_facilities);
         btnManageQR = findViewById(R.id.manage_qr_code);
+
         btnManageEvents.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -119,17 +119,31 @@
                 android:padding="16dp">
                 <!-- Content for Manage Events -->
                 <LinearLayout
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                    <!-- Add content for Manage Events here -->
-                    <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Event"
-                    android:textSize="24sp">
-                        </TextView>
+                    android:layout_height="wrap_content">
 
+                    <!-- ListView to display events -->
+                    <ListView
+                        android:id="@+id/eventListView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="#000000"
+
+                        android:background="#FFFFFF"
+                        android:divider="@color/black"
+                        android:dividerHeight="1dp" />
+
+                    <!-- Search Bar for filtering events -->
+                    <EditText
+                        android:id="@+id/searchEvents"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/white"
+                        android:drawableStart="@android:drawable/ic_menu_search"
+                        android:hint="Search Events"
+                        android:padding="10dp"
+                        android:textColor="@android:color/black" />
 
 
                 </LinearLayout>
@@ -143,11 +157,30 @@
                 android:padding="16dp">
                 <!-- Content for Manage Profile -->
                 <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                <!-- ListView to display events -->
+                <ListView
+                    android:id="@+id/ProfileListView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                    <!-- Add your content for Manage Profile here -->
+                    android:divider="@android:color/darker_gray"
+                    android:dividerHeight="1dp" />
+
+                <!-- Search Bar for filtering events -->
+                <EditText
+                    android:id="@+id/BrowseProfiles"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Search Profiles"
+                    android:padding="10dp"
+                    android:background="@android:color/white"
+                    android:textColor="@android:color/black"
+                    android:drawableStart="@android:drawable/ic_menu_search" />
                 </LinearLayout>
+
             </ScrollView>
 
             <!-- Manage Image Layout -->
@@ -158,10 +191,28 @@
                 android:padding="16dp">
                 <!-- Content for Manage Image -->
                 <LinearLayout
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                    <!-- Add your content for Manage Image here -->
+                    android:layout_height="wrap_content">
+
+                    <!-- ListView to display events -->
+                    <ListView
+                        android:id="@+id/ImageListView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:divider="@android:color/darker_gray"
+                        android:dividerHeight="1dp" />
+
+                    <!-- Search Bar for filtering events -->
+                    <EditText
+                        android:id="@+id/BrowseImages"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Search image"
+                        android:padding="10dp"
+                        android:background="@android:color/white"
+                        android:textColor="@android:color/black"
+                        android:drawableStart="@android:drawable/ic_menu_search" />
                 </LinearLayout>
             </ScrollView>
 
@@ -173,18 +224,28 @@
                 android:padding="16dp">
                 <!-- Content for Manage QR Code -->
                 <LinearLayout
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                    <!-- Add  content for Manage QR Code here -->
-                    <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="QR Code"
-                    android:textSize="24sp">
+                    android:layout_height="wrap_content">
 
-                    </TextView>
+                    <!-- ListView to display events -->
+                    <ListView
+                        android:id="@+id/QRcodeListView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:divider="@android:color/darker_gray"
+                        android:dividerHeight="1dp" />
 
+                    <!-- Search Bar for filtering events -->
+                    <EditText
+                        android:id="@+id/BrowseQRcodes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Search Hash data"
+                        android:padding="10dp"
+                        android:background="@android:color/white"
+                        android:textColor="@android:color/black"
+                        android:drawableStart="@android:drawable/ic_menu_search" />
                 </LinearLayout>
             </ScrollView>
 
@@ -196,11 +257,28 @@
                 android:padding="16dp">
                 <!-- Content for Manage Facilities -->
                 <LinearLayout
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                    <!-- Add content for Manage Facilities here -->
+                    android:layout_height="wrap_content">
 
+                    <!-- ListView to display events -->
+                    <ListView
+                        android:id="@+id/facilitiesListView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:divider="@android:color/darker_gray"
+                        android:dividerHeight="1dp" />
+
+                    <!-- Search Bar for filtering events -->
+                    <EditText
+                        android:id="@+id/Browsefacilities"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Search facilities"
+                        android:padding="10dp"
+                        android:background="@android:color/white"
+                        android:textColor="@android:color/black"
+                        android:drawableStart="@android:drawable/ic_menu_search" />
                 </LinearLayout>
             </ScrollView>
 
