@@ -17,6 +17,7 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 public class OrganizerHomeActivity extends AppCompatActivity {
+    Button createEventButton;
 
     private ViewPager2 viewPager;
     private FragmentStateAdapter pagerAdapter;
@@ -44,6 +45,30 @@ public class OrganizerHomeActivity extends AppCompatActivity {
                 getOnBackPressedDispatcher().onBackPressed();
             }
         });
+
+        createEventButton = findViewById(R.id.createEventButton);
+
+        createEventButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) { navigateToCreateEventPage(); }
+        });
+
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                if (position == 0) {
+                    createEventButton.setVisibility(View.GONE);
+                } else {
+                    createEventButton.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+    }
+
+    private void navigateToCreateEventPage() {
+        Intent intent = new Intent(OrganizerHomeActivity.this, OrganizerCreateEventActivity.class);
+        startActivity(intent);
     }
 
     private class ScreensSlidePagerAdapter extends FragmentStateAdapter {

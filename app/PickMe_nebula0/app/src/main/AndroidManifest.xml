@@ -30,6 +30,7 @@
         <activity android:name=".admin.activities.AdminHomeActivity"></activity>
         <activity android:name=".entrant.activities.EntrantHomeActivity"></activity>
         <activity android:name=".organizer.activities.OrganizerHomeActivity"></activity>
+        <activity android:name=".organizer.activities.OrganizerCreateEventActivity"></activity>
 
     </application>
 
