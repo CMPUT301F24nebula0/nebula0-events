@@ -1,6 +1,10 @@
-package com.example.pickme_nebula0;
+package com.example.pickme_nebula0.admin;
 
 import android.widget.ArrayAdapter;
+
+import com.example.pickme_nebula0.event.Event;
+import com.example.pickme_nebula0.facility.Facility;
+import com.example.pickme_nebula0.user.User;
 
 import java.util.ArrayList;
 

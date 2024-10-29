@@ -1,7 +1,8 @@
-package com.example.pickme_nebula0;
+package com.example.pickme_nebula0.db;
 
 import android.util.Log;
 
+import com.example.pickme_nebula0.user.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;

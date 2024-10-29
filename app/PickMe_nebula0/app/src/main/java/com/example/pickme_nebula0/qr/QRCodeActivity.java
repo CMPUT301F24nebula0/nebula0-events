@@ -1,10 +1,8 @@
-package com.example.pickme_nebula0.activities;
-import android.app.Activity;
+package com.example.pickme_nebula0.qr;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -16,7 +14,7 @@ import com.example.pickme_nebula0.R;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
-public class QRcodeActivity extends AppCompatActivity {
+public class QRCodeActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_CAMERA = 1;
 
     Button homebtn;
@@ -27,7 +25,7 @@ public class QRcodeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         active = true;
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.qrcodeactivity);
+        setContentView(R.layout.activity_qr_code);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSION_REQUEST_CAMERA);

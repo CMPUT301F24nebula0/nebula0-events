@@ -1,4 +1,6 @@
-package com.example.pickme_nebula0;
+package com.example.pickme_nebula0.event;
+
+import com.example.pickme_nebula0.entrant.EntrantRole;
 
 import java.util.ArrayList;
 

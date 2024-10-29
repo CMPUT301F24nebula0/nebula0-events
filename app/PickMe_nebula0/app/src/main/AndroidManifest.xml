@@ -24,12 +24,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.UserInfoActivity"></activity>
+        <activity android:name=".user.activities.UserInfoActivity"></activity>
         <activity android:name=".activities.HomePageActivity"></activity>
-        <activity android:name=".activities.QRcodeActivity"></activity>
-        <activity android:name=".activities.AdminHomeActivity"></activity>
-        <activity android:name=".activities.EntrantHomeActivity"></activity>
-        <activity android:name=".activities.OrganizerHomeActivity"></activity>
+        <activity android:name=".qr.QRCodeActivity"></activity>
+        <activity android:name=".admin.activities.AdminHomeActivity"></activity>
+        <activity android:name=".entrant.activities.EntrantHomeActivity"></activity>
+        <activity android:name=".organizer.activities.OrganizerHomeActivity"></activity>
+
     </application>
 
 </manifest>

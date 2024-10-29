@@ -1,4 +1,4 @@
-package com.example.pickme_nebula0;
+package com.example.pickme_nebula0.user;
 
 import java.util.ArrayList;
 import java.util.Arrays;

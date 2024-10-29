@@ -1,4 +1,8 @@
-package com.example.pickme_nebula0;
+package com.example.pickme_nebula0.organizer;
+
+import com.example.pickme_nebula0.entrant.EntrantRole;
+import com.example.pickme_nebula0.event.Event;
+import com.example.pickme_nebula0.user.User;
 
 import java.util.ArrayList;
 /**
@@ -157,7 +161,7 @@ public class OrganizerRole extends User {
     // US 02.06.05 As an organizer I want to cancel entrants that declined signing up for the event
     public void cancelEntrants(Event event, EntrantRole entrant) {
         // add error checking
-        event.entrantsChosen.remove(entrant);
+        event.getEntrantsChosen().remove(entrant);
         // in future, cancel entrants that declined signing up for the event
     }
 

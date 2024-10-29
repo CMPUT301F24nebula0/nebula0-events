@@ -1,4 +1,4 @@
-package com.example.pickme_nebula0.activities;
+package com.example.pickme_nebula0.user.activities;
 
 import android.os.Bundle;
 import android.view.View;
@@ -9,11 +9,11 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.pickme_nebula0.DBManager;
+import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.SharedDialogue;
-import com.example.pickme_nebula0.User;
+import com.example.pickme_nebula0.user.User;
 
 // TODO: add profile image LATER
 public class UserInfoActivity extends AppCompatActivity {

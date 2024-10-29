@@ -3,14 +3,15 @@ package com.example.pickme_nebula0.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.pickme_nebula0.R;
+import com.example.pickme_nebula0.admin.activities.AdminHomeActivity;
+import com.example.pickme_nebula0.entrant.activities.EntrantHomeActivity;
+import com.example.pickme_nebula0.organizer.activities.OrganizerHomeActivity;
+import com.example.pickme_nebula0.user.activities.UserInfoActivity;
 
 public class HomePageActivity extends AppCompatActivity {
     Button adminButton;
@@ -27,7 +28,7 @@ public class HomePageActivity extends AppCompatActivity {
         profileBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(HomePageActivity.this,UserInfoActivity.class);
+                Intent i = new Intent(HomePageActivity.this, UserInfoActivity.class);
                 startActivity(i);
             }
         });

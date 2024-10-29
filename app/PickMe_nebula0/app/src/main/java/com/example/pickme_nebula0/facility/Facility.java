@@ -1,5 +1,7 @@
-package com.example.pickme_nebula0;
+package com.example.pickme_nebula0.facility;
 
+
+import com.example.pickme_nebula0.event.Event;
 
 import java.util.ArrayList;
 
