@@ -98,11 +98,12 @@ public class UserInfoActivity extends AppCompatActivity {
 
     }
 
-    private void populateFieldsFromDB(User user){
-        nameField.setText(user.getName());
-        emailField.setText(user.getEmail());
-        phoneField.setText(user.getPhoneNumber());
-        enableNotifBox.setChecked(user.notifEnabled());
+    private void populateFieldsFromDB(Object user){
+        User castedUser = (User) user;
+        nameField.setText(castedUser.getName());
+        emailField.setText(castedUser.getEmail());
+        phoneField.setText(castedUser.getPhoneNumber());
+        enableNotifBox.setChecked(castedUser.notifEnabled());
     }
 
     private void failedToPopulateFieldsFromDB(){

@@ -27,8 +27,12 @@ public class DBManager {
         void run();  // Define the method to be used as a callback
     }
 
-    public interface User2VoidCallback {
-        void run(User u);
+    public interface Obj2VoidCallback {
+        void run(Object u);
+    }
+
+    public interface DocumentConverter {
+        Object convert(DocumentSnapshot doc);
     }
 
 
@@ -54,16 +58,9 @@ public class DBManager {
         addUpdateDocument(usersCollection,user.getUserID(),userData);
     }
 
-    /**
-     * Performs onSuccessCallback() on User profile if successfully retrieved, else performs onFailureCallback
-     *
-     * @param deviceID          deviceID of user of interest (key for db)
-     * @param onSuccessCallback action performed on user if their profile is found in database
-     * @param onFailureCallback action performed if user not found in database
-     */
-    public void getUser(String deviceID, User2VoidCallback onSuccessCallback, Void2VoidCallback onFailureCallback) {
-        DocumentReference docRef = db.collection("User").document(deviceID);
-        String operationDescription = String.format("getUser for [%s]", deviceID);
+    private void getDocumentAsObject(String collectionName, String documentID, DocumentConverter documentConverter, Obj2VoidCallback onSuccessCallback, Void2VoidCallback onFailureCallback){
+        DocumentReference docRef = db.collection(collectionName).document(documentID);
+        String operationDescription = String.format("getDocumentAsObject for [%s,%s]", collectionName, documentID);
 
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -73,24 +70,18 @@ public class DBManager {
                     String name, email, phone;
                     Boolean notifEnabled;
                     if (document.exists()) {
-                        Log.d("Firestore", operationDescription + " succeeded - user FOUND");
-                        // TODO: create User Object with fields from DB
+                        Object objToReturn;
                         try {
-                            name = document.getString("name");
-                            email = document.getString("email");
-                            phone = document.getString("phone");
-                            notifEnabled = document.getBoolean("notificationsEnabled");
-                            // TODO: add get profile picture URL
+                            objToReturn = documentConverter.convert(document);
                         } catch (Exception e) {
-                            Log.d("Firestore", operationDescription + " failed - user found, failed to extract required fields with error: " + e.getMessage());
+                            Log.d("Firestore", operationDescription + " failed - document found but failed to extract required fields with error: " + e.getMessage());
                             return;
                         }
-
-                        User userToReturn = new User(deviceID, name, email, phone, notifEnabled);
-                        onSuccessCallback.run(userToReturn);
+                        Log.d("Firestore", operationDescription + " succeeded");
+                        onSuccessCallback.run(objToReturn);
                     } else {
                         // Document does not exist
-                        Log.d("Firestore", operationDescription + " failed - user NOT FOUND");
+                        Log.d("Firestore", operationDescription + " failed - document does not exist");
                         onFailureCallback.run();
                     }
                 } else {
@@ -100,6 +91,26 @@ public class DBManager {
                 }
             }
         });
+    }
+
+    public Object userConverter(DocumentSnapshot document){
+        String name = document.getString("name");
+        String email = document.getString("email");
+        String phone = document.getString("phone");
+        Boolean notifEnabled = document.getBoolean("notificationsEnabled");
+
+        return new User(document.getId(), name, email, phone, notifEnabled);
+    }
+
+    /**
+     * Performs onSuccessCallback() on User profile if successfully retrieved, else performs onFailureCallback
+     *
+     * @param deviceID          deviceID of user of interest (key for db)
+     * @param onSuccessCallback action performed on user if their profile is found in database
+     * @param onFailureCallback action performed if user not found in database
+     */
+    public void getUser(String deviceID, Obj2VoidCallback onSuccessCallback, Void2VoidCallback onFailureCallback) {
+        getDocumentAsObject(usersCollection,deviceID,this::userConverter,onSuccessCallback,onFailureCallback);
     }
 
     // -------------------- / Users \ ---------------------------
@@ -116,7 +127,20 @@ public class DBManager {
     }
 
     public  void updateEvent(Event event){
+        // For every field in database, update with event.getField(),
+        // Can probably amalgamate add and update
+    }
 
+    public void getEvent(String eventID,Obj2VoidCallback onSuccessCallback, Void2VoidCallback onFailureCallback){
+
+    }
+
+    public void deleteEvent(Event event){
+        // Remove Event from all users
+
+        // Remove Event from organizer
+
+        // Remove Event from Events
     }
     // -------------------- / Events \ ---------------------------
 
