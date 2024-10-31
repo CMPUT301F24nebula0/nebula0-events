@@ -1,5 +1,6 @@
 package com.example.pickme_nebula0.event;
 
+import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.entrant.EntrantRole;
 
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
  */
 public class Event {
     private String eventID;
+    private DBManager dbManager;
     // -1 means no waiting list capacity limit
     protected int waitingListCapacity = -1;
     protected int eventCapacity = -1;
@@ -23,7 +25,8 @@ public class Event {
      * Constructor
      */
     public Event() {
-        eventID = null;
+        dbManager = new DBManager();
+        eventID = dbManager.createIDForDocumentIn(dbManager.eventsCollection);
     }
 
     /**
@@ -34,13 +37,6 @@ public class Event {
         return this.eventID;
     }
 
-    /**
-     * Set eventID
-     * @param eventID eventID
-     */
-    public void setEventID(String eventID) {
-        this.eventID = eventID;
-    }
 
     /**
      * Get Waiting List Capacity

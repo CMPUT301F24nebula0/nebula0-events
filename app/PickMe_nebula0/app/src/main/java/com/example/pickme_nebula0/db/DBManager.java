@@ -14,6 +14,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DBManager {
+    public String usersCollection = "Users";
+    public String eventsCollection = "Events";
+
     private FirebaseFirestore db;
 
     public DBManager() {
@@ -29,13 +32,14 @@ public class DBManager {
     }
 
 
+// -------------------- \ Users / ---------------------------
     /**
      * Checks for user with this device ID in the database
      * If no such user exists, launches UserInfoActivity
      * If user already exists, launches HomePageActivity
      */
     public void checkUserRegistration(String deviceID, Void2VoidCallback registeredCallback, Void2VoidCallback unregisteredVoid2VoidCallback) {
-        checkExistenceOfDocument("User", deviceID, registeredCallback, unregisteredVoid2VoidCallback);
+        checkExistenceOfDocument(usersCollection, deviceID, registeredCallback, unregisteredVoid2VoidCallback);
     }
 
     public void addUpdateUserProfile(User user) {
@@ -45,9 +49,9 @@ public class DBManager {
         userData.put("phone", user.getPhoneNumber());
         userData.put("profilePic", user.getProfilePicture());
         userData.put("notificationsEnabled", user.notifEnabled());
-        // TODO need to do this with events lists and facility profile too
+        // TODO need to do this with events lists and facility profile too - may be better to split addUserProfile and update user profile into two functions
 
-        addUpdateDocument("User",user.getUserID(),userData);
+        addUpdateDocument(usersCollection,user.getUserID(),userData);
     }
 
     /**
@@ -98,6 +102,24 @@ public class DBManager {
         });
     }
 
+    // -------------------- / Users \ ---------------------------
+
+    // -------------------- \ Events / ---------------------------
+    public void addEvent(Event event){
+         // Populate fields with data from object
+        Map<String, Object> eventData = new HashMap<>();
+        //eventData.put("organizerID",event.getOrgID());
+        // TODO - populate remaining fields
+
+        // Create document
+        addUpdateDocument(eventsCollection,event.getEventID(),eventData);
+    }
+
+    public  void updateEvent(Event event){
+
+    }
+    // -------------------- / Events \ ---------------------------
+
     private void checkExistenceOfDocument(String collectionName, String documentID, Void2VoidCallback foundCallback, Void2VoidCallback unfoundCallback) {
         DocumentReference docRef = db.collection(collectionName).document(documentID);
         String operationDescription = String.format("checkExistenceOfDocument for [%s,%s]", collectionName, documentID);
@@ -144,4 +166,7 @@ public class DBManager {
         });
     }
 
+    public String createIDForDocumentIn(String collectionName){
+        return FirebaseFirestore.getInstance().collection(collectionName).document().getId();
+    }
 }
