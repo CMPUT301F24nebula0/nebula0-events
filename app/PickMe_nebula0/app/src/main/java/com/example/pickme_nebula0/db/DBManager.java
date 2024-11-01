@@ -2,20 +2,37 @@ package com.example.pickme_nebula0.db;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.example.pickme_nebula0.event.Event;
 import com.example.pickme_nebula0.user.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class DBManager {
     public String usersCollection = "Users";
     public String eventsCollection = "Events";
+    public String eventRegistrantsCollection = "EventRegistrants";
+    public String registeredEventsCollection = "registeredEvents";
+    public String organizerEventsCollection = "organizerEvents";
+
+    public enum registrantStatus{
+        WAITLISTED, SELECTED, CONFIRMED, CANCELED
+    }
+    // Waitlisted (user is registered but has not "won the lottery"
+    // Selected (user has "won the lottery" but has not accepted the invite
+    // Confirmed (user has "won the lottery" and has accepted the invite
+    // Canceled (user "won the lottery" but took too long to accept, got canceled by organizer
 
     private FirebaseFirestore db;
 
@@ -34,6 +51,10 @@ public class DBManager {
 
     public interface DocumentConverter {
         Object convert(DocumentSnapshot doc);
+    }
+
+    public interface ForEachDocumentCallback {
+        void process(QueryDocumentSnapshot queryDocumentSnapshot);
     }
 // ------------- / Function Interfaces \ -----------------------------------------------------------
 
@@ -85,9 +106,9 @@ public class DBManager {
 
 // -------------------- \ Events / -----------------------------------------------------------------
     public void addEvent(Event event){
-         // Populate fields with data from object
+        // Populate fields with data from object
         Map<String, Object> eventData = new HashMap<>();
-        //eventData.put("organizerID",event.getOrgID());
+        eventData.put("organizerID",event.getOrganizerID());
         // TODO - populate remaining fields
 
         // Create document
@@ -97,20 +118,35 @@ public class DBManager {
     public  void updateEvent(Event event){
         // For every field in database, update with event.getField(),
         // Can probably amalgamate add and update
+        throw new RuntimeException("NOT IMPLEMENTED");
     }
 
     public void getEvent(String eventID,Obj2VoidCallback onSuccessCallback,
                          Void2VoidCallback onFailureCallback){
-
+        throw new RuntimeException("NOT IMPLEMENTED");
     }
 
     public void deleteEvent(Event event){
-        // Remove Event from all users
+        // Remove Event from all users who signed up
+        DocumentReference eventDoc = db.collection(eventsCollection).document(event.getEventID());
+        CollectionReference collectionOfEventRegistrants = eventDoc.collection(eventRegistrantsCollection);
+        iterateOverCollection(collectionOfEventRegistrants, this::removeEventFromRegistrant);
 
         // Remove Event from organizer
+        String orgID = event.getOrganizerID();
+        removeDocument(db.collection(usersCollection).document(orgID).collection(organizerEventsCollection).document(event.getEventID()));
 
         // Remove Event from Events
+        removeDocument(eventDoc);
     }
+
+    private void removeEventFromRegistrant(DocumentSnapshot eventRegistrantDoc){
+        String registrantID = eventRegistrantDoc.getId();
+        String eventID = eventRegistrantDoc.getReference().getParent().getId();
+
+        removeDocument(db.collection(usersCollection).document(registrantID).collection(registeredEventsCollection).document(eventID));
+    }
+
 // -------------------- / Events \ -----------------------------------------------------------------
 
 
@@ -177,11 +213,9 @@ public class DBManager {
 
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
-            public void onComplete(Task<DocumentSnapshot> task) {
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
-                    String name, email, phone;
-                    Boolean notifEnabled;
                     if (document.exists()) {
                         Object objToReturn;
                         try {
@@ -205,5 +239,39 @@ public class DBManager {
             }
         });
     }
+
+    private void iterateOverCollection(CollectionReference collectionRef, ForEachDocumentCallback forEachDocumentCallback){
+        String operationDescription = String.format("iterateOverCollection [%s]", collectionRef.getId());
+        collectionRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        forEachDocumentCallback.process(document);
+                    }
+                } else {
+                    Log.d("Firestore", operationDescription + " failed - "+task.getException());
+
+                }
+            }
+        });
+    }
+
+    private void removeDocument(DocumentReference doc){
+        String operationDescription = String.format("removeDocument [C-%s, D-%s]",doc.getParent().getId(), doc.getId());
+
+        doc.delete()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d("Firestore", operationDescription + " succeeded");
+                        } else {
+                            Log.d("Firestore", operationDescription + " failed: " + task.getException());
+                        }
+                    }
+                });
+    }
+
 // ----------------- \ Abstracted Helpers / --------------------------------------------------------
 }

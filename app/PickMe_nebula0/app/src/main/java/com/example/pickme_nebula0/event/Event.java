@@ -11,6 +11,7 @@ import java.util.ArrayList;
 public class Event {
     private String eventID;
     private DBManager dbManager;
+    private String organizerID;
     // -1 means no waiting list capacity limit
     protected int waitingListCapacity = -1;
     protected int eventCapacity = -1;
@@ -27,6 +28,7 @@ public class Event {
     public Event() {
         dbManager = new DBManager();
         eventID = dbManager.createIDForDocumentIn(dbManager.eventsCollection);
+        // TODO - add parameterized constructor, remember you must get the organizer's id (thier device id)
     }
 
     /**
@@ -53,6 +55,8 @@ public class Event {
     public void setWaitingListCapacity(int waitingListCapacity) {
         this.waitingListCapacity = waitingListCapacity;
     }
+
+    public String getOrganizerID() {return organizerID;}
 
     public String getEventPoster() {
         return this.eventPoster;
