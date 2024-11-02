@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.type.DateTime;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -35,7 +36,6 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         setContentView(R.layout.activity_organizer_create_event);
 
         // Components on screen
-        final Button backButton = findViewById(R.id.backButton);
         EditText eventNameField = findViewById(R.id.event_name_field);
         EditText eventDescriptionField = findViewById(R.id.event_description_field);
         eventDateField = findViewById(R.id.event_date_field);
@@ -55,6 +55,15 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         eventDateField.setFocusable(false);
         eventDateField.setOnClickListener(v -> showDatePickerDialog());
 
+        geolocationRequirementSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                geolocationRequirementField.setEnabled(true);
+            } else {
+                geolocationRequirementField.setEnabled(false);
+                geolocationRequirementField.setText("");
+            }
+        });
+
         // Waitlist Capacity Switch Logic
         waitlistCapacityRequiredSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
@@ -67,9 +76,9 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
 
         // Initially disable the waitlist capacity field
         waitlistCapacityField.setEnabled(false);
+        geolocationRequirementField.setEnabled(false);
 
-        // Back button functionality
-        backButton.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
+
 
         // Submit button logic
         eventCreationSubmitButton.setOnClickListener(v -> {
@@ -98,6 +107,10 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
                 eventData.put("facilityName", facilityName);
                 eventData.put("facilityAddress", facilityAddress);
                 eventData.put("geolocationRequired", geolocationRequired);
+                eventData.put("geolocationRequirement", geolocationRequirement);
+                eventData.put("waitlistCapacityRequired", waitlistCapacityRequired);
+                eventData.put("waitlistCapacity", waitlistCapacity);
+                eventData.put("createdDateTime", new Date());
 
                 if (geolocationRequired) {
                     eventData.put("geolocationRequirement", Integer.parseInt(geolocationRequirement));
