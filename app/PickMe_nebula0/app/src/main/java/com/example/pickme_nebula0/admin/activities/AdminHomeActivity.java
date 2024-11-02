@@ -1,4 +1,4 @@
-package com.example.pickme_nebula0.activities;
+package com.example.pickme_nebula0.admin.activities;
 
 import android.os.Bundle;
 import android.text.Editable;

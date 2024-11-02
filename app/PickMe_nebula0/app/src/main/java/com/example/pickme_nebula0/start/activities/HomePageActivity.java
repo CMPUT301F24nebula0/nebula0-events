@@ -8,6 +8,7 @@ import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.pickme_nebula0.R;
+import com.example.pickme_nebula0.admin.activities.AdminHomeActivity;
 import com.example.pickme_nebula0.entrant.activities.EntrantHomeActivity;
 import com.example.pickme_nebula0.organizer.activities.OrganizerHomeActivity;
 import com.example.pickme_nebula0.user.activities.UserInfoActivity;
@@ -28,7 +29,7 @@ public class HomePageActivity extends AppCompatActivity {
 
         // actions once buttons are pressed
         profileButton.setOnClickListener(view -> navigateTo(UserInfoActivity.class));
-        adminButton.setOnClickListener(view -> navigateTo(com.example.pickme_nebula0.activities.AdminHomeActivity.class));
+        adminButton.setOnClickListener(view -> navigateTo(AdminHomeActivity.class));
         entrantButton.setOnClickListener(view -> navigateTo(EntrantHomeActivity.class));
         organizerButton.setOnClickListener(view -> navigateTo(OrganizerHomeActivity.class));
     }
