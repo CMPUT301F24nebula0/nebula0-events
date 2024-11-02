@@ -1,10 +1,12 @@
 package com.example.pickme_nebula0.db;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.example.pickme_nebula0.event.Event;
+import com.example.pickme_nebula0.organizer.activities.OrganizerCreateEventActivity;
 import com.example.pickme_nebula0.user.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -16,6 +18,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -109,7 +112,14 @@ public class DBManager {
         // Populate fields with data from object
         Map<String, Object> eventData = new HashMap<>();
         eventData.put("organizerID",event.getOrganizerID());
-        // TODO - populate remaining fields
+        eventData.put("eventName", event.getEventName());
+        eventData.put("eventDescription", event.getEventDescription());
+        eventData.put("eventDate", event.getEventDate());
+        eventData.put("geolocationRequirement", event.getGeolocationMaxDistance());
+        eventData.put("waitlistCapacityRequired", event.getWaitingListCapacity());
+        eventData.put("createdDateTime", new Date());
+
+        eventData.put("numberOfAttendees", event.getEventCapacity());
 
         // Create document
         addUpdateDocument(eventsCollection,event.getEventID(),eventData);
@@ -189,6 +199,8 @@ public class DBManager {
                 docRef.set(data)
                         .addOnSuccessListener(aVoid -> {
                             Log.d("Firestore", operationDescription + " succeeded");
+//                            Toast.makeText(OrganizerCreateEventActivity.this, "Event data saved successfully", Toast.LENGTH_SHORT).show())
+                            // TODO add these toast messages to key operations
                         })
                         .addOnFailureListener(e -> {
                             Log.d("Firestore", operationDescription + "found/created doc but failed to set with error:" + e.getMessage());

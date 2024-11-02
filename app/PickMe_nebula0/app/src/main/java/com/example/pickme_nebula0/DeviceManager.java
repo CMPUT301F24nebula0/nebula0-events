@@ -1,5 +1,6 @@
 package com.example.pickme_nebula0;
 
+import android.app.Application;
 import android.content.Context;
 import android.provider.Settings;
 
@@ -15,11 +16,10 @@ public class DeviceManager {
     /**
      * Gets string identifier of physical device, this is unique to each physical device.
      *
-     * @param context
      * @return string containing hardware id provided by Andriod
      */
-    public static String getDeviceId(Context context) {
-        return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+    public static String getDeviceId() {
+        return Settings.Secure.getString(PickMeApplication.getInstance().getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 
 }

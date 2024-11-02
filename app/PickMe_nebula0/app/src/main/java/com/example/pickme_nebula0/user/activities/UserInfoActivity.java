@@ -36,7 +36,7 @@ public class UserInfoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_info);
 
         boolean newUser = getIntent().getBooleanExtra("newUser",false);
-        deviceID = DeviceManager.getDeviceId(this);
+        deviceID = DeviceManager.getDeviceId();
         dbManager = new DBManager();
 
         headerTextView = findViewById(R.id.textViewUserInfoHeader);
