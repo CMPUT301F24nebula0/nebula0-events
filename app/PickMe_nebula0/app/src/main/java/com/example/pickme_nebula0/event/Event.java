@@ -47,8 +47,6 @@ public class Event {
         this.eventCapacity = eventCapacity;
         this.waitingListCapacity = waitingListCapacity;
         this.geolocationMaxDistance = geolocationMaxDistance;
-
-        // TODO - add parameterized constructor, remember you must get the organizer's id (thier device id)
     }
 
     /**
