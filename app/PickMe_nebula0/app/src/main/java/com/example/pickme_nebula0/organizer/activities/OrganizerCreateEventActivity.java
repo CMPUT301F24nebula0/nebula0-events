@@ -26,16 +26,18 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
     private EditText eventDateField;
-    private Switch waitlistCapacityRequiredSwitch;
-    private EditText waitlistCapacityField;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // initialize firebase
         db = FirebaseFirestore.getInstance();
+
+        // attach to screen component xml
         setContentView(R.layout.activity_organizer_create_event);
 
-        // Components on screen
+        // components on screen
         EditText eventNameField = findViewById(R.id.event_name_field);
         EditText eventDescriptionField = findViewById(R.id.event_description_field);
         eventDateField = findViewById(R.id.event_date_field);
@@ -43,20 +45,23 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         EditText facilityAddressField = findViewById(R.id.facility_address_field);
         Switch geolocationRequirementSwitch = findViewById(R.id.geolocation_requirement_switch);
         EditText geolocationRequirementField = findViewById(R.id.geolocation_requirement_field);
-        waitlistCapacityRequiredSwitch = findViewById(R.id.waitlist_capacity_required_switch);
-        waitlistCapacityField = findViewById(R.id.waitlist_capacity_field);
+        Switch waitlistCapacityRequiredSwitch = findViewById(R.id.waitlist_capacity_required_switch);
+        EditText waitlistCapacityField = findViewById(R.id.waitlist_capacity_field);
         EditText numberOfAttendeesField = findViewById(R.id.number_of_attendees_field);
         Button eventCreationSubmitButton = findViewById(R.id.event_creation_submit_button);
         Button eventCreationCancelButton = findViewById(R.id.event_creation_cancel_button);
 
+        // get deviceID as the foreignKey
         String deviceID = DeviceManager.getDeviceId(this);
 
         // DatePicker logic
         eventDateField.setFocusable(false);
         eventDateField.setOnClickListener(v -> showDatePickerDialog());
 
+        // Geolocation Requirement Switch Logic
         geolocationRequirementSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
+                // the geolocation field can be edited
                 geolocationRequirementField.setEnabled(true);
             } else {
                 geolocationRequirementField.setEnabled(false);
@@ -67,6 +72,7 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         // Waitlist Capacity Switch Logic
         waitlistCapacityRequiredSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
+                // the waitlist capacity field can be edited
                 waitlistCapacityField.setEnabled(true);
             } else {
                 waitlistCapacityField.setEnabled(false);
@@ -74,10 +80,10 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
             }
         });
 
-        // Initially disable the waitlist capacity field
+        // Initially disable the geolocation requirement and waitlist capacity fields
+        // since both switches are off initially
         waitlistCapacityField.setEnabled(false);
         geolocationRequirementField.setEnabled(false);
-
 
 
         // Submit button logic
@@ -97,8 +103,7 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
             if (validateEventCreationUserInput(deviceID, eventName, eventDescription, eventDate,
                     facilityName, facilityAddress, geolocationRequired, geolocationRequirement,
                     waitlistCapacityRequired, waitlistCapacity, numberOfAttendees)) {
-
-                // Store event data in Firestore
+                // if validated, store event data in Firestore
                 Map<String, Object> eventData = new HashMap<>();
                 eventData.put("deviceID", deviceID);
                 eventData.put("eventName", eventName);
@@ -112,20 +117,27 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
                 eventData.put("waitlistCapacity", waitlistCapacity);
                 eventData.put("createdDateTime", new Date());
 
+                // if geolocation requirement switch on
                 if (geolocationRequired) {
+                    // save geolocation requirement
                     eventData.put("geolocationRequirement", Integer.parseInt(geolocationRequirement));
                 }
 
-                eventData.put("numberOfAttendees", Integer.parseInt(numberOfAttendees));
-
+                // if waitlist capacity requirement switch on
                 if (waitlistCapacityRequired) {
                     eventData.put("waitlistCapacity", Integer.parseInt(waitlistCapacity));
                 }
 
+                eventData.put("numberOfAttendees", Integer.parseInt(numberOfAttendees));
+
                 db.collection("Events").add(eventData)
                         .addOnSuccessListener(documentReference ->
+                                // for debugging
+                                // TODO: put custom message box instead
                                 Toast.makeText(OrganizerCreateEventActivity.this, "Event data saved successfully", Toast.LENGTH_SHORT).show())
                         .addOnFailureListener(e ->
+                                // for debugging
+                                // TODO: put custom message box instead
                                 Toast.makeText(OrganizerCreateEventActivity.this, "Error saving event data", Toast.LENGTH_SHORT).show());
             }
         });
@@ -147,6 +159,7 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         });
     }
 
+    // the Date Picker
     private void showDatePickerDialog() {
         final Calendar calendar = Calendar.getInstance();
         DatePickerDialog datePickerDialog = new DatePickerDialog(this,
@@ -160,6 +173,8 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         datePickerDialog.show();
     }
 
+    // validating input
+    // TODO: check and test if there are more conditions needed to check
     private boolean validateEventCreationUserInput(
             String deviceID,
             String eventName,
@@ -294,6 +309,7 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         return valid;
     }
 
+    // check if any fields are field (before cancelling)
     private boolean isAnyFieldFilled(EditText... fields) {
         for (EditText field : fields) {
             if (!field.getText().toString().isEmpty()) {
