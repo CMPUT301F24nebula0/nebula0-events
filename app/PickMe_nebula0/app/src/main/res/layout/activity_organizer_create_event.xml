@@ -1,20 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/organizer_create_event_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="16dp">
 
-    <TextView
-        android:id="@+id/organizer_create_event"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Create Event"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+    <!-- Back Button -->
     <Button
         android:id="@+id/backButton"
         android:layout_width="wrap_content"
@@ -22,5 +14,220 @@
         android:text="Back"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/create_an_event_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Create an Event"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/backButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintHorizontal_bias="0.5" />
+
+    <TextView
+        android:id="@+id/event_name_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Event Name*"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/backButton"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <!-- Event Name Field -->
+    <EditText
+        android:id="@+id/event_name_field"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Enter event name"
+        app:layout_constraintStart_toEndOf="@+id/event_name_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/event_name_text" />
+
+    <!-- Event Description Label -->
+    <TextView
+        android:id="@+id/event_description_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Event Description*"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/event_name_field" />
+
+    <!-- Event Description Field -->
+    <EditText
+        android:id="@+id/event_description_field"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Enter event description"
+        app:layout_constraintStart_toEndOf="@+id/event_description_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/event_description_text" />
+
+    <!-- Event Date Label -->
+    <TextView
+        android:id="@+id/event_date_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Event Date*"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/event_description_field" />
+
+    <!-- Event Date Field -->
+    <EditText
+        android:id="@+id/event_date_field"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Select event date"
+        android:focusable="false"
+        android:clickable="true"
+        app:layout_constraintStart_toEndOf="@+id/event_date_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/event_date_text" />
+
+    <!-- Facility Name Label -->
+    <TextView
+        android:id="@+id/facility_name_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Facility Name*"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/event_date_field" />
+
+    <!-- Facility Name Field -->
+    <EditText
+        android:id="@+id/facility_name_field"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Enter facility name"
+        app:layout_constraintStart_toEndOf="@+id/facility_name_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/facility_name_text" />
+
+    <!-- Facility Address Label -->
+    <TextView
+        android:id="@+id/facility_address_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Facility Address*"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/facility_name_field" />
+
+    <!-- Facility Address Field -->
+    <EditText
+        android:id="@+id/facility_address_field"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Enter facility address"
+        app:layout_constraintStart_toEndOf="@+id/facility_address_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/facility_address_text" />
+
+    <!-- Geolocation Requirement Label -->
+    <TextView
+        android:id="@+id/geolocation_requirement_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Geolocation Required"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/facility_address_field" />
+
+    <!-- Geolocation Requirement Switch -->
+    <Switch
+        android:id="@+id/geolocation_requirement_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@+id/geolocation_requirement_text"
+        app:layout_constraintTop_toTopOf="@+id/geolocation_requirement_text" />
+
+    <!-- Geolocation Requirement Field -->
+    <EditText
+        android:id="@+id/geolocation_requirement_field"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Enter geolocation details"
+        app:layout_constraintStart_toEndOf="@+id/geolocation_requirement_switch"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/geolocation_requirement_text" />
+
+    <!-- Waitlist Capacity Label -->
+    <TextView
+        android:id="@+id/waitlist_capacity_required_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Waitlist Capacity Required"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/geolocation_requirement_field" />
+
+    <!-- Waitlist Capacity Switch -->
+    <Switch
+        android:id="@+id/waitlist_capacity_required_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@+id/waitlist_capacity_required_text"
+        app:layout_constraintTop_toTopOf="@+id/waitlist_capacity_required_text" />
+
+    <!-- Waitlist Capacity Field -->
+    <EditText
+        android:id="@+id/waitlist_capacity_field"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Enter waitlist capacity"
+        android:inputType="number"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/waitlist_capacity_required_switch" />
+
+    <!-- Number of Attendees Label -->
+    <TextView
+        android:id="@+id/number_of_attendees_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Number of Attendees*"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/waitlist_capacity_field" />
+
+    <!-- Number of Attendees Field -->
+    <EditText
+        android:id="@+id/number_of_attendees_field"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Enter number of attendees"
+        android:inputType="number"
+        app:layout_constraintStart_toEndOf="@+id/number_of_attendees_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/number_of_attendees_text" />
+
+    <!-- Required Field Note -->
+    <TextView
+        android:id="@+id/required_field_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="* denotes a required field"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/number_of_attendees_field" />
+
+    <!-- Submit Button -->
+    <Button
+        android:id="@+id/event_creation_submit_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Submit"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/event_creation_cancel_button"
+        app:layout_constraintTop_toBottomOf="@+id/required_field_text"
+        app:layout_constraintHorizontal_chainStyle="spread_inside" />
+
+    <!-- Cancel Button -->
+    <Button
+        android:id="@+id/event_creation_cancel_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Cancel"
+        app:layout_constraintStart_toEndOf="@+id/event_creation_submit_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/required_field_text" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
