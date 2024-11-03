@@ -6,6 +6,7 @@ import com.example.pickme_nebula0.entrant.EntrantRole;
 import com.example.pickme_nebula0.user.activities.UserInfoActivity;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 /**
@@ -133,12 +134,12 @@ public class Event {
      */
     public boolean waitingListFull() {
         // waiting list is never full for a list with unlimited capacity
-        if (this.eventCapacity == -1) { return false; }
+        if (this.waitingListCapacity == -1) { return false; }
 
-        if (this.entrantsInWaitingList.size() > this.eventCapacity) {
+        if (this.entrantsInWaitingList.size() > this.waitingListCapacity) {
             throw new IllegalStateException("Waiting list capacity exceeded somehow. Should not happen, check implementation for adding entrants.")
         }
-        return (this.entrantsInWaitingList.size() == this.eventCapacity);
+        return (this.entrantsInWaitingList.size() == this.waitingListCapacity);
     }
 
     /**
@@ -171,17 +172,25 @@ public class Event {
 
     // renamed function to be shorter
     // may be less descriptive but other function can be named resampleEntrants
+    /**
+     * Randomly sample n entrants from the waiting list,
+     * where n = eventCapacity.
+     *
+     */
     public void sampleEntrants() {
         // eventCapacity == -1 means no limit
-        if (this.eventCapacity == -1) {
-            this.entrantsChosen.addAll(this.entrantsInWaitingList);
-        } else
-        {
-            // have something check while entrant wants to join event
-            int remainingCapacity = this.eventCapacity - this.entrantsChosen.size();
-            if (remainingCapacity > 0) {
-                // randomly add entrants in waiting list to chosen list (remaining capacity amount)
-            }
+        if (this.eventCapacity == -1 || this.entrantsInWaitingList.size() <= this.eventCapacity) {
+            this.entrantsChosen = new ArrayList<>(this.entrantsInWaitingList);
+        } else {
+            // waiting entrants exceeds event capacity
+            // randomly sample
+            // create new arraylist to avoid altering original
+            ArrayList<EntrantRole> shuffledEntrants = new ArrayList<>(this.entrantsInWaitingList);
+            Collections.shuffle(shuffledEntrants);
+            ArrayList<EntrantRole> selectedEntrants = new ArrayList<>(shuffledEntrants.subList(0, this.eventCapacity));
+            // modify selectedEntrants as needed prior to assigning to this.entrantsChosen
+
+            this.entrantsChosen = selectedEntrants;
         }
     }
 
