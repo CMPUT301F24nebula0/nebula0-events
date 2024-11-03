@@ -29,7 +29,7 @@ public class DBManager {
     public String registeredEventsCollection = "registeredEvents";
     public String organizerEventsCollection = "organizerEvents";
 
-    public enum registrantStatus{
+    public enum RegistrantStatus{
         WAITLISTED, SELECTED, CONFIRMED, CANCELED
     }
     // Waitlisted (user is registered but has not "won the lottery"
@@ -125,6 +125,39 @@ public class DBManager {
         addUpdateDocument(eventsCollection,event.getEventID(),eventData);
     }
 
+    public void addRegistrantToWaitlist(String eventID, String registrantID){
+        Map<String, Object> data = new HashMap<>();
+        data.put("status", RegistrantStatus.WAITLISTED);
+
+        // In Events, update event to have waitlisted registrant
+        CollectionReference eventRegColRef = db.collection(eventsCollection).document(eventID).collection(eventRegistrantsCollection);
+        createDocument(eventRegColRef,registrantID,data);
+
+        // In Users, update user to have event
+        CollectionReference userEventsColRef = db.collection(usersCollection).document(eventID).collection(registeredEventsCollection);
+        createDocument(userEventsColRef,eventID,data);
+    }
+
+    public void removeRegistrantFromEvent(String eventID,String registrantID){
+        // Remove registrant from events
+        DocumentReference regInEventDocRef = getDocOfRegistrantInEvent(eventID,registrantID);
+        removeDocument(regInEventDocRef);
+
+        // Remove event from registrant
+        DocumentReference eveInRegDocRef = getDocOfEventInRegistrant(eventID,registrantID);
+        removeDocument(eveInRegDocRef);
+    }
+
+    public void setRegistrantStatus(String eventID,String registrantID,RegistrantStatus registrantStatus){
+        // Set status within event
+        DocumentReference regInEventDocRef = getDocOfRegistrantInEvent(eventID,registrantID);
+        updateField(regInEventDocRef,"status", registrantStatus);
+
+        // Set status within registrant
+        DocumentReference eveInRegDocRef = getDocOfEventInRegistrant(eventID,registrantID);
+        updateField(eveInRegDocRef,"status",registrantStatus);
+    }
+
     public  void updateEvent(Event event){
         // For every field in database, update with event.getField(),
         // Can probably amalgamate add and update
@@ -154,7 +187,7 @@ public class DBManager {
         String registrantID = eventRegistrantDoc.getId();
         String eventID = eventRegistrantDoc.getReference().getParent().getId();
 
-        removeDocument(db.collection(usersCollection).document(registrantID).collection(registeredEventsCollection).document(eventID));
+        removeDocument(getDocOfEventInRegistrant(eventID,registrantID));
     }
 
 // -------------------- / Events \ -----------------------------------------------------------------
@@ -284,6 +317,36 @@ public class DBManager {
                     }
                 });
     }
+
+    private void updateField(DocumentReference doc,String fieldName, Object newVal){
+        String operationDescription = String.format("updateField [C-%s,D-%s, F-%s]",doc.getParent().getId(),doc.getId(),fieldName);
+        doc.update(fieldName,newVal);
+    }
+
+    private void createDocument(CollectionReference colRef, String docID, Map<String, Object> data){
+        String operationDescription = String.format("createDocument [C-%s, D-%s]",colRef.getId(), docID);
+
+        colRef.document(docID).set(data)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d("Firestore", operationDescription + " succeeded");
+                        } else {
+                            Log.d("Firestore", operationDescription + " failed: " + task.getException());
+                        }
+                    }
+                });
+    }
+
+    private DocumentReference getDocOfRegistrantInEvent(String eventID, String registrantID){
+        return db.collection(eventsCollection).document(eventID).collection(eventRegistrantsCollection).document(registrantID);
+    }
+
+    private DocumentReference getDocOfEventInRegistrant(String eventID, String registrantID){
+        return db.collection(usersCollection).document(registrantID).collection(registeredEventsCollection).document(eventID);
+    }
+
 
 // ----------------- \ Abstracted Helpers / --------------------------------------------------------
 }
