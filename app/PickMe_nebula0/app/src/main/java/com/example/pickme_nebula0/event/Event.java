@@ -30,8 +30,6 @@ public class Event {
 
     protected ArrayList<EntrantRole> entrantsInWaitingList = new ArrayList<EntrantRole>();
     protected ArrayList<EntrantRole> entrantsChosen = new ArrayList<EntrantRole>();
-    protected ArrayList<EntrantRole> entrantsDeclined = new ArrayList<EntrantRole>();
-    protected ArrayList<EntrantRole> entrantsCancelled = new ArrayList<EntrantRole>();
     protected ArrayList<EntrantRole> entrantsEnrolled = new ArrayList<EntrantRole>();
 
     /**
@@ -109,17 +107,16 @@ public class Event {
     }
 
     public ArrayList<EntrantRole> getEntrantsCancelled() {
-        return this.entrantsCancelled;
+        // FETCH FROM DB INSTEAD
+        return new ArrayList<>();
     }
 
     public ArrayList<EntrantRole> getEntrantsEnrolled() {
         return this.entrantsEnrolled;
     }
 
-    public ArrayList<EntrantRole> getEntrantsDeclined() {
-        return this.entrantsDeclined;
-    }
 
+    //------------ WAITING LIST LOGIC
 
     /**
      * Simplifies checking if waiting list is full.
@@ -137,7 +134,7 @@ public class Event {
         if (this.waitingListCapacity == -1) { return false; }
 
         if (this.entrantsInWaitingList.size() > this.waitingListCapacity) {
-            throw new IllegalStateException("Waiting list capacity exceeded somehow. Should not happen, check implementation for adding entrants.")
+            throw new IllegalStateException("Waiting list capacity exceeded somehow. Should not happen, check implementation for adding entrants.");
         }
         return (this.entrantsInWaitingList.size() == this.waitingListCapacity);
     }
@@ -159,8 +156,14 @@ public class Event {
     }
 
     public void removeEntrantFromWaitingList(EntrantRole entrant) {
-        this.entrantsInWaitingList.remove(entrant);
+        boolean entrantRemoved = this.entrantsInWaitingList.remove(entrant);
+
+        if (entrantRemoved) {
+            // UPDATE DB
+        }
     }
+
+    //---------- SAMPLE ENTRANTS
 
     public void addEntrantToChosen(EntrantRole entrant) {
         this.entrantsChosen.add(entrant);
@@ -194,14 +197,29 @@ public class Event {
         }
     }
 
-    public void addToEntrantCancelled(EntrantRole entrant) {
-        // maybe add error checking
-        this.entrantsCancelled.add(entrant);
+    //------------- AFTER REGISTRTATION CLOSES
+
+    /**
+     * Removes an entrant from the chosen list.
+     * CALL THIS FROM:
+     *  OrganizerRole - if cancelling chosen entrant.
+     *  EntrantRole - if declining invite.
+     * Updates DB.
+     */
+    public void removeChosenEntrant(EntrantRole entrant) {
+        boolean entrantRemoved = this.entrantsChosen.remove(entrant);
+
+        if (entrantRemoved) {
+            // UPDATE DB
+        }
     }
 
-    public void removeFromEntrantCancelled(EntrantRole entrant) {
-        // maybe add error checking
-        this.entrantsCancelled.remove(entrant);
+    /**
+     * Replaces cancelled/declined entrants with
+     * unselected entrants who opted in to being resampled.
+     */
+    public void resampleEntrants() {
+        // NOT IMPLEMENTED YET
     }
 
     public void addToEntrantEnrolled(EntrantRole entrant) {
