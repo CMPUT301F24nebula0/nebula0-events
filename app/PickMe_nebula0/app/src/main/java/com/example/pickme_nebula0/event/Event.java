@@ -119,8 +119,42 @@ public class Event {
         return this.entrantsDeclined;
     }
 
-    public void addEntrantToWaitingList(EntrantRole entrant) {
+
+    /**
+     * Simplifies checking if waiting list is full.
+     * Can be used when adding entrant or used by EntrantRole to check
+     * if list is full, and notify entrant if they attempt to
+     * add themself to a full list.
+     *
+     * Removes need for object to first check if capacity is defined,
+     * since it returns false anyways if no capacity is defined.
+     *
+     * @return boolean Whether list is full or not
+     */
+    public boolean waitingListFull() {
+        // waiting list is never full for a list with unlimited capacity
+        if (this.eventCapacity == -1) { return false; }
+
+        if (this.entrantsInWaitingList.size() > this.eventCapacity) {
+            throw new IllegalStateException("Waiting list capacity exceeded somehow. Should not happen, check implementation for adding entrants.")
+        }
+        return (this.entrantsInWaitingList.size() == this.eventCapacity);
+    }
+
+    /**
+     * Add entrant to waiting list if not full.
+     * Calling object should check whether adding was successful or not
+     * and handle each case appropriately, eg. notifying entrant
+     * if waiting list is full.
+     *
+     * @param entrant Entrant to add
+     * @return boolean Whether addition was successful or rejected
+     */
+    public boolean addEntrantToWaitingList(EntrantRole entrant) {
+        if (waitingListFull()) { return false;}
+
         this.entrantsInWaitingList.add(entrant);
+        return true;
     }
 
     public void removeEntrantFromWaitingList(EntrantRole entrant) {
@@ -135,16 +169,20 @@ public class Event {
         this.entrantsChosen.remove(entrant);
     }
 
-    public void sampleFromWaitingList() {
+    // renamed function to be shorter
+    // may be less descriptive but other function can be named resampleEntrants
+    public void sampleEntrants() {
+        // eventCapacity == -1 means no limit
         if (this.eventCapacity == -1) {
             this.entrantsChosen.addAll(this.entrantsInWaitingList);
         } else
         {
+            // have something check while entrant wants to join event
             int remainingCapacity = this.eventCapacity - this.entrantsChosen.size();
             if (remainingCapacity > 0) {
                 // randomly add entrants in waiting list to chosen list (remaining capacity amount)
             }
-            }
+        }
     }
 
     public void addToEntrantCancelled(EntrantRole entrant) {
