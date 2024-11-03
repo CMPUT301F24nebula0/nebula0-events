@@ -30,6 +30,7 @@ public class Event {
 
     protected ArrayList<EntrantRole> entrantsInWaitingList = new ArrayList<EntrantRole>();
     protected ArrayList<EntrantRole> entrantsChosen = new ArrayList<EntrantRole>();
+    protected ArrayList<EntrantRole> entrantsCancelled = new ArrayList<EntrantRole>();
     protected ArrayList<EntrantRole> entrantsEnrolled = new ArrayList<EntrantRole>();
 
     /**
@@ -108,7 +109,7 @@ public class Event {
 
     public ArrayList<EntrantRole> getEntrantsCancelled() {
         // FETCH FROM DB INSTEAD
-        return new ArrayList<>();
+        return this.entrantsCancelled;
     }
 
     public ArrayList<EntrantRole> getEntrantsEnrolled() {
@@ -165,13 +166,13 @@ public class Event {
 
     //---------- SAMPLE ENTRANTS
 
+    // should only be done when sampling waiting entrants or resampling entrants
     public void addEntrantToChosen(EntrantRole entrant) {
         this.entrantsChosen.add(entrant);
+
+        // UPDATE DB
     }
 
-    public void removeEntrantFromChosen(EntrantRole entrant) {
-        this.entrantsChosen.remove(entrant);
-    }
 
     // renamed function to be shorter
     // may be less descriptive but other function can be named resampleEntrants
@@ -197,7 +198,7 @@ public class Event {
         }
     }
 
-    //------------- AFTER REGISTRTATION CLOSES
+    //------------- AFTER REGISTRATION CLOSES
 
     /**
      * Removes an entrant from the chosen list.
@@ -222,8 +223,9 @@ public class Event {
         // NOT IMPLEMENTED YET
     }
 
-    public void addToEntrantEnrolled(EntrantRole entrant) {
-        // maybe add error checking
-        this.entrantsEnrolled.add(entrant);
-    }
+    // all entrants should be enrolled from the chosen list
+//    public void addToEntrantEnrolled(EntrantRole entrant) {
+//        // maybe add error checking
+//        this.entrantsEnrolled.add(entrant);
+//    }
 }
