@@ -1,18 +1,32 @@
 package com.example.pickme_nebula0.event;
 
+import com.example.pickme_nebula0.DeviceManager;
+import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.entrant.EntrantRole;
+import com.example.pickme_nebula0.user.activities.UserInfoActivity;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Event
  */
 public class Event {
+    private DBManager dbManager;
+
     private String eventID;
-    // -1 means no waiting list capacity limit
+    private String organizerID; // we get facility info through organizer
+
+    private String eventName;
+    private String eventDescription;
+    private Date eventDate;
+    protected String eventPoster;
+
+    // -1 means no limit
     protected int waitingListCapacity = -1;
     protected int eventCapacity = -1;
-    protected String eventPoster;
+    private int geolocationMaxDistance = -1;
+
     protected ArrayList<EntrantRole> entrantsInWaitingList = new ArrayList<EntrantRole>();
     protected ArrayList<EntrantRole> entrantsChosen = new ArrayList<EntrantRole>();
     protected ArrayList<EntrantRole> entrantsDeclined = new ArrayList<EntrantRole>();
@@ -22,8 +36,19 @@ public class Event {
     /**
      * Constructor
      */
-    public Event() {
-        eventID = null;
+    public Event(String eventName, String eventDescription, Date eventDate, int eventCapacity, int waitingListCapacity, int geolocationMaxDistance) {
+        dbManager = new DBManager();
+        eventID = dbManager.createIDForDocumentIn(dbManager.eventsCollection);
+        organizerID = DeviceManager.getDeviceId();
+
+        this.eventName = eventName;
+        this.eventDescription = eventDescription;
+        this.eventDate = eventDate;
+        this.eventCapacity = eventCapacity;
+        this.waitingListCapacity = waitingListCapacity;
+        this.geolocationMaxDistance = geolocationMaxDistance;
+
+        // TODO - add parameterized constructor, remember you must get the organizer's id (thier device id)
     }
 
     /**
@@ -34,13 +59,13 @@ public class Event {
         return this.eventID;
     }
 
-    /**
-     * Set eventID
-     * @param eventID eventID
-     */
-    public void setEventID(String eventID) {
-        this.eventID = eventID;
-    }
+    public String getEventName() {return this.eventName;}
+
+    public String getEventDescription() {return this.eventDescription;}
+
+    public Date getEventDate(){return  this.eventDate;}
+
+    public int getGeolocationMaxDistance(){return  this.geolocationMaxDistance;}
 
     /**
      * Get Waiting List Capacity
@@ -57,6 +82,8 @@ public class Event {
     public void setWaitingListCapacity(int waitingListCapacity) {
         this.waitingListCapacity = waitingListCapacity;
     }
+
+    public String getOrganizerID() {return organizerID;}
 
     public String getEventPoster() {
         return this.eventPoster;

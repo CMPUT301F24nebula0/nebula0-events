@@ -1,6 +1,7 @@
 package com.example.pickme_nebula0.organizer.activities;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Switch;
@@ -12,6 +13,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
+import com.example.pickme_nebula0.db.DBManager;
+import com.example.pickme_nebula0.event.Event;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.type.DateTime;
 
@@ -24,15 +27,13 @@ import java.util.Map;
 
 public class OrganizerCreateEventActivity extends AppCompatActivity {
 
-    private FirebaseFirestore db;
+    private DBManager dbManager;
     private EditText eventDateField;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        dbManager = new DBManager();
         super.onCreate(savedInstanceState);
-
-        // initialize firebase
-        db = FirebaseFirestore.getInstance();
 
         // attach to screen component xml
         setContentView(R.layout.activity_organizer_create_event);
@@ -52,7 +53,7 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         Button eventCreationCancelButton = findViewById(R.id.event_creation_cancel_button);
 
         // get deviceID as the foreignKey
-        String deviceID = DeviceManager.getDeviceId(this);
+        String deviceID = DeviceManager.getDeviceId();
 
         // DatePicker logic
         eventDateField.setFocusable(false);
@@ -100,46 +101,35 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
             String numberOfAttendees = numberOfAttendeesField.getText().toString();
 
             // Validate user input
-            if (validateEventCreationUserInput(deviceID, eventName, eventDescription, eventDate,
+            if (!validateEventCreationUserInput(deviceID, eventName, eventDescription, eventDate,
                     facilityName, facilityAddress, geolocationRequired, geolocationRequirement,
                     waitlistCapacityRequired, waitlistCapacity, numberOfAttendees)) {
-                // if validated, store event data in Firestore
-                Map<String, Object> eventData = new HashMap<>();
-                eventData.put("deviceID", deviceID);
-                eventData.put("eventName", eventName);
-                eventData.put("eventDescription", eventDescription);
-                eventData.put("eventDate", eventDate);
-                eventData.put("facilityName", facilityName);
-                eventData.put("facilityAddress", facilityAddress);
-                eventData.put("geolocationRequired", geolocationRequired);
-                eventData.put("geolocationRequirement", geolocationRequirement);
-                eventData.put("waitlistCapacityRequired", waitlistCapacityRequired);
-                eventData.put("waitlistCapacity", waitlistCapacity);
-                eventData.put("createdDateTime", new Date());
-
-                // if geolocation requirement switch on
-                if (geolocationRequired) {
-                    // save geolocation requirement
-                    eventData.put("geolocationRequirement", Integer.parseInt(geolocationRequirement));
-                }
-
-                // if waitlist capacity requirement switch on
-                if (waitlistCapacityRequired) {
-                    eventData.put("waitlistCapacity", Integer.parseInt(waitlistCapacity));
-                }
-
-                eventData.put("numberOfAttendees", Integer.parseInt(numberOfAttendees));
-
-                db.collection("Events").add(eventData)
-                        .addOnSuccessListener(documentReference ->
-                                // for debugging
-                                // TODO: put custom message box instead
-                                Toast.makeText(OrganizerCreateEventActivity.this, "Event data saved successfully", Toast.LENGTH_SHORT).show())
-                        .addOnFailureListener(e ->
-                                // for debugging
-                                // TODO: put custom message box instead
-                                Toast.makeText(OrganizerCreateEventActivity.this, "Error saving event data", Toast.LENGTH_SHORT).show());
+                // If user input is invalid, don't add event
+                return;
             }
+
+            Date eventDateObj = parseDate(eventDate);
+
+            // if geolocation requirement switch on
+            int geolocationMaxDistance = -1;
+            if (geolocationRequired) {
+                // save geolocation requirement
+                geolocationMaxDistance = Integer.parseInt(geolocationRequirement);
+            }
+
+            // if waitlist capacity requirement switch on
+            int waitlistMaxCapacity = -1;
+            if (waitlistCapacityRequired) {
+                waitlistMaxCapacity = Integer.parseInt(waitlistCapacity);
+            }
+
+            int maxNumberOfAttendees = Integer.parseInt(numberOfAttendees);
+
+
+            Event event = new Event(eventName,eventDescription,eventDateObj,maxNumberOfAttendees,waitlistMaxCapacity,geolocationMaxDistance);// TODO parameters
+            dbManager.addEvent(event);
+
+            finish();
         });
 
         // Cancel button logic
@@ -317,5 +307,15 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
             }
         }
         return false;
+    }
+
+    private static Date parseDate(String dateString) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            return formatter.parse(dateString);
+        } catch (ParseException e) {
+            Log.d("OrganizerCreateEventActivity", "parseDate failed with error: " + e.getMessage());
+            return null; // Handle exception as needed
+        }
     }
 }

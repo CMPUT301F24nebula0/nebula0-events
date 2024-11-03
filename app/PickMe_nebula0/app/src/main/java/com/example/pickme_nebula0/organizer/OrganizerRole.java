@@ -37,12 +37,13 @@ public class OrganizerRole extends User {
 
     // US 02.01.01 As a an organizer I want to create a new event and generate a unique promotional QR code that links to the event description and event poster in the app
     public boolean createEvent() {
-        boolean eventCreated = false;
-        // Create event
-        Event event = new Event();
-        events.add(event);
-        //
-        return false;
+//        boolean eventCreated = false;
+//        // Create event
+//        Event event = new Event();
+//        events.add(event);
+//        //
+//        return false;
+        throw new RuntimeException("NOT IMPLEMENTED");
     }
 
     // US 02.01.01 As a an organizer I want to create a new event and generate a unique promotional QR code that links to the event description and event poster in the app

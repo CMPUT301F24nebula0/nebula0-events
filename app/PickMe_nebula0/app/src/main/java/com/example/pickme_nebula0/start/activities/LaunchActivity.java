@@ -32,7 +32,7 @@ public class LaunchActivity extends AppCompatActivity {
             return insets;
         });
 
-        deviceID = DeviceManager.getDeviceId(this);
+        deviceID = DeviceManager.getDeviceId();
         dbManager = new DBManager();
         dbManager.checkUserRegistration(deviceID,this::registeredCallback,this::unregisteredCallback);
     }
