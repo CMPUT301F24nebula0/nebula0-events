@@ -27,11 +27,13 @@ public class Event {
     protected int waitingListCapacity = -1;
     protected int eventCapacity = -1;
     private int geolocationMaxDistance = -1;
+    private int unfilledSpots = 0;  // # of entrants to be resampled
 
     protected ArrayList<EntrantRole> entrantsInWaitingList = new ArrayList<EntrantRole>();
     protected ArrayList<EntrantRole> entrantsChosen = new ArrayList<EntrantRole>();
     protected ArrayList<EntrantRole> entrantsCancelled = new ArrayList<EntrantRole>();
     protected ArrayList<EntrantRole> entrantsEnrolled = new ArrayList<EntrantRole>();
+    protected ArrayList<EntrantRole> entrantsToResample = new ArrayList<EntrantRole>();
 
     /**
      * Constructor
@@ -156,8 +158,10 @@ public class Event {
         return true;
     }
 
+    // can be done by organizer or entrant who removes themselves
     public void removeEntrantFromWaitingList(EntrantRole entrant) {
         boolean entrantRemoved = this.entrantsInWaitingList.remove(entrant);
+        // check if entrant exists in DB instead of relying on private attribute
 
         if (entrantRemoved) {
             // UPDATE DB
@@ -165,17 +169,14 @@ public class Event {
     }
 
     //---------- SAMPLE ENTRANTS
+    /*
+    Entrants who opted to be resampled if not chosen are added to a list
+    when sampling occurs. This makes it easier to resample later on,
+    and is done during sampling because this info does not need to be
+    known to Event before sampling occurs (would be slow and unnecessary
+    to track prior to sampling.)
+     */
 
-    // should only be done when sampling waiting entrants or resampling entrants
-    public void addEntrantToChosen(EntrantRole entrant) {
-        this.entrantsChosen.add(entrant);
-
-        // UPDATE DB
-    }
-
-
-    // renamed function to be shorter
-    // may be less descriptive but other function can be named resampleEntrants
     /**
      * Randomly sample n entrants from the waiting list,
      * where n = eventCapacity.
@@ -195,24 +196,26 @@ public class Event {
             // modify selectedEntrants as needed prior to assigning to this.entrantsChosen
 
             this.entrantsChosen = selectedEntrants;
+
+            // have this in the DB later
+            entrantsToResample = new ArrayList<>(shuffledEntrants.subList(this.eventCapacity, shuffledEntrants.size()));
         }
     }
 
     //------------- AFTER REGISTRATION CLOSES
+    /*
+    If an entrant is removed, manually resample entrants.
+    unfilledSpots tracks the number of spots to be resampled.
+    According to discussion forum, it's ok for resampling to be done
+    manually instead of after each removed entrant.
 
-    /**
-     * Removes an entrant from the chosen list.
-     * CALL THIS FROM:
-     *  OrganizerRole - if cancelling chosen entrant.
-     *  EntrantRole - if declining invite.
-     * Updates DB.
      */
-    public void removeChosenEntrant(EntrantRole entrant) {
-        boolean entrantRemoved = this.entrantsChosen.remove(entrant);
 
-        if (entrantRemoved) {
-            // UPDATE DB
-        }
+    public ArrayList<EntrantRole> getEntrantsToResample() {
+        // FETCH FROM DB LATER
+
+        // creates new arraylist because return value will be modified by resampleEntrants
+        return new ArrayList<>(this.entrantsToResample);
     }
 
     /**
@@ -220,12 +223,73 @@ public class Event {
      * unselected entrants who opted in to being resampled.
      */
     public void resampleEntrants() {
-        // NOT IMPLEMENTED YET
+        if (this.unfilledSpots == 0) { return; }
+
+        ArrayList<EntrantRole> entrantsToResample = getEntrantsToResample();
+        Collections.shuffle(entrantsToResample);
+
+        for (int i=0; i<this.unfilledSpots; i++) {
+            int ind = 0;    // make sure this is consistent
+            addEntrantToChosen(entrantsToResample.get(ind));
+            entrantsToResample.remove(ind);
+        }
+
+        this.unfilledSpots = 0;
+        this.entrantsToResample = entrantsToResample;
     }
 
-    // all entrants should be enrolled from the chosen list
-//    public void addToEntrantEnrolled(EntrantRole entrant) {
-//        // maybe add error checking
-//        this.entrantsEnrolled.add(entrant);
-//    }
+    // should only be done when sampling waiting entrants or resampling entrants
+    public void addEntrantToChosen(EntrantRole entrant) {
+        this.entrantsChosen.add(entrant);
+        // check if entrant exists in DB instead of relying on private attribute
+
+        // UPDATE DB
+    }
+
+    /**
+     * Removes an entrant from the chosen list.
+     * CALL THIS FROM:
+     *  EntrantRole - if declining invite.
+     * Updates DB.
+     */
+    public boolean removeChosenEntrant(EntrantRole entrant) {
+        boolean entrantRemoved = this.entrantsChosen.remove(entrant);
+
+        // check if entrant exists in DB instead of relying on private attribute
+        if (entrantRemoved) {
+            unfilledSpots += 1;
+            // UPDATE DB
+        }
+
+        return entrantRemoved;
+    }
+
+    /**
+     * Removes an entrant from the chosen list.
+     * CALL THIS FROM:
+     *  OrganizerRole - if cancelling chosen entrant.
+     */
+    public boolean cancelEntrant(EntrantRole entrant) {
+
+        boolean entrantRemoved = removeChosenEntrant(entrant);
+        if (entrantRemoved) {
+            // unfilledSpots already updated from removeChosenEntrant
+
+            // UPDATE DB
+            this.entrantsCancelled.add(entrant);
+            // this.entrantsChosen is already updated
+        }
+
+        return entrantRemoved;
+    }
+
+    /**
+     * Enrolls all entrants currently in chosen list.
+     * Assumes that organizer doesn't want to enroll each entrant
+     * one by one.
+     */
+    public void enrollEntrants() {
+        // fetch chosen entrants from DB and update DB
+        this.entrantsEnrolled = new ArrayList<>(this.entrantsChosen);
+    }
 }
