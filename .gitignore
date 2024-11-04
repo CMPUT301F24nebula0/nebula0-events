@@ -1,2 +1,5 @@
 # macOS file metadata
 .DS_Store
+.idea/
+app/**/google-services.json
+#.json -> use this if the line above does not ignore the google-services file. will ignore any additional json files too though
