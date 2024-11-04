@@ -3,7 +3,6 @@ package com.example.pickme_nebula0.event;
 import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.entrant.EntrantRole;
-import com.example.pickme_nebula0.user.activities.UserInfoActivity;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,6 +27,9 @@ public class Event {
     private boolean waitlistCapacityRequired;
     protected int waitlistCapacity = -1;
     protected int eventCapacity = -1;
+    private Date createdDateTime;
+    private int numberOfAttendees;
+    private int geolocationRequirement;
 
     protected String eventPoster;
 
@@ -39,6 +41,9 @@ public class Event {
     protected ArrayList<EntrantRole> entrantsEnrolled = new ArrayList<EntrantRole>();
     protected ArrayList<EntrantRole> entrantsToResample = new ArrayList<EntrantRole>();
 
+    public Event() {
+
+    }
     /**
      * Constructor
      */
@@ -73,13 +78,16 @@ public class Event {
     public String getFacilityAddress() { return this.facilityAddress; }
     public boolean getGeolocationRequired() { return this.geolocationRequired; }
     public int getGeolocationMaxDistance() { return this.geolocationMaxDistance; }
-    public boolean getWaitlistCapaciyRequired() { return this.waitlistCapacityRequired; }
+    public boolean getWaitlistCapacityRequired() { return this.waitlistCapacityRequired; }
     public int getWaitlistCapacity() { return this.waitlistCapacity; }
     public int getEventCapacity() { return this.eventCapacity; }
     public String getOrganizerID() {return organizerID;}
     public String getEventPoster() {
         return this.eventPoster;
     }
+    public Date getCreatedDateTime() { return this.createdDateTime; }
+    public int getNumberOfAttendees() { return this.numberOfAttendees; }
+    public int getGeolocationRequirement() { return this.geolocationRequirement; }
 
     public ArrayList<EntrantRole> getEntrantsInWaitingList() {
         return this.entrantsInWaitingList;
@@ -111,6 +119,9 @@ public class Event {
     public void setEventCapacity(int eventCapacity) { this.eventCapacity = eventCapacity; }
     public void setOrganizerID(String organizerID) { this.organizerID = organizerID; }
     public void setEventPoster(String eventPoster) { this.eventPoster = eventPoster; }
+    public void setCreatedDateTime(Date createdDateTime) { this.createdDateTime = createdDateTime; }
+    public void setNumberOfAttendees (int numberOfAttendees) { this.numberOfAttendees = numberOfAttendees; }
+    public void setGeolocationRequirement (int geolocationRequirement) { this.geolocationRequirement = geolocationRequirement; }
 
     //------------ WAITING LIST LOGIC
 

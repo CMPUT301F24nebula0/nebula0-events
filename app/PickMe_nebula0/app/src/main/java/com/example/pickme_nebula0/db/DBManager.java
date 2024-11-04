@@ -1,12 +1,10 @@
 package com.example.pickme_nebula0.db;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.example.pickme_nebula0.event.Event;
-import com.example.pickme_nebula0.organizer.activities.OrganizerCreateEventActivity;
 import com.example.pickme_nebula0.user.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -17,7 +15,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -117,7 +114,7 @@ public class DBManager {
         eventData.put("eventDate", event.getEventDate());
         eventData.put("geolocationRequired", event.getGeolocationRequired());
         eventData.put("geolocationRequirement", event.getGeolocationMaxDistance());
-        eventData.put("waitlistCapacityRequired", event.getWaitlistCapaciyRequired());
+        eventData.put("waitlistCapacityRequired", event.getWaitlistCapacityRequired());
         eventData.put("waitlistCapacity", event.getWaitlistCapacity());
         eventData.put("createdDateTime", new Date());
         eventData.put("numberOfAttendees", event.getEventCapacity());
