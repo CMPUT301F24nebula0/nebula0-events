@@ -39,6 +39,14 @@ public class EntrantRole extends User {
         this.entrantID = entrantID;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) { return true; }
+        if (!(o instanceof EntrantRole)) { return false; }
+        EntrantRole entrant = (EntrantRole) o;
+        return this.getEntrantID() == entrant.getEntrantID();
+    }
+
    // US 01.01.01 As an entrant, I want to join the waiting list for a specific event
     public boolean joinWaitingList(Event event) {
         event.getEntrantsInWaitingList().add(this);
