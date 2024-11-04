@@ -4,6 +4,7 @@ import com.example.pickme_nebula0.event.Event;
 import com.example.pickme_nebula0.user.User;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * EntrantRole
@@ -44,7 +45,7 @@ public class EntrantRole extends User {
         if (o == this) { return true; }
         if (!(o instanceof EntrantRole)) { return false; }
         EntrantRole entrant = (EntrantRole) o;
-        return this.getEntrantID() == entrant.getEntrantID();
+        return Objects.equals(this.getEntrantID(), entrant.getEntrantID());
     }
 
    // US 01.01.01 As an entrant, I want to join the waiting list for a specific event
