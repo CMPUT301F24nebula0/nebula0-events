@@ -111,14 +111,15 @@ public class DBManager {
     public void addEvent(Event event){
         // Populate fields with data from object
         Map<String, Object> eventData = new HashMap<>();
-        eventData.put("organizerID",event.getOrganizerID());
+        eventData.put("organizerID", event.getOrganizerID());
         eventData.put("eventName", event.getEventName());
         eventData.put("eventDescription", event.getEventDescription());
         eventData.put("eventDate", event.getEventDate());
+        eventData.put("geolocationRequired", event.getGeolocationRequired());
         eventData.put("geolocationRequirement", event.getGeolocationMaxDistance());
-        eventData.put("waitlistCapacityRequired", event.getWaitingListCapacity());
+        eventData.put("waitlistCapacityRequired", event.getWaitlistCapaciyRequired());
+        eventData.put("waitlistCapacity", event.getWaitlistCapacity());
         eventData.put("createdDateTime", new Date());
-
         eventData.put("numberOfAttendees", event.getEventCapacity());
 
         // Create document

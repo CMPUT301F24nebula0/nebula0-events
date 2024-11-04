@@ -126,7 +126,11 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
             int maxNumberOfAttendees = Integer.parseInt(numberOfAttendees);
 
 
-            Event event = new Event(eventName,eventDescription,eventDateObj,maxNumberOfAttendees,waitlistMaxCapacity,geolocationMaxDistance);// TODO parameters
+            Event event = new Event(
+                    eventName, eventDescription, eventDateObj, facilityName, facilityAddress,
+                    geolocationRequired, geolocationMaxDistance, waitlistCapacityRequired,
+                    waitlistMaxCapacity, maxNumberOfAttendees);
+
             dbManager.addEvent(event);
 
             finish();

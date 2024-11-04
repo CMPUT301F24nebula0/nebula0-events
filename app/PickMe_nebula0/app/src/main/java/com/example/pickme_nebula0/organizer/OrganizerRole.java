@@ -82,12 +82,12 @@ public class OrganizerRole extends User {
 
     // US 02.03.01 As an organizer I want to OPTIONALLY limit the number of entrants who can join my waiting list
     public int getWaitingListCapacity(Event event) {
-        return event.getWaitingListCapacity();
+        return event.getWaitlistCapacity();
     }
 
     // US 02.03.01 As an organizer I want to OPTIONALLY limit the number of entrants who can join my waiting list
     public void setWaitingListCapacity(Event event, int capacity) {
-        event.setWaitingListCapacity(capacity);
+        event.setWaitlistCapacity(capacity);
     }
 
     // US 02.04.01 As an organizer I want to upload an event poster to provide visual information to entrants 
