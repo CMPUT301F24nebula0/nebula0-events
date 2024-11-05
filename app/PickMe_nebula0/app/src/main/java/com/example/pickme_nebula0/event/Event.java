@@ -198,7 +198,7 @@ public class Event {
             this.entrantsChosen = selectedEntrants;
 
             // have this in the DB later
-            entrantsToResample = new ArrayList<>(shuffledEntrants.subList(this.eventCapacity, shuffledEntrants.size()));
+            this.entrantsToResample = new ArrayList<>(shuffledEntrants.subList(this.eventCapacity, shuffledEntrants.size()));
         }
     }
 
@@ -228,6 +228,7 @@ public class Event {
         ArrayList<EntrantRole> entrantsToResample = getEntrantsToResample();
         Collections.shuffle(entrantsToResample);
 
+        // update chosen entrants and entrants to resample
         for (int i=0; i<this.unfilledSpots; i++) {
             int ind = 0;    // make sure this is consistent
             addEntrantToChosen(entrantsToResample.get(ind));
@@ -235,7 +236,7 @@ public class Event {
         }
 
         this.unfilledSpots = 0;
-        this.entrantsToResample = entrantsToResample;
+        this.entrantsToResample = entrantsToResample;   // reassign to shuffled list
     }
 
     // should only be done when sampling waiting entrants or resampling entrants
@@ -247,7 +248,8 @@ public class Event {
     }
 
     /**
-     * Removes an entrant from the chosen list.
+     * Removes an entrant from the chosen list IF entrant is found in chosen list.
+     * Does nothing if entrant not found.
      * CALL THIS FROM:
      *  EntrantRole - if declining invite.
      * Updates DB.
@@ -266,6 +268,7 @@ public class Event {
 
     /**
      * Removes an entrant from the chosen list.
+     * Also calls removeChosenEntrant.
      * CALL THIS FROM:
      *  OrganizerRole - if cancelling chosen entrant.
      */
@@ -284,12 +287,17 @@ public class Event {
     }
 
     /**
-     * Enrolls all entrants currently in chosen list.
-     * Assumes that organizer doesn't want to enroll each entrant
-     * one by one.
+     * Enrolls an entrant.
+     * Called by entrant when they accept the invite and sign up for the event.
+     * Note: no way to remove entrants, as this functionality is not required
+     * for any of the user requirements.
      */
-    public void enrollEntrants() {
-        // fetch chosen entrants from DB and update DB
-        this.entrantsEnrolled = new ArrayList<>(this.entrantsChosen);
+    public void enrollEntrant(EntrantRole entrant) {
+        this.entrantsEnrolled.add(entrant);
+
+        // update DB with following:
+        // entrant status
+        // event list of chosen entrants
+
     }
 }
