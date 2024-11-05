@@ -16,6 +16,7 @@ public class User {
     protected String profilePicture;
     protected Boolean notifEnabled;
     private final ArrayList<String> roles = new ArrayList<String>(Arrays.asList("admin", "entrant", "organizer"));
+    // todo - start as entrant only then add organizer, admin role conditionally
 
     public User(){
 

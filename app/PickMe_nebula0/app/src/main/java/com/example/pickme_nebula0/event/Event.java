@@ -20,8 +20,7 @@ public class Event {
     private String eventName;
     private String eventDescription;
     private Date eventDate;
-    private String facilityName;
-    private String facilityAddress;
+
     private boolean geolocationRequired;
     private int geolocationMaxDistance = -1; // -1 means no limit
     private boolean waitlistCapacityRequired;
@@ -47,8 +46,7 @@ public class Event {
     /**
      * Constructor
      */
-    public Event(String eventName, String eventDescription, Date eventDate, String facilityName,
-                 String facilityAddress, boolean geolocationRequired, int geolocationMaxDistance,
+    public Event(String eventName, String eventDescription, Date eventDate, boolean geolocationRequired, int geolocationMaxDistance,
                  boolean waitlistCapacityRequired, int waitlistCapacity,
                  int eventCapacity) {
         dbManager = new DBManager();
@@ -58,8 +56,23 @@ public class Event {
         this.eventName = eventName;
         this.eventDescription = eventDescription;
         this.eventDate = eventDate;
-        this.facilityName = facilityName;
-        this.facilityAddress = facilityAddress;
+        this.geolocationRequired = geolocationRequired;
+        this.geolocationMaxDistance = geolocationMaxDistance;
+        this.waitlistCapacityRequired = waitlistCapacityRequired;
+        this.waitlistCapacity = waitlistCapacity;
+        this.eventCapacity = eventCapacity;
+    }
+
+    public Event(String eventID,String organizerID, String eventName, String eventDescription, Date eventDate, boolean geolocationRequired, int geolocationMaxDistance,
+                 boolean waitlistCapacityRequired, int waitlistCapacity,
+                 int eventCapacity) {
+        dbManager = new DBManager();
+
+        this.eventID = eventID;
+        this.organizerID = organizerID;
+        this.eventName = eventName;
+        this.eventDescription = eventDescription;
+        this.eventDate = eventDate;
         this.geolocationRequired = geolocationRequired;
         this.geolocationMaxDistance = geolocationMaxDistance;
         this.waitlistCapacityRequired = waitlistCapacityRequired;
@@ -74,8 +87,6 @@ public class Event {
     public String getEventName() { return this.eventName; }
     public String getEventDescription() { return this.eventDescription; }
     public Date getEventDate() { return this.eventDate; }
-    public String getFacilityName() { return this.facilityName; }
-    public String getFacilityAddress() { return this.facilityAddress; }
     public boolean getGeolocationRequired() { return this.geolocationRequired; }
     public int getGeolocationMaxDistance() { return this.geolocationMaxDistance; }
     public boolean getWaitlistCapacityRequired() { return this.waitlistCapacityRequired; }
@@ -110,8 +121,6 @@ public class Event {
     public void setEventName(String eventName) { this.eventName = eventName; }
     public void setEventDescription(String eventDescription) { this.eventDescription = eventDescription; }
     public void setEventDate(Date eventDate) { this.eventDate = eventDate; }
-    public void setFacilityName(String facilityName) { this.facilityName = facilityName; }
-    public void setFacilityAddress(String facilityAddress) { this.facilityAddress = facilityAddress; }
     public void setGeolocationRequired(boolean geolocationRequired) { this.geolocationRequired = geolocationRequired; }
     public void setGeolocationMaxDistance(int geolocationMaxDistance) { this.geolocationMaxDistance = geolocationMaxDistance; }
     public void setWaitlistCapacityRequired(boolean waitlistCapacityRequired) { this.waitlistCapacityRequired = waitlistCapacityRequired; }
@@ -167,6 +176,7 @@ public class Event {
     public boolean removeEntrantFromWaitlist(EntrantRole entrant) {
         boolean entrantRemoved = this.entrantsInWaitlist.remove(entrant);
         // check if entrant exists in DB
+        //TODO
 
         if (entrantRemoved) {
             // UPDATE DB
