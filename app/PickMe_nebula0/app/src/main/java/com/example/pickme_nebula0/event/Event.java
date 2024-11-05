@@ -3,7 +3,6 @@ package com.example.pickme_nebula0.event;
 import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.entrant.EntrantRole;
-import com.example.pickme_nebula0.user.activities.UserInfoActivity;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,12 +20,19 @@ public class Event {
     private String eventName;
     private String eventDescription;
     private Date eventDate;
+    private String facilityName;
+    private String facilityAddress;
+    private boolean geolocationRequired;
+    private int geolocationMaxDistance = -1; // -1 means no limit
+    private boolean waitlistCapacityRequired;
+    protected int waitlistCapacity = -1;
+    protected int eventCapacity = -1;
+    private Date createdDateTime;
+    private int numberOfAttendees;
+    private int geolocationRequirement;
+
     protected String eventPoster;
 
-    // -1 means no limit
-    protected int waitingListCapacity = -1;
-    protected int eventCapacity = -1;
-    private int geolocationMaxDistance = -1;
     private int unfilledSpots = 0;  // # of entrants to be resampled
 
     protected ArrayList<EntrantRole> entrantsInWaitingList = new ArrayList<EntrantRole>();
@@ -35,71 +41,53 @@ public class Event {
     protected ArrayList<EntrantRole> entrantsEnrolled = new ArrayList<EntrantRole>();
     protected ArrayList<EntrantRole> entrantsToResample = new ArrayList<EntrantRole>();
 
+    public Event() {
+
+    }
     /**
      * Constructor
      */
-    public Event(String eventName, String eventDescription, Date eventDate, int eventCapacity, int waitingListCapacity, int geolocationMaxDistance) {
+    public Event(String eventName, String eventDescription, Date eventDate, String facilityName,
+                 String facilityAddress, boolean geolocationRequired, int geolocationMaxDistance,
+                 boolean waitlistCapacityRequired, int waitlistCapacity,
+                 int eventCapacity) {
         dbManager = new DBManager();
         eventID = dbManager.createIDForDocumentIn(dbManager.eventsCollection);
-        organizerID = DeviceManager.getDeviceId();
 
+        organizerID = DeviceManager.getDeviceId();
         this.eventName = eventName;
         this.eventDescription = eventDescription;
         this.eventDate = eventDate;
-        this.eventCapacity = eventCapacity;
-        this.waitingListCapacity = waitingListCapacity;
+        this.facilityName = facilityName;
+        this.facilityAddress = facilityAddress;
+        this.geolocationRequired = geolocationRequired;
         this.geolocationMaxDistance = geolocationMaxDistance;
+        this.waitlistCapacityRequired = waitlistCapacityRequired;
+        this.waitlistCapacity = waitlistCapacity;
+        this.eventCapacity = eventCapacity;
     }
 
-    /**
-     * Get eventID
-     * @return eventID eventID
-     */
+    // getters
     public String getEventID() {
         return this.eventID;
     }
-
-    public String getEventName() {return this.eventName;}
-
-    public String getEventDescription() {return this.eventDescription;}
-
-    public Date getEventDate(){return  this.eventDate;}
-
-    public int getGeolocationMaxDistance(){return  this.geolocationMaxDistance;}
-
-    /**
-     * Get Waiting List Capacity
-     * @return waitingListCapacity waiting list capacity
-     */
-    public int getWaitingListCapacity() {
-        return this.waitingListCapacity;
-    }
-
-    /**
-     * Set Waiting List Capacity
-     * @param waitingListCapacity waiting list capacity
-     */
-    public void setWaitingListCapacity(int waitingListCapacity) {
-        this.waitingListCapacity = waitingListCapacity;
-    }
-
+    public String getEventName() { return this.eventName; }
+    public String getEventDescription() { return this.eventDescription; }
+    public Date getEventDate() { return this.eventDate; }
+    public String getFacilityName() { return this.facilityName; }
+    public String getFacilityAddress() { return this.facilityAddress; }
+    public boolean getGeolocationRequired() { return this.geolocationRequired; }
+    public int getGeolocationMaxDistance() { return this.geolocationMaxDistance; }
+    public boolean getWaitlistCapacityRequired() { return this.waitlistCapacityRequired; }
+    public int getWaitlistCapacity() { return this.waitlistCapacity; }
+    public int getEventCapacity() { return this.eventCapacity; }
     public String getOrganizerID() {return organizerID;}
-
     public String getEventPoster() {
         return this.eventPoster;
     }
-
-    public void setEventPoster(String eventPoster) {
-        this.eventPoster = eventPoster;
-    }
-
-    public int getEventCapacity() {
-        return this.eventCapacity;
-    }
-
-    public void setEventCapacity(int eventCapacity) {
-        this.eventCapacity = eventCapacity;
-    }
+    public Date getCreatedDateTime() { return this.createdDateTime; }
+    public int getNumberOfAttendees() { return this.numberOfAttendees; }
+    public int getGeolocationRequirement() { return this.geolocationRequirement; }
 
     public ArrayList<EntrantRole> getEntrantsInWaitingList() {
         return this.entrantsInWaitingList;
@@ -113,11 +101,27 @@ public class Event {
         // FETCH FROM DB INSTEAD
         return this.entrantsCancelled;
     }
-
     public ArrayList<EntrantRole> getEntrantsEnrolled() {
         return this.entrantsEnrolled;
     }
 
+    // setters
+    public void setEventID(String eventID) { this.eventID = eventID; }
+    public void setEventName(String eventName) { this.eventName = eventName; }
+    public void setEventDescription(String eventDescription) { this.eventDescription = eventDescription; }
+    public void setEventDate(Date eventDate) { this.eventDate = eventDate; }
+    public void setFacilityName(String facilityName) { this.facilityName = facilityName; }
+    public void setFacilityAddress(String facilityAddress) { this.facilityAddress = facilityAddress; }
+    public void setGeolocationRequired(boolean geolocationRequired) { this.geolocationRequired = geolocationRequired; }
+    public void setGeolocationMaxDistance(int geolocationMaxDistance) { this.geolocationMaxDistance = geolocationMaxDistance; }
+    public void setWaitlistCapacityRequired(boolean waitlistCapacityRequired) { this.waitlistCapacityRequired = waitlistCapacityRequired; }
+    public void setWaitlistCapacity(int waitlistCapacity) { this.waitlistCapacity = waitlistCapacity; }
+    public void setEventCapacity(int eventCapacity) { this.eventCapacity = eventCapacity; }
+    public void setOrganizerID(String organizerID) { this.organizerID = organizerID; }
+    public void setEventPoster(String eventPoster) { this.eventPoster = eventPoster; }
+    public void setCreatedDateTime(Date createdDateTime) { this.createdDateTime = createdDateTime; }
+    public void setNumberOfAttendees (int numberOfAttendees) { this.numberOfAttendees = numberOfAttendees; }
+    public void setGeolocationRequirement (int geolocationRequirement) { this.geolocationRequirement = geolocationRequirement; }
 
     //------------ WAITING LIST LOGIC
 
@@ -134,12 +138,12 @@ public class Event {
      */
     public boolean waitingListFull() {
         // waiting list is never full for a list with unlimited capacity
-        if (this.waitingListCapacity == -1) { return false; }
+        if (this.waitlistCapacity == -1) { return false; }
 
-        if (this.entrantsInWaitingList.size() > this.waitingListCapacity) {
-            throw new IllegalStateException("Waiting list capacity exceeded somehow. Should not happen, check implementation for adding entrants.");
+        if (this.entrantsInWaitingList.size() > this.waitlistCapacity) {
+            throw new IllegalStateException("Waitlist capacity exceeded somehow. Should not happen, check implementation for adding entrants.");
         }
-        return (this.entrantsInWaitingList.size() == this.waitingListCapacity);
+        return (this.entrantsInWaitingList.size() == this.waitlistCapacity);
     }
 
     /**
