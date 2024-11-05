@@ -3,6 +3,7 @@ package com.example.pickme_nebula0.entrant;
 import com.example.pickme_nebula0.event.Event;
 import com.example.pickme_nebula0.user.User;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -39,6 +40,11 @@ public class EntrantRole extends User {
     public void setEntrantID(String entrantID) {
         this.entrantID = entrantID;
     }
+
+
+    // GETTERS
+    public ArrayList<Event> getEventsInWaitlist() { return this.eventsInWaitlist;}
+    public ArrayList<Event> getEventsEnrolled() { return this.eventsEnrolled;}
 
     //------------ GET STATUS OF EVENTS
 
