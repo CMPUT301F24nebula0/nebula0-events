@@ -22,11 +22,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DBManager {
+
     public String usersCollection = "Users";
-    public String eventsCollection = "Events";
-    public String eventRegistrantsCollection = "EventRegistrants";
+    // Subcollections of Users
     public String registeredEventsCollection = "registeredEvents";
     public String organizerEventsCollection = "organizerEvents";
+
+    public String eventsCollection = "Events";
+    public String eventRegistrantsCollection = "EventRegistrants";
+
+    public String facilitiesCollection = "Facilities";
+
+
 
     public enum RegistrantStatus{
         WAITLISTED, SELECTED, CONFIRMED, CANCELED
