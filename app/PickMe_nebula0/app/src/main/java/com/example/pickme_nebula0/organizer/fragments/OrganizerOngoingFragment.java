@@ -8,9 +8,18 @@ import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 
+import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
+import com.example.pickme_nebula0.event.Event;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import java.util.ArrayList;
+import java.util.Date;
 
 public class OrganizerOngoingFragment extends Fragment {
+    private FirebaseFirestore db;
+    ArrayList<Event> ongoingEvents = new ArrayList<Event>();
 
     public OrganizerOngoingFragment() {
     }
@@ -22,8 +31,27 @@ public class OrganizerOngoingFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_organizer_ongoing, container, false);
+        View view = inflater.inflate(R.layout.fragment_organizer_ongoing, container, false);
+
+        db = FirebaseFirestore.getInstance();
+
+        db.collection("Events")
+                .whereEqualTo("organizerID", DeviceManager.getDeviceId())
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            Event event = document.toObject(Event.class);
+                            if (event.getEventDate() != null && !event.getEventDate().before(new Date())) {
+                                ongoingEvents.add(event);
+                            }
+                            Log.d("test", event.getEventName() + " | Event ID: " + document.getId());
+                        }
+                    } else {
+                        Log.d("Firestore", "Error getting past events: ", task.getException());
+                    }
+                });
+
+        return view;
     }
-
-
 }

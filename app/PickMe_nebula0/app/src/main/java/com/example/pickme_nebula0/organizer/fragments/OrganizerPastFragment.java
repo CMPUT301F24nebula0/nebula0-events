@@ -19,6 +19,7 @@ import java.util.Date;
 
 public class OrganizerPastFragment extends Fragment {
     private FirebaseFirestore db;
+    ArrayList<Event> pastEvents = new ArrayList<Event>();
 
     public OrganizerPastFragment() {
     }
@@ -33,24 +34,6 @@ public class OrganizerPastFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_organizer_past, container, false);
 
         db = FirebaseFirestore.getInstance();
-        /*
-        db.collection("Events")
-                .whereEqualTo("organizerID", DeviceManager.getDeviceId())
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            Log.d("OrganizerPastFragment", "Event ID: " + document.getId() + " | Data: " + document.getData());
-                        }
-                        if (task.getResult().isEmpty()) {
-                            Log.d("OrganizerPastFragment", "No events found for organizerID: " + DeviceManager.getDeviceId());
-                        }
-                    } else {
-                        Log.d("OrganizerPastFragment", "Error getting events: ", task.getException());
-                    }
-                });
-
-         */
 
         db.collection("Events")
                 .whereEqualTo("organizerID", DeviceManager.getDeviceId())
@@ -59,9 +42,9 @@ public class OrganizerPastFragment extends Fragment {
                     if (task.isSuccessful()) {
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             Event event = document.toObject(Event.class);
-//                            if (event.getEventDate() != null && event.getEventDate().before(new Date())) {
-//                                pastEvents.add(event);
-//                            }
+                            if (event.getEventDate() != null && event.getEventDate().before(new Date())) {
+                                pastEvents.add(event);
+                            }
                             Log.d("test", event.getEventName() + " | Event ID: " + document.getId());
                         }
                     } else {
