@@ -314,6 +314,7 @@ public class Event {
         // entrant status
         // event list of chosen entrants
 
+        return true;
     }
 
     //-------------- UTILITY FUNCTIONS
