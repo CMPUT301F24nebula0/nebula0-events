@@ -88,15 +88,28 @@ public class DBManager {
     }
 
     public void addUpdateUserProfile(User user) {
+        checkExistenceOfDocument(usersCollection,user.getUserID(),()->updateUser(user),()->createNewUser(user));
+    }
+
+    private void createNewUser(User user){
         Map<String, Object> userData = new HashMap<>();
         userData.put("name", user.getName());
         userData.put("email", user.getEmail());
         userData.put("phone", user.getPhoneNumber());
         userData.put("profilePic", user.getProfilePicture());
         userData.put("notificationsEnabled", user.notifEnabled());
-        // TODO need to do this with events lists and facility profile too - may be better to split addUserProfile and update user profile into two functions
+        userData.put("admin", false);
 
         addUpdateDocument(usersCollection,user.getUserID(),userData);
+    }
+
+    private void updateUser(User user){
+        DocumentReference docRef = db.collection(usersCollection).document(user.getUserID());
+        updateField(docRef,"name",user.getName());
+        updateField(docRef,"email",user.getEmail());
+        updateField(docRef,"phone",user.getPhoneNumber());
+        updateField(docRef,"profilePic",user.getProfilePicture());
+        updateField(docRef,"notificationsEnabled",user.notifEnabled());
     }
 
     /**
@@ -118,6 +131,22 @@ public class DBManager {
 
         return new User(document.getId(), name, email, phone, notifEnabled);
     }
+
+    public void deleteUser(String userID){
+        DocumentReference userDoc = db.collection(usersCollection).document(userID);
+
+        // Remove User from all events they signed up for
+        CollectionReference registeredEventsCol = userDoc.collection(registeredEventsCollection);
+        iterateOverCollection(registeredEventsCol,(qds)->fromEventDocInRegisteredCollectionRemoveUser(qds,userID));
+
+        // Remove any events user created (if were an organizer)
+        CollectionReference createdEventsCol = userDoc.collection(organizerEventsCollection);
+        iterateOverCollection(createdEventsCol,(qds)->{deleteEvent(qds.getId());});
+
+        // Remove User from Users
+        removeDocument(userDoc);
+    }
+
 
 // -------------------- / Users \ ------------------------------------------------------------------
 
@@ -165,6 +194,11 @@ public class DBManager {
         removeDocument(eveInRegDocRef);
     }
 
+    public void fromEventDocInRegisteredCollectionRemoveUser(QueryDocumentSnapshot registeredEventQDS, String userID){
+        String eventID = registeredEventQDS.getId();
+        removeRegistrantFromEvent(eventID, userID);
+    }
+
     public void setRegistrantStatus(String eventID,String registrantID,RegistrantStatus registrantStatus){
         // Set status within event
         DocumentReference regInEventDocRef = getDocOfRegistrantInEvent(eventID,registrantID);
@@ -183,21 +217,25 @@ public class DBManager {
 
     public void getEvent(String eventID,Obj2VoidCallback onSuccessCallback,
                          Void2VoidCallback onFailureCallback){
-        throw new RuntimeException("NOT IMPLEMENTED");
+        getDocumentAsObject(eventsCollection,eventID,this::eventConverter,onSuccessCallback,onFailureCallback);
     }
 
-    public void deleteEvent(Event event){
+    public void deleteEvent(String eventID){
         // Remove Event from all users who signed up
-        DocumentReference eventDoc = db.collection(eventsCollection).document(event.getEventID());
+        DocumentReference eventDoc = db.collection(eventsCollection).document(eventID);
         CollectionReference collectionOfEventRegistrants = eventDoc.collection(eventRegistrantsCollection);
         iterateOverCollection(collectionOfEventRegistrants, this::removeEventFromRegistrant);
 
         // Remove Event from organizer
-        String orgID = event.getOrganizerID();
-        removeDocument(db.collection(usersCollection).document(orgID).collection(organizerEventsCollection).document(event.getEventID()));
+        getDocumentAsObject(eventsCollection,eventID,this::eventConverter,this::removeEventFromOrganizer,()->{});
 
         // Remove Event from Events
         removeDocument(eventDoc);
+    }
+
+    private void removeEventFromOrganizer(Object event){
+        Event castedEvent = (Event) event;
+        removeDocument(db.collection(usersCollection).document(castedEvent.getOrganizerID()).collection(organizerEventsCollection).document(castedEvent.getEventID()));
     }
 
     private void removeEventFromRegistrant(DocumentSnapshot eventRegistrantDoc){
@@ -205,6 +243,21 @@ public class DBManager {
         String eventID = eventRegistrantDoc.getReference().getParent().getId();
 
         removeDocument(getDocOfEventInRegistrant(eventID,registrantID));
+    }
+
+    private Object eventConverter(DocumentSnapshot document){
+        String eventID = document.getId();
+        String organizerID = document.getString("organizerID");
+        String name = document.getString("eventName");
+        String desc = document.getString("eventDescription");
+        Date date = document.getDate("eventDate");
+        Boolean geolocationRequired = document.getBoolean("geolocationRequired");
+        Integer geolocRequirement = (Integer) document.get("geolocationRequirement");
+        Integer numberOfAttendees = (Integer) document.get("numberOfAttendees");
+        Boolean waitistCapcityReq = document.getBoolean("waitlistCapacityRequired");
+        Integer waitlistCapacity = (Integer) document.get("waitlistCapacity");
+
+        return new Event(eventID,organizerID,name,desc,date,geolocationRequired,geolocRequirement,waitistCapcityReq,waitlistCapacity,numberOfAttendees);
     }
 
 // -------------------- / Events \ -----------------------------------------------------------------
@@ -217,11 +270,10 @@ public class DBManager {
 
     public void updateOldFacility(Object facilityID,Facility facility){
         // update facilities collection
-        Map<String, Object> facilityData = new HashMap<>();
-        facilityData.put("name", facility.getFacilityName());
-        facilityData.put("address", facility.getFacilityAddress());
-        addUpdateDocument(facilitiesCollection,facilityID.toString(),facilityData);
-    }
+        DocumentReference docRefFacilities = db.collection(facilitiesCollection).document(facilityID.toString());
+        updateField(docRefFacilities,"name",facility.getFacilityName());
+        updateField(docRefFacilities,"address",facility.getFacilityAddress());
+      }
 
     public void createNewFacility(Facility facility){
         // create new document in facilities collection
@@ -229,13 +281,12 @@ public class DBManager {
         Map<String, Object> facilityData = new HashMap<>();
         facilityData.put("name", facility.getFacilityName());
         facilityData.put("address", facility.getFacilityAddress());
+        facilityData.put("organizerID",facility.getOrganizerID());
         addUpdateDocument(facilitiesCollection,facilityID,facilityData);
 
         // update user in users collection
         updateField(db.collection(usersCollection).document(DeviceManager.getDeviceId()),"facilityID",facilityID);
     }
-
-
 
     public void getFacility(String userID, Obj2VoidCallback onPopulated, Void2VoidCallback onFailureCallback){
         DocumentReference userDocRef = db.collection(usersCollection).document(userID);
@@ -249,43 +300,43 @@ public class DBManager {
     private Object facilityConverter(DocumentSnapshot document){
         String name = document.getString("name");
         String adr = document.getString("address");
+        String orgID = document.getString("organizerID");
 
-        return new Facility(document.getId(),name,adr);
+        return new Facility(document.getId(),orgID,name,adr);
     }
 
-    private void performIfFieldPopulated(DocumentReference docRef, String fieldName, Obj2VoidCallback populatedCallback, Void2VoidCallback unpopulatedCallback){
-        String operationDescription = String.format("checkFieldPopulated [C-%s, D-%s, F-%s]: ",docRef.getParent().getId(),docRef.getId(), fieldName);
+    public void deleteFacility(String facilityID){
+        DocumentReference facilityDocRef = db.collection(facilitiesCollection).document(facilityID);
 
-        docRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
-                if (document.exists()) {
-                    // Check if the field exists and is non-null
-                    if (document.contains(fieldName) && document.get(fieldName) != null) {
+        // Delete all the events occurring at this facility e.g. all events for that organizer, and remove the facility from the organize
+        getDocumentAsObject(facilitiesCollection,facilityID,this::facilityConverter,this::removeEventsAtFacilityAndRemoveFromOrganizer,()->{});
 
-                        Object fieldValue = document.get(fieldName);
-                        populatedCallback.run(fieldValue);
-                        Log.d("Firestore", operationDescription + "field is populated");
-                    } else {
-                        Log.d("Firestore", operationDescription + "field DNE or NULL");
-                        unpopulatedCallback.run();
-                    }
-                } else {
-                    Log.d("Firestore", operationDescription + "document DNE");
-                }
-            } else {
-                Log.e("Firestore", operationDescription + "Failed to retrieve document", task.getException());
-            }
-        });
+        // Remove it from Facilities Collection
+        removeDocument(facilityDocRef);
     }
 
-    private DocumentReference facilityRetriever(String facilityID){
-        return db.collection(facilitiesCollection).document(facilityID);
-    }
+    private void removeEventsAtFacilityAndRemoveFromOrganizer(Object facility){
+        Facility castedFacility = (Facility) facility;
+        String organizerID = castedFacility.getOrganizerID();
+        CollectionReference createdEventsCol = db.collection(usersCollection).document(organizerID).collection(organizerEventsCollection);
+        iterateOverCollection(createdEventsCol,(qds)->{deleteEvent(qds.getId());});
 
+        updateField(db.collection(usersCollection).document(organizerID),"facilityID",null);
+    }
 
 
 // -------------------- / Facilities \ -----------------------------------------------------------------
+
+// ----------------- \ TODO / --------------------------------------------------------
+    public void deleteQRCode(){
+        throw new RuntimeException("NOT IMPLEMENTED");
+    }
+
+    public void deleteImage(){
+        throw new RuntimeException("NOT IMPLEMENTED");
+    }
+
+// ----------------- / TODO \ --------------------------------------------------------
 
 
 // ----------------- \ Abstracted Helpers / --------------------------------------------------------
@@ -311,6 +362,33 @@ public class DBManager {
                     Log.d("Firestore", operationDescription + " failed with error: " + task.getException());
                     unfoundCallback.run();
                 }
+            }
+        });
+    }
+
+
+    private void performIfFieldPopulated(DocumentReference docRef, String fieldName, Obj2VoidCallback populatedCallback, Void2VoidCallback unpopulatedCallback){
+        String operationDescription = String.format("checkFieldPopulated [C-%s, D-%s, F-%s]: ",docRef.getParent().getId(),docRef.getId(), fieldName);
+
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    // Check if the field exists and is non-null
+                    if (document.contains(fieldName) && document.get(fieldName) != null) {
+
+                        Object fieldValue = document.get(fieldName);
+                        populatedCallback.run(fieldValue);
+                        Log.d("Firestore", operationDescription + "field is populated");
+                    } else {
+                        Log.d("Firestore", operationDescription + "field DNE or NULL");
+                        unpopulatedCallback.run();
+                    }
+                } else {
+                    Log.d("Firestore", operationDescription + "document DNE");
+                }
+            } else {
+                Log.e("Firestore", operationDescription + "Failed to retrieve document", task.getException());
             }
         });
     }

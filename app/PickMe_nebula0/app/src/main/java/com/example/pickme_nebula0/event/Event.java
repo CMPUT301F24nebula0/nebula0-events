@@ -63,6 +63,23 @@ public class Event {
         this.eventCapacity = eventCapacity;
     }
 
+    public Event(String eventID,String organizerID, String eventName, String eventDescription, Date eventDate, boolean geolocationRequired, int geolocationMaxDistance,
+                 boolean waitlistCapacityRequired, int waitlistCapacity,
+                 int eventCapacity) {
+        dbManager = new DBManager();
+
+        this.eventID = eventID;
+        this.organizerID = organizerID;
+        this.eventName = eventName;
+        this.eventDescription = eventDescription;
+        this.eventDate = eventDate;
+        this.geolocationRequired = geolocationRequired;
+        this.geolocationMaxDistance = geolocationMaxDistance;
+        this.waitlistCapacityRequired = waitlistCapacityRequired;
+        this.waitlistCapacity = waitlistCapacity;
+        this.eventCapacity = eventCapacity;
+    }
+
     // getters
     public String getEventID() {
         return this.eventID;
