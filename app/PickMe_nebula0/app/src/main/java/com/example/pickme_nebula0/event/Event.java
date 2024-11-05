@@ -35,7 +35,7 @@ public class Event {
 
     private int unfilledSpots = 0;  // # of entrants to be resampled
 
-    protected ArrayList<EntrantRole> entrantsInWaitingList = new ArrayList<EntrantRole>();
+    protected ArrayList<EntrantRole> entrantsInWaitlist = new ArrayList<EntrantRole>();
     protected ArrayList<EntrantRole> entrantsChosen = new ArrayList<EntrantRole>();
     protected ArrayList<EntrantRole> entrantsCancelled = new ArrayList<EntrantRole>();
     protected ArrayList<EntrantRole> entrantsEnrolled = new ArrayList<EntrantRole>();
@@ -89,8 +89,8 @@ public class Event {
     public int getNumberOfAttendees() { return this.numberOfAttendees; }
     public int getGeolocationRequirement() { return this.geolocationRequirement; }
 
-    public ArrayList<EntrantRole> getEntrantsInWaitingList() {
-        return this.entrantsInWaitingList;
+    public ArrayList<EntrantRole> getEntrantsInWaitlist() {
+        return this.entrantsInWaitlist;
     }
 
     public ArrayList<EntrantRole> getEntrantsChosen() {
@@ -123,7 +123,7 @@ public class Event {
     public void setNumberOfAttendees (int numberOfAttendees) { this.numberOfAttendees = numberOfAttendees; }
     public void setGeolocationRequirement (int geolocationRequirement) { this.geolocationRequirement = geolocationRequirement; }
 
-    //------------ WAITING LIST LOGIC
+    //------------ WAITLIST LOGIC
 
     /**
      * Simplifies checking if waiting list is full.
@@ -136,14 +136,14 @@ public class Event {
      *
      * @return boolean Whether list is full or not
      */
-    public boolean waitingListFull() {
+    public boolean waitlistFull() {
         // waiting list is never full for a list with unlimited capacity
         if (this.waitlistCapacity == -1) { return false; }
 
-        if (this.entrantsInWaitingList.size() > this.waitlistCapacity) {
+        if (this.entrantsInWaitlist.size() > this.waitlistCapacity) {
             throw new IllegalStateException("Waitlist capacity exceeded somehow. Should not happen, check implementation for adding entrants.");
         }
-        return (this.entrantsInWaitingList.size() == this.waitlistCapacity);
+        return (this.entrantsInWaitlist.size() == this.waitlistCapacity);
     }
 
     /**
@@ -155,17 +155,17 @@ public class Event {
      * @param entrant Entrant to add
      * @return boolean Whether addition was successful or rejected
      */
-    public boolean addEntrantToWaitingList(EntrantRole entrant) {
+    public boolean addEntrantToWaitlist(EntrantRole entrant) {
         // TODO: return specific error message
-        if (waitingListFull() || entrantInWaitlist(entrant)) { return false;}
+        if (waitlistFull() || entrantInWaitlist(entrant)) { return false;}
 
-        this.entrantsInWaitingList.add(entrant);
+        this.entrantsInWaitlist.add(entrant);
         return true;
     }
 
     // can be done by organizer or entrant who removes themselves
-    public boolean removeEntrantFromWaitingList(EntrantRole entrant) {
-        boolean entrantRemoved = this.entrantsInWaitingList.remove(entrant);
+    public boolean removeEntrantFromWaitlist(EntrantRole entrant) {
+        boolean entrantRemoved = this.entrantsInWaitlist.remove(entrant);
         // check if entrant exists in DB
 
         if (entrantRemoved) {
@@ -191,13 +191,13 @@ public class Event {
      */
     public void sampleEntrants() {
         // eventCapacity == -1 means no limit
-        if (this.eventCapacity == -1 || this.entrantsInWaitingList.size() <= this.eventCapacity) {
-            this.entrantsChosen = new ArrayList<>(this.entrantsInWaitingList);
+        if (this.eventCapacity == -1 || this.entrantsInWaitlist.size() <= this.eventCapacity) {
+            this.entrantsChosen = new ArrayList<>(this.entrantsInWaitlist);
         } else {
             // waiting entrants exceeds event capacity
             // randomly sample
             // create new arraylist to avoid altering original
-            ArrayList<EntrantRole> shuffledEntrants = new ArrayList<>(this.entrantsInWaitingList);
+            ArrayList<EntrantRole> shuffledEntrants = new ArrayList<>(this.entrantsInWaitlist);
             Collections.shuffle(shuffledEntrants);
             ArrayList<EntrantRole> selectedEntrants = new ArrayList<>(shuffledEntrants.subList(0, this.eventCapacity));
             // modify selectedEntrants as needed prior to assigning to this.entrantsChosen
@@ -323,7 +323,7 @@ public class Event {
 
     //-------------- UTILITY FUNCTIONS
     public boolean entrantInWaitlist(EntrantRole entrant) {
-        return entrantInList(entrant, this.entrantsInWaitingList);
+        return entrantInList(entrant, this.entrantsInWaitlist);
     }
 
     public boolean entrantChosen(EntrantRole entrant) {
