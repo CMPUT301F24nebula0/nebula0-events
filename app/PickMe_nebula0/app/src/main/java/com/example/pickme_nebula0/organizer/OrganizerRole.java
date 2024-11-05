@@ -5,6 +5,8 @@ import com.example.pickme_nebula0.event.Event;
 import com.example.pickme_nebula0.user.User;
 
 import java.util.ArrayList;
+import java.util.Date;
+
 /**
  * OrganizerRole
  */
@@ -82,12 +84,12 @@ public class OrganizerRole extends User {
 
     // US 02.03.01 As an organizer I want to OPTIONALLY limit the number of entrants who can join my waiting list
     public int getWaitingListCapacity(Event event) {
-        return event.getWaitingListCapacity();
+        return event.getWaitlistCapacity();
     }
 
     // US 02.03.01 As an organizer I want to OPTIONALLY limit the number of entrants who can join my waiting list
     public void setWaitingListCapacity(Event event, int capacity) {
-        event.setWaitingListCapacity(capacity);
+        event.setWaitlistCapacity(capacity);
     }
 
     // US 02.04.01 As an organizer I want to upload an event poster to provide visual information to entrants 
@@ -100,23 +102,8 @@ public class OrganizerRole extends User {
         event.setEventPoster(eventPoster);
     }
 
-    public boolean sendNotificationToEntrantsInWaitingList(Event event) {
-        boolean notificationSent = false;
 
-        ArrayList<EntrantRole> entrantsInWaitingList = event.getEntrantsInWaitingList();
-        // Send notification
-        return notificationSent;
-    }
-
-    // US 02.05.01 As an organizer I want to send a notification to chosen entrants to sign up for events
-    // update entrant info in firebase?
-    public boolean sendNotificationToEntrantsChosen(Event event) {
-        boolean notificationSent = false;
-
-        ArrayList<EntrantRole> entrantsChosen = event.getEntrantsChosen();
-        // Send notification
-        return notificationSent;
-    }
+    // moved under notification section
 
     // US 02.05.02
     // As an organizer I want to set the system to sample a specified number of attendees to register for the event
@@ -161,37 +148,55 @@ public class OrganizerRole extends User {
 
     // US 02.06.05 As an organizer I want to cancel entrants that declined signing up for the event
     public void cancelEntrants(Event event, EntrantRole entrant) {
-        // add error checking
-        event.getEntrantsChosen().remove(entrant);
-        // in future, cancel entrants that declined signing up for the event
+        // cancelEntrant performs error checking
+        event.cancelEntrant(entrant);
     }
 
+    //---------- NOTIFICATIONS
     // US 02.07.01 As an organizer I want to send notifications to all entrants on the waiting list
-    public boolean notifyWaitingEntrants(Event event) {
-        boolean notificationSent = false;
-
-        ArrayList<EntrantRole> entrantsWaiting = event.getEntrantsInWaitingList();
-        // Send notification
+    public boolean notifyEntrantsInWaitlist(Event event, String message) {
+        boolean notificationSent = notifyEntrants(event, event.getEntrantsInWaitingList(), message);
         return notificationSent;
     }
 
     // US 02.07.02 As an organizer I want to send notifications to all selected entrants
-    public boolean notifySelectedEntrants(Event event) {
-        boolean notificationSent = false;
-
-        ArrayList<EntrantRole> entrantsChosen = event.getEntrantsChosen();
-        // Send notification
+    public boolean notifySelectedEntrants(Event event, String message) {
+        boolean notificationSent = notifyEntrants(event, event.getEntrantsChosen(), message);
         return notificationSent;
     }
 
     // US 02.07.03 As an organizer I want to send a notification to all canceled entrants
-    public boolean notifyCancelledEntrants(Event event) {
-        boolean notificationSent = false;
-
-        ArrayList<EntrantRole> entrantsCanceled = event.getEntrantsCancelled();
-        // Send notification
+    public boolean notifyCancelledEntrants(Event event, String message) {
+        boolean notificationSent = notifyEntrants(event, event.getEntrantsCancelled(), message);
         return notificationSent;
     }
 
+    // US 02.05.01 As an organizer I want to send a notification to chosen entrants to sign up for events
+    public boolean notifyEntrantsChosen(Event event) {
+        String message = "You have been selected for "+event.getEventName()+". Sign up now.";
+        boolean notificationSent = notifyEntrants(event, event.getEntrantsChosen(), message);
+        return notificationSent;
+    }
 
+    public boolean notifyEntrants(Event event, ArrayList<EntrantRole> entrants, String message) {
+        boolean notificationSent = false;
+
+        // notification attributes
+        Date timestamp = new Date();
+        String eventID = event.getEventID();
+
+        for (int i=0; i<entrants.size(); i++) {
+            EntrantRole current_entrant = entrants.get(i);
+
+            if (current_entrant.canRecieveNotifs()) {
+                String entrantID = current_entrant.getUserID(); // replace with device ID
+
+                // NOTIFICATION GOES HERE
+                // how to send notification?
+
+            }
+        }
+
+        return notificationSent;
+    }
 }

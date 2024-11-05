@@ -1,12 +1,10 @@
 package com.example.pickme_nebula0.db;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.example.pickme_nebula0.event.Event;
-import com.example.pickme_nebula0.organizer.activities.OrganizerCreateEventActivity;
 import com.example.pickme_nebula0.user.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -16,8 +14,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import android.widget.Toast;
+import com.example.pickme_nebula0.organizer.activities.OrganizerCreateEventActivity;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -111,14 +110,16 @@ public class DBManager {
     public void addEvent(Event event){
         // Populate fields with data from object
         Map<String, Object> eventData = new HashMap<>();
-        eventData.put("organizerID",event.getOrganizerID());
+        eventData.put("eventID", event.getEventID());
+        eventData.put("organizerID", event.getOrganizerID());
         eventData.put("eventName", event.getEventName());
         eventData.put("eventDescription", event.getEventDescription());
         eventData.put("eventDate", event.getEventDate());
+        eventData.put("geolocationRequired", event.getGeolocationRequired());
         eventData.put("geolocationRequirement", event.getGeolocationMaxDistance());
-        eventData.put("waitlistCapacityRequired", event.getWaitingListCapacity());
+        eventData.put("waitlistCapacityRequired", event.getWaitlistCapacityRequired());
+        eventData.put("waitlistCapacity", event.getWaitlistCapacity());
         eventData.put("createdDateTime", new Date());
-
         eventData.put("numberOfAttendees", event.getEventCapacity());
 
         // Create document
