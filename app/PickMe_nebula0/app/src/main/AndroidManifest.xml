@@ -26,6 +26,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".user.activities.UserInfoActivity"></activity>
+        <activity android:name=".user.activities.FacilityInfoActivity"></activity>
         <activity android:name=".start.activities.HomePageActivity"></activity>
         <activity android:name=".qr.QRCodeActivity"></activity>
         <activity android:name=".admin.activities.AdminHomeActivity"></activity>

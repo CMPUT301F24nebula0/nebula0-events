@@ -4,7 +4,11 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.pickme_nebula0.DeviceManager;
+import com.example.pickme_nebula0.PickMeApplication;
+import com.example.pickme_nebula0.SharedDialogue;
 import com.example.pickme_nebula0.event.Event;
+import com.example.pickme_nebula0.facility.Facility;
 import com.example.pickme_nebula0.user.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -20,6 +24,7 @@ import com.example.pickme_nebula0.organizer.activities.OrganizerCreateEventActiv
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 public class DBManager {
 
@@ -56,6 +61,10 @@ public class DBManager {
 
     public interface Obj2VoidCallback {
         void run(Object u);
+    }
+
+    public interface DocRetriever{
+        DocumentReference retrieve(String docID);
     }
 
     public interface DocumentConverter {
@@ -117,7 +126,7 @@ public class DBManager {
     public void addEvent(Event event){
         // Populate fields with data from object
         Map<String, Object> eventData = new HashMap<>();
-        eventData.put("eventID", event.getEventID());
+        eventData.put("eventID", event.getEventID()); // TODO - this is the key so I think we can get rid of this
         eventData.put("organizerID", event.getOrganizerID());
         eventData.put("eventName", event.getEventName());
         eventData.put("eventDescription", event.getEventDescription());
@@ -199,6 +208,84 @@ public class DBManager {
     }
 
 // -------------------- / Events \ -----------------------------------------------------------------
+
+// ----------------- \ Facilities / --------------------------------------------------------
+    public void addUpdateFacility(Facility facility){
+        String userID = DeviceManager.getDeviceId();
+        performIfFieldPopulated(db.collection(usersCollection).document(userID),"facilityID",(facilityID)-> updateOldFacility(facilityID,facility),()->createNewFacility(facility));
+    }
+
+    public void updateOldFacility(Object facilityID,Facility facility){
+        // update facilities collection
+        Map<String, Object> facilityData = new HashMap<>();
+        facilityData.put("name", facility.getFacilityName());
+        facilityData.put("address", facility.getFacilityAddress());
+        addUpdateDocument(facilitiesCollection,facilityID.toString(),facilityData);
+    }
+
+    public void createNewFacility(Facility facility){
+        // create new document in facilities collection
+        String facilityID = createIDForDocumentIn(facilitiesCollection);
+        Map<String, Object> facilityData = new HashMap<>();
+        facilityData.put("name", facility.getFacilityName());
+        facilityData.put("address", facility.getFacilityAddress());
+        addUpdateDocument(facilitiesCollection,facilityID,facilityData);
+
+        // update user in users collection
+        updateField(db.collection(usersCollection).document(DeviceManager.getDeviceId()),"facilityID",facilityID);
+    }
+
+
+
+    public void getFacility(String userID, Obj2VoidCallback onPopulated, Void2VoidCallback onFailureCallback){
+        DocumentReference userDocRef = db.collection(usersCollection).document(userID);
+        performIfFieldPopulated(userDocRef,"facilityID",(facilityID) -> onSuc(facilityID, onPopulated, onFailureCallback),()->{return;});
+    }
+
+    public void onSuc(Object facilityID, Obj2VoidCallback suc2,Void2VoidCallback fail){
+        getDocumentAsObject(facilitiesCollection,facilityID.toString(),this::facilityConverter,suc2,fail);
+    }
+
+    private Object facilityConverter(DocumentSnapshot document){
+        String name = document.getString("name");
+        String adr = document.getString("address");
+
+        return new Facility(document.getId(),name,adr);
+    }
+
+    private void performIfFieldPopulated(DocumentReference docRef, String fieldName, Obj2VoidCallback populatedCallback, Void2VoidCallback unpopulatedCallback){
+        String operationDescription = String.format("checkFieldPopulated [C-%s, D-%s, F-%s]: ",docRef.getParent().getId(),docRef.getId(), fieldName);
+
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    // Check if the field exists and is non-null
+                    if (document.contains(fieldName) && document.get(fieldName) != null) {
+
+                        Object fieldValue = document.get(fieldName);
+                        populatedCallback.run(fieldValue);
+                        Log.d("Firestore", operationDescription + "field is populated");
+                    } else {
+                        Log.d("Firestore", operationDescription + "field DNE or NULL");
+                        unpopulatedCallback.run();
+                    }
+                } else {
+                    Log.d("Firestore", operationDescription + "document DNE");
+                }
+            } else {
+                Log.e("Firestore", operationDescription + "Failed to retrieve document", task.getException());
+            }
+        });
+    }
+
+    private DocumentReference facilityRetriever(String facilityID){
+        return db.collection(facilitiesCollection).document(facilityID);
+    }
+
+
+
+// -------------------- / Facilities \ -----------------------------------------------------------------
 
 
 // ----------------- \ Abstracted Helpers / --------------------------------------------------------
@@ -328,7 +415,16 @@ public class DBManager {
 
     private void updateField(DocumentReference doc,String fieldName, Object newVal){
         String operationDescription = String.format("updateField [C-%s,D-%s, F-%s]",doc.getParent().getId(),doc.getId(),fieldName);
-        doc.update(fieldName,newVal);
+        doc.update(fieldName,newVal).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Log.d("Firestore", operationDescription + " succeeded");
+                } else {
+                    Log.d("Firestore", operationDescription + " failed: " + task.getException());
+                }
+            }
+        });;
     }
 
     private void createDocument(CollectionReference colRef, String docID, Map<String, Object> data){

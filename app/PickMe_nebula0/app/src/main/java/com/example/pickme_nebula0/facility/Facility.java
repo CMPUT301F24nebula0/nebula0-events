@@ -20,8 +20,15 @@ public class Facility {
      */
     public Facility(String facilityName, String facilityAddress) {
         dbManager = new DBManager();
-        facilityID = dbManager.createIDForDocumentIn(dbManager.facilitiesCollection);
 
+        this.facilityName = facilityName;
+        this.facilityAddress = facilityAddress;
+    }
+
+    public Facility(String facilityID, String facilityName, String facilityAddress){
+        dbManager = new DBManager();
+
+        this.facilityID = facilityID;
         this.facilityName = facilityName;
         this.facilityAddress = facilityAddress;
     }
