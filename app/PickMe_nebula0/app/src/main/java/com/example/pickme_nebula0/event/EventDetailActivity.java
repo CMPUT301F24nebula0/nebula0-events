@@ -1,6 +1,8 @@
 package com.example.pickme_nebula0.event;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -17,6 +19,13 @@ public class EventDetailActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_detail);
+
+        final Button backButton = findViewById(R.id.backButton);
+
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) { getOnBackPressedDispatcher().onBackPressed(); }
+        });
 
         eventDetailsTextView = findViewById(R.id.event_details_text_view);
 

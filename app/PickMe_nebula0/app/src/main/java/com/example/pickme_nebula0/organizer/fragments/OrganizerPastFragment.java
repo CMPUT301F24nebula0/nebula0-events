@@ -40,20 +40,20 @@ public class OrganizerPastFragment extends Fragment {
 
         db = FirebaseFirestore.getInstance();
 
-        db.collection("Events")
-                .whereEqualTo("organizerID", DeviceManager.getDeviceId())
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            Event event = document.toObject(Event.class);
-                            if (event.getEventDate() != null && event.getEventDate().before(new Date())) {
-                                pastEvents.add(event);
-                            }
-                        }
-                        adapter.notifyDataSetChanged();
-                    }
-                });
+//        db.collection("Events")
+//                .whereEqualTo("organizerID", DeviceManager.getDeviceId())
+//                .get()
+//                .addOnCompleteListener(task -> {
+//                    if (task.isSuccessful()) {
+//                        for (QueryDocumentSnapshot document : task.getResult()) {
+//                            Event event = document.toObject(Event.class);
+//                            if (event.getEventDate() != null && event.getEventDate().before(new Date())) {
+//                                pastEvents.add(event);
+//                            }
+//                        }
+//                        adapter.notifyDataSetChanged();
+//                    }
+//                });
 
         return view;
     }
