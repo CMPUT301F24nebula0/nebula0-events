@@ -70,25 +70,25 @@ public class OrganizerRole extends User {
     }
 
     // US 02.02.01 As an organizer I want to view the list of entrants who joined my event waiting list
-    public ArrayList<EntrantRole> viewWaitingList(Event event) {
-        ArrayList<EntrantRole> entrantsInWaitingList = new ArrayList<EntrantRole>();
+    public ArrayList<EntrantRole> viewWaitlist(Event event) {
+        ArrayList<EntrantRole> entrantsInWaitlist = new ArrayList<EntrantRole>();
 
         // in future, get the list of entrants who joined the event waiting list
-        return entrantsInWaitingList;
+        return entrantsInWaitlist;
     }
 
     // US 02.02.02 As an organizer I want to see on a map where entrants joined my event waiting list from.
-    public void viewMapOfWaitingList(Event event) {
+    public void viewMapOfWaitlist(Event event) {
         // in future, show the map of entrants who joined the event waiting list
     }
 
     // US 02.03.01 As an organizer I want to OPTIONALLY limit the number of entrants who can join my waiting list
-    public int getWaitingListCapacity(Event event) {
+    public int getWaitlistCapacity(Event event) {
         return event.getWaitlistCapacity();
     }
 
     // US 02.03.01 As an organizer I want to OPTIONALLY limit the number of entrants who can join my waiting list
-    public void setWaitingListCapacity(Event event, int capacity) {
+    public void setWaitlistCapacity(Event event, int capacity) {
         event.setWaitlistCapacity(capacity);
     }
 
@@ -155,7 +155,7 @@ public class OrganizerRole extends User {
     //---------- NOTIFICATIONS
     // US 02.07.01 As an organizer I want to send notifications to all entrants on the waiting list
     public boolean notifyEntrantsInWaitlist(Event event, String message) {
-        boolean notificationSent = notifyEntrants(event, event.getEntrantsInWaitingList(), message);
+        boolean notificationSent = notifyEntrants(event, event.getEntrantsInWaitlist(), message);
         return notificationSent;
     }
 
