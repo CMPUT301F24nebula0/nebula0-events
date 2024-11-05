@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1055508444879",
+    "project_id": "pickme-c2fb3",
+    "storage_bucket": "pickme-c2fb3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1055508444879:android:29e753ba1e9ea8ecd7a9ba",
+        "android_client_info": {
+          "package_name": "com.example.pickme_nebula0"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRM3S3RkzR7e0cKGwT4Vk4tEtemocMP8Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
