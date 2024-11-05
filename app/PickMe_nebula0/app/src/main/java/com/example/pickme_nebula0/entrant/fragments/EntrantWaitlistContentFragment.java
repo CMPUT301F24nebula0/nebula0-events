@@ -14,6 +14,7 @@ import com.example.pickme_nebula0.event.Event;
 import com.example.pickme_nebula0.event.WaitlistEventAdapter;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class EntrantWaitlistContentFragment extends Fragment {
 
@@ -49,8 +50,6 @@ public class EntrantWaitlistContentFragment extends Fragment {
                     eventTitles[i],
                     eventDescriptions[i],
                     null,
-                    "",
-                    "",
                     false,
                     0,
                     false,
