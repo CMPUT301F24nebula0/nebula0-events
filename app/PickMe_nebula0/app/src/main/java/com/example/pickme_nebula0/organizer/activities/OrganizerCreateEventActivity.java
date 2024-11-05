@@ -42,8 +42,6 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         EditText eventNameField = findViewById(R.id.event_name_field);
         EditText eventDescriptionField = findViewById(R.id.event_description_field);
         eventDateField = findViewById(R.id.event_date_field);
-        EditText facilityNameField = findViewById(R.id.facility_name_field);
-        EditText facilityAddressField = findViewById(R.id.facility_address_field);
         Switch geolocationRequirementSwitch = findViewById(R.id.geolocation_requirement_switch);
         EditText geolocationRequirementField = findViewById(R.id.geolocation_requirement_field);
         Switch waitlistCapacityRequiredSwitch = findViewById(R.id.waitlist_capacity_required_switch);
@@ -92,8 +90,6 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
             String eventName = eventNameField.getText().toString();
             String eventDescription = eventDescriptionField.getText().toString();
             String eventDate = eventDateField.getText().toString();
-            String facilityName = facilityNameField.getText().toString();
-            String facilityAddress = facilityAddressField.getText().toString();
             boolean geolocationRequired = geolocationRequirementSwitch.isChecked();
             String geolocationRequirement = geolocationRequirementField.getText().toString();
             boolean waitlistCapacityRequired = waitlistCapacityRequiredSwitch.isChecked();
@@ -102,7 +98,7 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
 
             // Validate user input
             if (!validateEventCreationUserInput(deviceID, eventName, eventDescription, eventDate,
-                    facilityName, facilityAddress, geolocationRequired, geolocationRequirement,
+                    geolocationRequired, geolocationRequirement,
                     waitlistCapacityRequired, waitlistCapacity, numberOfAttendees)) {
                 // If user input is invalid, don't add event
                 return;
@@ -126,8 +122,7 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
             int maxNumberOfAttendees = Integer.parseInt(numberOfAttendees);
 
 
-            Event event = new Event(
-                    eventName, eventDescription, eventDateObj, facilityName, facilityAddress,
+            Event event = new Event(eventName, eventDescription, eventDateObj,
                     geolocationRequired, geolocationMaxDistance, waitlistCapacityRequired,
                     waitlistMaxCapacity, maxNumberOfAttendees);
 
@@ -138,8 +133,7 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
 
         // Cancel button logic
         eventCreationCancelButton.setOnClickListener(v -> {
-            if (isAnyFieldFilled(eventNameField, eventDescriptionField, eventDateField, facilityNameField,
-                    facilityAddressField, geolocationRequirementField, waitlistCapacityField, numberOfAttendeesField)) {
+            if (isAnyFieldFilled(eventNameField, eventDescriptionField, eventDateField, geolocationRequirementField, waitlistCapacityField, numberOfAttendeesField)) {
 
                 new AlertDialog.Builder(OrganizerCreateEventActivity.this)
                         .setTitle("Cancel Event Creation")
@@ -174,8 +168,6 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
             String eventName,
             String eventDescription,
             String eventDate,
-            String facilityName,
-            String facilityAddress,
             boolean geolocationRequired,
             String geolocationRequirement,
             boolean waitlistCapacityRequired,
@@ -228,14 +220,7 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
                 valid = false;
             }
         }
-        if (facilityName.isEmpty()) {
-            warningMessage.append("\n- The facility name cannot be blank.");
-            valid = false;
-        }
-        if (facilityAddress.isEmpty()) {
-            warningMessage.append("\n- The facility address cannot be blank.");
-            valid = false;
-        }
+
         if (geolocationRequired) {
             if (geolocationRequirement.isEmpty()) {
                 warningMessage.append("\n- The geolocation requirement cannot be blank.");

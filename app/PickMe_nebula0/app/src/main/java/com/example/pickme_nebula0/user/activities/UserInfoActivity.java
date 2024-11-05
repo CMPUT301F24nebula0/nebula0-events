@@ -1,5 +1,6 @@
 package com.example.pickme_nebula0.user.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -81,8 +82,8 @@ public class UserInfoActivity extends AppCompatActivity {
         facilityButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: launch facility management activity
-                finish();
+                Intent intent = new Intent(UserInfoActivity.this, FacilityInfoActivity.class);
+                startActivity(intent);
             }
         });
 
