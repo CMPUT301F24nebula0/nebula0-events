@@ -108,6 +108,7 @@ public class DBManager {
     public void addEvent(Event event){
         // Populate fields with data from object
         Map<String, Object> eventData = new HashMap<>();
+        eventData.put("eventID", event.getEventID());
         eventData.put("organizerID", event.getOrganizerID());
         eventData.put("eventName", event.getEventName());
         eventData.put("eventDescription", event.getEventDescription());

@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.event.Event;
+import com.example.pickme_nebula0.event.EventDetailActivity;
 
 import java.util.ArrayList;
 
@@ -38,7 +39,7 @@ public class PastEventsAdapter extends RecyclerView.Adapter<PastEventsAdapter.Pa
 
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, EventDetailActivity.class);
-            intent.putExtra("eventName", event.getEventName());
+            intent.putExtra("eventID", event.getEventID());
             context.startActivity(intent);
         });
     }

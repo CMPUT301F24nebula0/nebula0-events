@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/organizer_past_fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <TextView
-        android:id="@+id/organizer_past_text"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/past_events_recycler_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Past Events Content"
-        android:layout_gravity="center" />
+        />
 
 </FrameLayout>
