@@ -156,20 +156,23 @@ public class Event {
      * @return boolean Whether addition was successful or rejected
      */
     public boolean addEntrantToWaitingList(EntrantRole entrant) {
-        if (waitingListFull()) { return false;}
+        // TODO: return specific error message
+        if (waitingListFull() || entrantInWaitlist(entrant)) { return false;}
 
         this.entrantsInWaitingList.add(entrant);
         return true;
     }
 
     // can be done by organizer or entrant who removes themselves
-    public void removeEntrantFromWaitingList(EntrantRole entrant) {
+    public boolean removeEntrantFromWaitingList(EntrantRole entrant) {
         boolean entrantRemoved = this.entrantsInWaitingList.remove(entrant);
-        // check if entrant exists in DB instead of relying on private attribute
+        // check if entrant exists in DB
 
         if (entrantRemoved) {
             // UPDATE DB
         }
+
+        return entrantRemoved;
     }
 
     //---------- SAMPLE ENTRANTS
@@ -236,6 +239,7 @@ public class Event {
             int ind = 0;    // make sure this is consistent
             addEntrantToChosen(entrantsToResample.get(ind));
             entrantsToResample.remove(ind);
+            // notify resampled entrants they were chosen
         }
 
         this.unfilledSpots = 0;
@@ -243,11 +247,14 @@ public class Event {
     }
 
     // should only be done when sampling waiting entrants or resampling entrants
-    public void addEntrantToChosen(EntrantRole entrant) {
+    public boolean addEntrantToChosen(EntrantRole entrant) {
+        if (entrantChosen(entrant)) { return false; }
         this.entrantsChosen.add(entrant);
         // check if entrant exists in DB instead of relying on private attribute
 
         // UPDATE DB
+
+        return true;
     }
 
     /**
@@ -296,4 +303,55 @@ public class Event {
         // fetch chosen entrants from DB and update DB
         this.entrantsEnrolled = new ArrayList<>(this.entrantsChosen);
     }
+
+    /**
+     * Enrolls an entrant.
+     * Called by entrant when they accept the invite and sign up for the event.
+     * Note: no way to remove entrants, as this functionality is not required
+     * for any of the user requirements.
+     */
+    public boolean enrollEntrant(EntrantRole entrant) {
+        if (entrantEnrolled(entrant)) { return false; }
+        this.entrantsEnrolled.add(entrant);
+
+        // update DB with following:
+        // entrant status
+        // event list of chosen entrants
+
+        return true;
+    }
+
+    //-------------- UTILITY FUNCTIONS
+    public boolean entrantInWaitlist(EntrantRole entrant) {
+        return entrantInList(entrant, this.entrantsInWaitingList);
+    }
+
+    public boolean entrantChosen(EntrantRole entrant) {
+        return entrantInList(entrant, this.entrantsChosen);
+    }
+
+    public boolean entrantCanBeResampled(EntrantRole entrant) {
+        return entrantInList(entrant, this.entrantsToResample);
+    }
+
+    public boolean entrantCancelled(EntrantRole entrant) {
+        return entrantInList(entrant, this.entrantsCancelled);
+    }
+
+    public boolean entrantEnrolled(EntrantRole entrant) {
+        return entrantInList(entrant, this.entrantsEnrolled);
+    }
+
+    private boolean entrantInList(EntrantRole entrant, ArrayList<EntrantRole> entrantList) {
+        // FETCH FROM DB
+        boolean found_entrant = false;
+
+        for (int i=0; i<entrantList.size(); i++) {
+            EntrantRole current_entrant = entrantList.get(i);
+            if (current_entrant.equals(entrant)) { break; }
+        }
+
+        return found_entrant;
+    }
+
 }
