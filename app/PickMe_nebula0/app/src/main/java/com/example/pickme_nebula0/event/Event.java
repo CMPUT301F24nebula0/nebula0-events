@@ -292,4 +292,35 @@ public class Event {
         // fetch chosen entrants from DB and update DB
         this.entrantsEnrolled = new ArrayList<>(this.entrantsChosen);
     }
+
+    //-------------- UTILITY FUNCTIONS
+    public boolean entrantInWaitlist(EntrantRole entrant) {
+        return entrantInList(entrant, this.entrantsInWaitingList);
+    }
+
+    public boolean entrantChosen(EntrantRole entrant) {
+        return entrantInList(entrant, this.entrantsChosen);
+    }
+
+    public boolean entrantCanBeResampled(EntrantRole entrant) {
+        return entrantInList(entrant, this.entrantsToResample);
+    }
+
+    public boolean entrantCancelled(EntrantRole entrant) {
+        return entrantInList(entrant, this.entrantsCancelled);
+    }
+    
+
+    private boolean entrantInList(EntrantRole entrant, ArrayList<EntrantRole> entrantList) {
+        // FETCH FROM DB
+        boolean found_entrant = false;
+
+        for (int i=0; i<entrantList.size(); i++) {
+            EntrantRole current_entrant = entrantList.get(i);
+            if (current_entrant.equals(entrant)) { break; }
+        }
+
+        return found_entrant;
+    }
+
 }
