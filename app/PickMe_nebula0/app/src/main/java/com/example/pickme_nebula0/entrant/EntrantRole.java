@@ -12,8 +12,8 @@ import java.util.Objects;
 public class EntrantRole extends User {
     private String entrantID;
     private boolean isOptedOutFromNotification = false;
-    private ArrayList<Event> joinedWaitingList = new ArrayList<Event>();
-    private ArrayList<Event> joinedEvents = new ArrayList<Event>();
+    private ArrayList<Event> eventsInWaitlist = new ArrayList<Event>();
+    private ArrayList<Event> eventsEnrolled = new ArrayList<Event>();
 
     /**
      * Constructor
@@ -63,23 +63,23 @@ public class EntrantRole extends User {
 
    // US 01.01.01 As an entrant, I want to join the waiting list for a specific event
     // updates both list in Entrant and Event
-    public boolean joinWaitingList(Event event) {
+    public boolean joinWaitlist(Event event) {
         // isJoined is false if waitList is already full
         // or joining fails for some other reason
-        // see addEntrantToWaitingList (Event)
-        boolean isJoined = event.addEntrantToWaitingList(this);
+        // see addEntrantToWaitlist (Event)
+        boolean isJoined = event.addEntrantToWaitlist(this);
         if (isJoined) {
-            if (!eventInEvents(event, this.joinedWaitingList)) { this.joinedWaitingList.add(event); }
+            if (!eventInEvents(event, this.eventsInWaitlist)) { this.eventsInWaitlist.add(event); }
         }
 
         return isJoined;
     }
 
     // US 01.01.02 As an entrant, I want to unjoin a waiting list for a specific event 
-    public boolean unjoinWaitingList(Event event) {
-        boolean isUnjoined = event.removeEntrantFromWaitingList(this);
+    public boolean unjoinWaitlist(Event event) {
+        boolean isUnjoined = event.removeEntrantFromWaitlist(this);
         if (isUnjoined) {
-            this.joinedWaitingList.remove(event);
+            this.eventsInWaitlist.remove(event);
         }
 
         return isUnjoined;
@@ -97,7 +97,7 @@ public class EntrantRole extends User {
 
     // US 01.04.01 As an entrant I want to receive notification when chosen from the waiting list (when I "win" the lottery)
     // US 01.04.02 As an entrant I want to receive notification of not chosen on the app (when I "lose" the lottery)
-    public void receiveNotificationForWaitingList() {
+    public void receiveNotificationForWaitlist() {
         if (!this.isOptedOutFromNotification) {
             // in future, receive notification for waiting list
             // when chosen or not chosen for the waiting list
@@ -125,8 +125,8 @@ public class EntrantRole extends User {
         // currently, rejects entrant if they are already enrolled
         isAccepted = event.enrollEntrant(this);
         if (isAccepted) {
-            this.joinedWaitingList.remove(event);
-            if (!eventInEvents(event, this.joinedEvents)) { this.joinedEvents.add(event); }
+            this.eventsInWaitlist.remove(event);
+            if (!eventInEvents(event, this.eventsEnrolled)) { this.eventsEnrolled.add(event); }
         }
 
         return isAccepted;
@@ -137,8 +137,8 @@ public class EntrantRole extends User {
         boolean isDeclined = false;
         isDeclined = event.removeChosenEntrant(this);
         if (isDeclined) {
-            this.joinedWaitingList.remove(event);
-            this.joinedEvents.remove(event);
+            this.eventsInWaitlist.remove(event);
+            this.eventsEnrolled.remove(event);
         }
 
         return isDeclined;
