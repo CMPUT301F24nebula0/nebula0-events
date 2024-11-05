@@ -16,25 +16,25 @@ import com.example.pickme_nebula0.event.EventDetailActivity;
 
 import java.util.ArrayList;
 
-public class PastEventsAdapter extends RecyclerView.Adapter<PastEventsAdapter.PastEventViewHolder> {
-    private ArrayList<Event> pastEvents;
+public class OngoingEventsAdapter extends RecyclerView.Adapter<OngoingEventsAdapter.OngoingEventViewHolder> {
+    private ArrayList<Event> ongoingEvents;
     private Context context;
 
-    public PastEventsAdapter(Context context, ArrayList<Event> pastEvents) {
+    public OngoingEventsAdapter(Context context, ArrayList<Event> ongoingEvents) {
         this.context = context;
-        this.pastEvents = pastEvents;
+        this.ongoingEvents = ongoingEvents;
     }
 
     @NonNull
     @Override
-    public PastEventViewHolder onCreateViewHolder(@NonNull ViewGroup parent,int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_event, parent, false);
-        return new PastEventViewHolder(view);
+    public OngoingEventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()). inflate(R.layout.item_event, parent, false);
+        return new OngoingEventViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull PastEventViewHolder holder, int position) {
-        Event event = pastEvents.get(position);
+    public void onBindViewHolder(@NonNull OngoingEventViewHolder holder, int position) {
+        Event event = ongoingEvents.get(position);
         holder.eventNameTextView.setText(event.getEventName());
 
         holder.itemView.setOnClickListener(v -> {
@@ -46,13 +46,13 @@ public class PastEventsAdapter extends RecyclerView.Adapter<PastEventsAdapter.Pa
 
     @Override
     public int getItemCount() {
-        return pastEvents.size();
+        return ongoingEvents.size();
     }
 
-    static class PastEventViewHolder extends RecyclerView.ViewHolder {
+    static class OngoingEventViewHolder extends RecyclerView.ViewHolder {
         TextView eventNameTextView;
 
-        public PastEventViewHolder(@NonNull View itemView) {
+        public OngoingEventViewHolder(@NonNull View itemView) {
             super(itemView);
             eventNameTextView = itemView.findViewById(R.id.event_name_text_view);
         }

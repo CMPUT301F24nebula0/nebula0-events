@@ -57,4 +57,28 @@ public class OrganizerPastFragment extends Fragment {
 
         return view;
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadPastEvents();
+    }
+
+    private void loadPastEvents() {
+        pastEvents.clear();
+        db.collection("Events")
+                .whereEqualTo("organizerID", DeviceManager.getDeviceId())
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            Event event = document.toObject(Event.class);
+                            if (event.getEventDate() != null && event.getEventDate().before(new Date())) {
+                                pastEvents.add(event);
+                            }
+                        }
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+    }
 }
