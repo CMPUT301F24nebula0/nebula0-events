@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/organizer_create_event_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -32,10 +33,10 @@
     <EditText
         android:id="@+id/event_name_field"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="56dp"
         android:hint="Enter event name"
-        app:layout_constraintStart_toEndOf="@+id/event_name_text"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/event_name_text"
         app:layout_constraintTop_toTopOf="@+id/event_name_text" />
 
     <!-- Event Description Label -->
@@ -51,10 +52,10 @@
     <EditText
         android:id="@+id/event_description_field"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="56dp"
         android:hint="Enter event description"
-        app:layout_constraintStart_toEndOf="@+id/event_description_text"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/event_description_text"
         app:layout_constraintTop_toTopOf="@+id/event_description_text" />
 
     <!-- Event Date Label -->
@@ -70,112 +71,94 @@
     <EditText
         android:id="@+id/event_date_field"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Select event date"
-        android:focusable="false"
+        android:layout_height="56dp"
         android:clickable="true"
-        app:layout_constraintStart_toEndOf="@+id/event_date_text"
+        android:focusable="false"
+        android:hint="Select event date"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/event_date_text"
         app:layout_constraintTop_toTopOf="@+id/event_date_text" />
 
     <!-- Facility Name Label -->
-    <TextView
-        android:id="@+id/facility_name_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Facility Name*"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/event_date_field" />
 
     <!-- Facility Name Field -->
-    <EditText
-        android:id="@+id/facility_name_field"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Enter facility name"
-        app:layout_constraintStart_toEndOf="@+id/facility_name_text"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/facility_name_text" />
 
     <!-- Facility Address Label -->
-    <TextView
-        android:id="@+id/facility_address_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Facility Address*"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/facility_name_field" />
 
     <!-- Facility Address Field -->
-    <EditText
-        android:id="@+id/facility_address_field"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Enter facility address"
-        app:layout_constraintStart_toEndOf="@+id/facility_address_text"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/facility_address_text" />
 
     <!-- Geolocation Requirement Label -->
+
+    <!-- Geolocation Requirement Switch -->
+
+    <!-- Geolocation Requirement Field -->
+
     <TextView
         android:id="@+id/geolocation_requirement_text"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="26dp"
+        android:layout_marginStart="8dp"
         android:text="Geolocation Required"
+        app:layout_constraintBottom_toBottomOf="@+id/geolocation_requirement_switch"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/facility_address_field" />
+        app:layout_constraintTop_toTopOf="@+id/geolocation_requirement_switch" />
 
-    <!-- Geolocation Requirement Switch -->
     <Switch
         android:id="@+id/geolocation_requirement_switch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
         app:layout_constraintStart_toEndOf="@+id/geolocation_requirement_text"
-        app:layout_constraintTop_toTopOf="@+id/geolocation_requirement_text" />
-
-    <!-- Geolocation Requirement Field -->
-    <EditText
-        android:id="@+id/geolocation_requirement_field"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Enter geolocation details"
-        app:layout_constraintStart_toEndOf="@+id/geolocation_requirement_switch"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/geolocation_requirement_text" />
+        app:layout_constraintTop_toBottomOf="@+id/event_date_field" />
 
     <!-- Waitlist Capacity Label -->
+
+    <!-- Waitlist Capacity Switch -->
+    <EditText
+        android:id="@+id/geolocation_requirement_field"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:hint="Enter geolocation details"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/geolocation_requirement_text" />
+
     <TextView
         android:id="@+id/waitlist_capacity_required_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Waitlist Capacity Required"
+        app:layout_constraintBottom_toBottomOf="@+id/waitlist_capacity_required_switch"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/geolocation_requirement_field" />
+        app:layout_constraintTop_toTopOf="@+id/waitlist_capacity_required_switch" />
 
-    <!-- Waitlist Capacity Switch -->
     <Switch
         android:id="@+id/waitlist_capacity_required_switch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="24dp"
         app:layout_constraintStart_toEndOf="@+id/waitlist_capacity_required_text"
-        app:layout_constraintTop_toTopOf="@+id/waitlist_capacity_required_text" />
+        app:layout_constraintTop_toBottomOf="@+id/geolocation_requirement_field" />
 
     <!-- Waitlist Capacity Field -->
     <EditText
         android:id="@+id/waitlist_capacity_field"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
         android:hint="Enter waitlist capacity"
         android:inputType="number"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/waitlist_capacity_required_switch" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/waitlist_capacity_required_text" />
 
     <!-- Number of Attendees Label -->
     <TextView
         android:id="@+id/number_of_attendees_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:text="Number of Attendees*"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/waitlist_capacity_field" />
@@ -184,11 +167,11 @@
     <EditText
         android:id="@+id/number_of_attendees_field"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="56dp"
         android:hint="Enter number of attendees"
         android:inputType="number"
-        app:layout_constraintStart_toEndOf="@+id/number_of_attendees_text"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/number_of_attendees_text"
         app:layout_constraintTop_toTopOf="@+id/number_of_attendees_text" />
 
     <!-- Required Field Note -->
@@ -196,6 +179,7 @@
         android:id="@+id/required_field_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:text="* denotes a required field"
         android:textSize="12sp"
         app:layout_constraintStart_toStartOf="parent"
