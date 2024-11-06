@@ -22,8 +22,8 @@ import com.example.pickme_nebula0.organizer.activities.OrganizerHomeActivity;
 import com.example.pickme_nebula0.user.activities.UserInfoActivity;
 
 public class HomePageActivity extends AppCompatActivity {
-
     private static final int REQUEST_CODE_PERMISSION = 100;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

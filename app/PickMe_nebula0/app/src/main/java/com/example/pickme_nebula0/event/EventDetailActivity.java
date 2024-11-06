@@ -1,5 +1,6 @@
 package com.example.pickme_nebula0.event;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -15,6 +16,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.db.DBManager;
+import com.example.pickme_nebula0.notification.NotificationCreationActivity;
+import com.example.pickme_nebula0.start.activities.LaunchActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class EventDetailActivity extends AppCompatActivity {
@@ -28,16 +31,9 @@ public class EventDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_detail);
         final Button backButton = findViewById(R.id.backButton);
+        final Button msgEntrantsButton = findViewById(R.id.button_ed_msgEntrants);
 
         dbManager = new DBManager();
-
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) { getOnBackPressedDispatcher().onBackPressed(); }
-        });
-
-        eventDetailsTextView = findViewById(R.id.event_details_text_view);
-        qrCodeImageView = findViewById(R.id.qr_code_image_view);
 
         String eventID = getIntent().getStringExtra("eventID");
         if (eventID == null || eventID.isEmpty()) {
@@ -46,9 +42,28 @@ public class EventDetailActivity extends AppCompatActivity {
             return;
         }
 
-        //
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) { getOnBackPressedDispatcher().onBackPressed(); }
+        });
+
+        msgEntrantsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(EventDetailActivity.this, NotificationCreationActivity.class);
+                i.putExtra("eventID", eventID);
+                startActivity(i);
+            }
+        });
+
+        eventDetailsTextView = findViewById(R.id.event_details_text_view);
+        qrCodeImageView = findViewById(R.id.qr_code_image_view);
+
         fetchEventDetails(eventID);
+
+
     }
+
 
     private void fetchEventDetails(String eventID) {
         dbManager.getEvent(eventID, eventObj -> {

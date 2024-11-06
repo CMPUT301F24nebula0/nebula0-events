@@ -1,10 +1,15 @@
 package com.example.pickme_nebula0.notification;
 
+import com.google.firebase.Timestamp;
+
 /**
  * Notification class
  */
 public class Notification {
     private String notificationID;
+    private String title;
+    private  String message;
+    private Timestamp timestamp;
 
     /**
      * Constructor
