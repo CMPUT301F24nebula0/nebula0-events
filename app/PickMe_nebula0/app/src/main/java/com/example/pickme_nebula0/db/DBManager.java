@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Class encompassing database access and modification
+ *
  * @author Stephine Yearley
  * @see Event,User,Facility
  */

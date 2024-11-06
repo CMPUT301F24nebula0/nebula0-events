@@ -3,6 +3,11 @@ package com.example.pickme_nebula0;
 import android.app.AlertDialog;
 import android.content.Context;
 
+/**
+ * Class for minimizing code duplication by providing dialogue box creation shared by multiple activities
+ *
+ * @author Stephine Yearley
+ */
 public class SharedDialogue {
 
     /**
