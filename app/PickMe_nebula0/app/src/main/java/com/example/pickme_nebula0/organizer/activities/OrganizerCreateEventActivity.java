@@ -127,6 +127,7 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
                     waitlistMaxCapacity, maxNumberOfAttendees);
 
             dbManager.addEvent(event);
+            Toast.makeText(this, "Event created successfully with QR Code!", Toast.LENGTH_LONG).show();
 
             finish();
         });
