@@ -1,14 +1,14 @@
 package com.example.pickme_nebula0.db;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.example.pickme_nebula0.DeviceManager;
-import com.example.pickme_nebula0.PickMeApplication;
-import com.example.pickme_nebula0.SharedDialogue;
 import com.example.pickme_nebula0.event.Event;
 import com.example.pickme_nebula0.facility.Facility;
+import com.example.pickme_nebula0.organizer.activities.OrganizerCreateEventActivity;
 import com.example.pickme_nebula0.user.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -18,79 +18,118 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import android.widget.Toast;
-import com.example.pickme_nebula0.organizer.activities.OrganizerCreateEventActivity;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 
+/**
+ * Class encompassing database access and modification
+ *
+ * @author Stephine Yearley
+ * @see Event,User,Facility
+ */
 public class DBManager {
 
     public String usersCollection = "Users";
-    // Subcollections of Users
+    // Sub-collections of Users
     public String registeredEventsCollection = "registeredEvents";
     public String organizerEventsCollection = "organizerEvents";
 
     public String eventsCollection = "Events";
+    // Sub-collections of Event
     public String eventRegistrantsCollection = "EventRegistrants";
 
     public String facilitiesCollection = "Facilities";
 
-
-
+    /**
+     * Enum describing status of an entrant
+     * Waitlisted = user is registered but has not "won the lottery"
+     * Selected = user has "won the lottery" but has not accepted the invite
+     * Confirmed = user has "won the lottery" and has accepted the invite
+     * Canceled = user "won the lottery" but took too long to accept, got canceled by organizer
+     */
     public enum RegistrantStatus{
         WAITLISTED, SELECTED, CONFIRMED, CANCELED
     }
-    // Waitlisted (user is registered but has not "won the lottery"
-    // Selected (user has "won the lottery" but has not accepted the invite
-    // Confirmed (user has "won the lottery" and has accepted the invite
-    // Canceled (user "won the lottery" but took too long to accept, got canceled by organizer
 
-    private FirebaseFirestore db;
+    private final FirebaseFirestore db;
 
+    /**
+     * Constructor, instantiates the default FirebaseFirestore instance
+     */
     public DBManager() {
         db = FirebaseFirestore.getInstance();
     }
 
 // ------------- \ Function Interfaces / -----------------------------------------------------------
+
+    /**
+     * Interface defining a callback function with signature "void foo()"
+     * Pass callback into a function that takes a Void2VoidCallback using "bar(this::foo)"
+     * Run callback function using foo.run();
+     */
     public interface Void2VoidCallback {
-        void run();  // Define the method to be used as a callback
+        void run();
     }
 
+    /**
+     * Interface defining a callback function with signature "void foo(Object obj)"
+     * Pass callback into a function that takes a Obj2VoidCallback using "bar(this::foo)"
+     * Run callback function using foo.run(obj)
+     * NOTE: Function of type Obj2VoidCallback should cast to required object type, if necessary
+     */
     public interface Obj2VoidCallback {
         void run(Object u);
     }
 
-    public interface DocRetriever{
-        DocumentReference retrieve(String docID);
-    }
-
+    /**
+     * Interface defining a function that converts a DocumentSnapshot into a relevant class Instance
+     * A valid DocumentConverter has signature "Object myDocConverter(DocumentSnapshot doc)"
+     */
     public interface DocumentConverter {
         Object convert(DocumentSnapshot doc);
     }
 
-    public interface ForEachDocumentCallback {
+    /**
+     * Interface defining a callback to be performed on a document in the results of a query.
+     * A valid ProcessQueryDocCallback has signature "void myForEachDocCallback(QueryDocumentSnapshot)"
+     */
+    public interface ProcessQueryDocCallback {
         void process(QueryDocumentSnapshot queryDocumentSnapshot);
     }
 // ------------- / Function Interfaces \ -----------------------------------------------------------
 
 
 // -------------------- \ Users / ------------------------------------------------------------------
+
     /**
-     * Checks for user with this device ID in the database
-     * If no such user exists, launches UserInfoActivity
-     * If user already exists, launches HomePageActivity
+     * Checks if user with given deviceID exists in Users collection of database
+     *
+     * @param deviceID deviceID of user we are searching for
+     * @param registeredCallback function called if user exists in database
+     * @param unregisteredVoid2VoidCallback function called if user does not exist in database
      */
     public void checkUserRegistration(String deviceID, Void2VoidCallback registeredCallback, Void2VoidCallback unregisteredVoid2VoidCallback) {
         checkExistenceOfDocument(usersCollection, deviceID, registeredCallback, unregisteredVoid2VoidCallback);
     }
 
+    /**
+     * If user not in database, adds an entry to Users collection with user info
+     * If user already in database, updates the document for the given user
+     *
+     * @param user instance of User containing data to add or update User collection entry with
+     */
     public void addUpdateUserProfile(User user) {
         checkExistenceOfDocument(usersCollection,user.getUserID(),()->updateUser(user),()->createNewUser(user));
     }
 
+    /**
+     * Adds a given user to the database.
+     * If this user (same user.deviceID) already exists, their data will be overwritten.
+     *
+     * @param user instance of User to be added to the Users collection of the database
+     */
     private void createNewUser(User user){
         Map<String, Object> userData = new HashMap<>();
         userData.put("name", user.getName());
@@ -103,6 +142,11 @@ public class DBManager {
         addUpdateDocument(usersCollection,user.getUserID(),userData);
     }
 
+    /**
+     * Updates a user's profile in the database.
+     *
+     * @param user - instance of
+     */
     private void updateUser(User user){
         DocumentReference docRef = db.collection(usersCollection).document(user.getUserID());
         updateField(docRef,"name",user.getName());
@@ -123,39 +167,61 @@ public class DBManager {
         getDocumentAsObject(usersCollection,deviceID,this::userConverter,onSuccessCallback,onFailureCallback);
     }
 
-    private Object userConverter(DocumentSnapshot document){
-        String name = document.getString("name");
-        String email = document.getString("email");
-        String phone = document.getString("phone");
-        Boolean notifEnabled = document.getBoolean("notificationsEnabled");
+    /**
+     * Returns an instance of user by extracting data about user from given userDocument
+     *
+     * @param userDocument instance of DocumentSnapshot for document associated with this user in Users collection
+     * @return an instance of User representing the information held in this document
+     */
+    private Object userConverter(DocumentSnapshot userDocument){
+        String name = userDocument.getString("name");
+        String email = userDocument.getString("email");
+        String phone = userDocument.getString("phone");
+        Boolean notifEnabled = userDocument.getBoolean("notificationsEnabled");
 
-        return new User(document.getId(), name, email, phone, notifEnabled);
+        return new User(userDocument.getId(), name, email, phone, notifEnabled);
     }
 
+    /**
+     * Deletes the user associated with a given userID
+     * Removes user from all events they signed up for (Entrant)
+     * Deletes all events created by this user (Organizer)
+     * Deletes facility associated with this user if applicable (Organizer)
+     * Deletes user from Users collection
+     *
+     * @param userID ID of user to delete
+     */
     public void deleteUser(String userID){
         DocumentReference userDoc = db.collection(usersCollection).document(userID);
 
         // Remove User from all events they signed up for
         CollectionReference registeredEventsCol = userDoc.collection(registeredEventsCollection);
-        iterateOverCollection(registeredEventsCol,(qds)->fromEventDocInRegisteredCollectionRemoveUser(qds,userID));
+        iterateOverCollection(registeredEventsCol,(registeredEventQDS)->removeRegistrantFromEvent(registeredEventQDS.getId(), userID));
 
-        // Remove any events user created (if were an organizer)
+        // Remove any events user created (if an organizer)
         CollectionReference createdEventsCol = userDoc.collection(organizerEventsCollection);
         iterateOverCollection(createdEventsCol,(qds)->{deleteEvent(qds.getId());});
+
+        // Remove facility associated with that user (if an organizer)
+        performIfFieldPopulated(userDoc,"facilityID",this::deleteFacility,()->{});
 
         // Remove User from Users
         removeDocument(userDoc);
     }
-
-
 // -------------------- / Users \ ------------------------------------------------------------------
 
 
 // -------------------- \ Events / -----------------------------------------------------------------
+
+    /**
+     * Adds new event document to Events collection given an Event instance.
+     * If Event exists already (same eventID), overwrites entry in database.
+     *
+     * @param event instance of event containing information to be added to database Events collection
+     */
     public void addEvent(Event event){
         // Populate fields with data from object
         Map<String, Object> eventData = new HashMap<>();
-        eventData.put("eventID", event.getEventID()); // TODO - this is the key so I think we can get rid of this
         eventData.put("organizerID", event.getOrganizerID());
         eventData.put("eventName", event.getEventName());
         eventData.put("eventDescription", event.getEventDescription());
@@ -171,6 +237,14 @@ public class DBManager {
         addUpdateDocument(eventsCollection,event.getEventID(),eventData);
     }
 
+    /**
+     * Adds a given registrant to a given event.
+     * Updates the list of registrants in the event document's sub-collection
+     * Updates the user's list of registered events in the user document's sub-collection
+     *
+     * @param eventID      eventID of event to register in
+     * @param registrantID userID of user registering in event
+     */
     public void addRegistrantToWaitlist(String eventID, String registrantID){
         Map<String, Object> data = new HashMap<>();
         data.put("status", RegistrantStatus.WAITLISTED);
@@ -179,11 +253,19 @@ public class DBManager {
         CollectionReference eventRegColRef = db.collection(eventsCollection).document(eventID).collection(eventRegistrantsCollection);
         createDocument(eventRegColRef,registrantID,data);
 
-        // In Users, update user to have event
+        // In Users, update user to have waitlisted event
         CollectionReference userEventsColRef = db.collection(usersCollection).document(eventID).collection(registeredEventsCollection);
         createDocument(userEventsColRef,eventID,data);
     }
 
+    /**
+     * Removes a given registrant from a given event.
+     * Updates event document in Events collection
+     * Updates user document in Users collection
+     *
+     * @param eventID eventID of event we are removing registrant from
+     * @param registrantID userID of registrant we are removing from event
+     */
     public void removeRegistrantFromEvent(String eventID,String registrantID){
         // Remove registrant from events
         DocumentReference regInEventDocRef = getDocOfRegistrantInEvent(eventID,registrantID);
@@ -194,11 +276,15 @@ public class DBManager {
         removeDocument(eveInRegDocRef);
     }
 
-    public void fromEventDocInRegisteredCollectionRemoveUser(QueryDocumentSnapshot registeredEventQDS, String userID){
-        String eventID = registeredEventQDS.getId();
-        removeRegistrantFromEvent(eventID, userID);
-    }
-
+    /**
+     * Sets the status of a given registrant for a given event to a given status.
+     * Updates the event document sub-collection
+     * Updates the user document sub-collection
+     *
+     * @param eventID eventID of event to modify user registration for
+     * @param registrantID userID of registrant we are modifying registration status of
+     * @param registrantStatus new status to set user registration status to
+     */
     public void setRegistrantStatus(String eventID,String registrantID,RegistrantStatus registrantStatus){
         // Set status within event
         DocumentReference regInEventDocRef = getDocOfRegistrantInEvent(eventID,registrantID);
@@ -209,17 +295,47 @@ public class DBManager {
         updateField(eveInRegDocRef,"status",registrantStatus);
     }
 
-    public  void updateEvent(Event event){
-        // For every field in database, update with event.getField(),
-        // Can probably amalgamate add and update
-        throw new RuntimeException("NOT IMPLEMENTED");
+    /**
+     * Updates the database entry for an event with the information held in given event instance
+     *
+     * @param event event with updated values, must have same eventID as event you want to update
+     */
+    public void updateEvent(Event event){
+        DocumentReference eventDocRef = db.collection(eventsCollection).document(event.getEventID());
+
+        updateField(eventDocRef,"organizerID", event.getOrganizerID());
+        updateField(eventDocRef,"eventName", event.getEventName());
+        updateField(eventDocRef,"eventDescription", event.getEventDescription());
+        updateField(eventDocRef,"eventDate", event.getEventDate());
+        updateField(eventDocRef,"geolocationRequired", event.getGeolocationRequired());
+        updateField(eventDocRef,"geolocationRequirement", event.getGeolocationMaxDistance());
+        updateField(eventDocRef,"waitlistCapacityRequired", event.getWaitlistCapacityRequired());
+        updateField(eventDocRef,"waitlistCapacity", event.getWaitlistCapacity());
+        updateField(eventDocRef,"numberOfAttendees", event.getEventCapacity());
     }
 
+    /**
+     * Gets event associated with a given eventID as an Event object.
+     * If successful in retrieving event, performs onSuccessCallback on event object.
+     * If unsuccessful, perform onFailureCallback.
+     *
+     * @param eventID eventID of event to retrieve and perform onSuccessCallback on
+     * @param onSuccessCallback operation to perform on retrieved Event object
+     * @param onFailureCallback operation to perform if event cannot be retrieved
+     */
     public void getEvent(String eventID,Obj2VoidCallback onSuccessCallback,
                          Void2VoidCallback onFailureCallback){
         getDocumentAsObject(eventsCollection,eventID,this::eventConverter,onSuccessCallback,onFailureCallback);
     }
 
+    /**
+     * Removes the event associated with the given eventID from the database.
+     * Removes the event from all users who had registered for it
+     * Removes the event from the organizers list of events
+     * Removes the event from the Events collection
+     *
+     * @param eventID eventID of event to be removed
+     */
     public void deleteEvent(String eventID){
         // Remove Event from all users who signed up
         DocumentReference eventDoc = db.collection(eventsCollection).document(eventID);
@@ -233,11 +349,21 @@ public class DBManager {
         removeDocument(eventDoc);
     }
 
+    /**
+     * Removes a given event from an organizer's list of events
+     *
+     * @param event object castable to event
+     */
     private void removeEventFromOrganizer(Object event){
         Event castedEvent = (Event) event;
         removeDocument(db.collection(usersCollection).document(castedEvent.getOrganizerID()).collection(organizerEventsCollection).document(castedEvent.getEventID()));
     }
 
+    /**
+     * Removes the given registeredEvent document from the user given a eventRegistrant document.
+     *
+     * @param eventRegistrantDoc DocumentSnapshot of a db.collection(Events).document(<eventID>).collection(eventRegistrants).document(<userID>)
+     */
     private void removeEventFromRegistrant(DocumentSnapshot eventRegistrantDoc){
         String registrantID = eventRegistrantDoc.getId();
         String eventID = eventRegistrantDoc.getReference().getParent().getId();
@@ -245,6 +371,12 @@ public class DBManager {
         removeDocument(getDocOfEventInRegistrant(eventID,registrantID));
     }
 
+    /**
+     * Creates an instance of Event class populated with values from the given event document
+     *
+     * @param document snapshot of event document from the Events collection of database
+     * @return an instance of Event populated with data from the document
+     */
     private Object eventConverter(DocumentSnapshot document){
         String eventID = document.getId();
         String organizerID = document.getString("organizerID");
@@ -263,11 +395,24 @@ public class DBManager {
 // -------------------- / Events \ -----------------------------------------------------------------
 
 // ----------------- \ Facilities / --------------------------------------------------------
+
+    /**
+     * Adds or updates a facility document in the database.
+     * Modifiers Facilities collection and if new facility, document of organizer in Users collection
+     *
+     * @param facility instance of Facility containing attributes to store in database
+     */
     public void addUpdateFacility(Facility facility){
         String userID = DeviceManager.getDeviceId();
         performIfFieldPopulated(db.collection(usersCollection).document(userID),"facilityID",(facilityID)-> updateOldFacility(facilityID,facility),()->createNewFacility(facility));
     }
 
+    /**
+     * Updates the document in Facilities collection associated with the given facilityID to contain values held by given facility instance
+     *
+     * @param facilityID facilityID of facility to update
+     * @param facility instance of Facility class containing attributes to update database with
+     */
     public void updateOldFacility(Object facilityID,Facility facility){
         // update facilities collection
         DocumentReference docRefFacilities = db.collection(facilitiesCollection).document(facilityID.toString());
@@ -275,6 +420,12 @@ public class DBManager {
         updateField(docRefFacilities,"address",facility.getFacilityAddress());
       }
 
+    /**
+     * Creates a new document in Facilities collection
+     * Updates organizers user profile to contain facilityID field
+     *
+     * @param facility instance of Facility class containing attributes to upload to the database
+     */
     public void createNewFacility(Facility facility){
         // create new document in facilities collection
         String facilityID = createIDForDocumentIn(facilitiesCollection);
@@ -288,15 +439,39 @@ public class DBManager {
         updateField(db.collection(usersCollection).document(DeviceManager.getDeviceId()),"facilityID",facilityID);
     }
 
-    public void getFacility(String userID, Obj2VoidCallback onPopulated, Void2VoidCallback onFailureCallback){
-        DocumentReference userDocRef = db.collection(usersCollection).document(userID);
-        performIfFieldPopulated(userDocRef,"facilityID",(facilityID) -> onSuc(facilityID, onPopulated, onFailureCallback),()->{return;});
+    /**
+     * Attempts to retrieve an instance of Facility class for a given organizer's userID.
+     * If the user is not an organizer (i.e. does not have a facilityID), does nothing.
+     * If the organizer has an invalid facilityID, runs onFailureCallback.
+     * If facility was successfuly retrieved, runs onSuccessCallback.
+     *
+     * @param organizerID deviceID (aka userID) of organizer we are trying to retrieve facility info for
+     * @param onSuccessCallback function to run on Facility instance if we successfully retrieve it
+     * @param onFailureCallback function to run if we fail to retrieve the facility
+     */
+    public void getFacility(String organizerID, Obj2VoidCallback onSuccessCallback, Void2VoidCallback onFailureCallback){
+        DocumentReference userDocRef = db.collection(usersCollection).document(organizerID);
+        performIfFieldPopulated(userDocRef,"facilityID",(facilityID) -> facilityPopulatedCallback(facilityID, onSuccessCallback, onFailureCallback),()->{return;});
     }
 
-    public void onSuc(Object facilityID, Obj2VoidCallback suc2,Void2VoidCallback fail){
-        getDocumentAsObject(facilitiesCollection,facilityID.toString(),this::facilityConverter,suc2,fail);
+    /**
+     * Defines callbacks to be performed on the facilityID value
+     * Attempts to generate instance of Facility class to perform populatedSuccessCallback on
+     *
+     * @param facilityID facilityID retrieved from populated facilityID field, castable to string
+     * @param populatedSuccessCallback function that operates on an instance of Facility, called if successful in retrieving facility document and generating Facility instance
+     * @param populatedFailureCallback function called if unable to generate Facility instance for given facilityID
+     */
+    public void facilityPopulatedCallback(Object facilityID, Obj2VoidCallback populatedSuccessCallback,Void2VoidCallback populatedFailureCallback){
+        getDocumentAsObject(facilitiesCollection,facilityID.toString(),this::facilityConverter,populatedSuccessCallback,populatedFailureCallback);
     }
 
+    /**
+     * Given a document snapshot of a facility document, generates an instance of Facility
+     *
+     * @param document DocumentSnapshot of facility we want to create an instance of Facility for
+     * @return returns a new Facility instance containing the values held in the document
+     */
     private Object facilityConverter(DocumentSnapshot document){
         String name = document.getString("name");
         String adr = document.getString("address");
@@ -305,6 +480,13 @@ public class DBManager {
         return new Facility(document.getId(),orgID,name,adr);
     }
 
+    /**
+     * Given a facilityID, deletes this facility.
+     * Deletes all events that are held at this facility and removes it from the organizer's profile
+     * Deletes the facility from the facilities collection.
+     *
+     * @param facilityID facilityID of the facility we want to delete
+     */
     public void deleteFacility(String facilityID){
         DocumentReference facilityDocRef = db.collection(facilitiesCollection).document(facilityID);
 
@@ -315,6 +497,20 @@ public class DBManager {
         removeDocument(facilityDocRef);
     }
 
+    /**
+     * Given the facilityID string as an object, casts the object to string and deletes the facility
+     *
+     * @param facilityID Object containing facilityID
+     */
+    private void deleteFacility(Object facilityID) {
+        deleteFacility(facilityID.toString());
+    }
+
+    /**
+     * Deletes all events that occur at a given facility and removes this facility from the organizer's profile
+     *
+     * @param facility Object castable to Facility that we want to remove events and organizer from
+     */
     private void removeEventsAtFacilityAndRemoveFromOrganizer(Object facility){
         Facility castedFacility = (Facility) facility;
         String organizerID = castedFacility.getOrganizerID();
@@ -324,14 +520,20 @@ public class DBManager {
         updateField(db.collection(usersCollection).document(organizerID),"facilityID",null);
     }
 
-
 // -------------------- / Facilities \ -----------------------------------------------------------------
 
 // ----------------- \ TODO / --------------------------------------------------------
+
+    /**
+     * NOT IMPLEMENTED
+     */
     public void deleteQRCode(){
         throw new RuntimeException("NOT IMPLEMENTED");
     }
 
+    /**
+     * NOT IMPLEMENTED
+     */
     public void deleteImage(){
         throw new RuntimeException("NOT IMPLEMENTED");
     }
@@ -340,6 +542,17 @@ public class DBManager {
 
 
 // ----------------- \ Abstracted Helpers / --------------------------------------------------------
+
+    /**
+     * Checks for existence of given document in given collection.
+     * Performs foundCallback if it exists.
+     * Performs unfoundCallback if it does not exist
+     *
+     * @param collectionName name of collection potentially containing the document of interest
+     * @param documentID id of the document of interest
+     * @param foundCallback function called if document found
+     * @param unfoundCallback function called if document not found
+     */
     private void checkExistenceOfDocument(String collectionName, String documentID,
                                           Void2VoidCallback foundCallback,
                                           Void2VoidCallback unfoundCallback) {
@@ -366,7 +579,14 @@ public class DBManager {
         });
     }
 
-
+    /**
+     * Attempts to perform given function on field value if that field is populated
+     *
+     * @param docRef reference to the document containing the field of interest
+     * @param fieldName name of the field of interest
+     * @param populatedCallback callback called on the value of the field of interest if it is populated
+     * @param unpopulatedCallback callback called if the field of interest is not populated
+     */
     private void performIfFieldPopulated(DocumentReference docRef, String fieldName, Obj2VoidCallback populatedCallback, Void2VoidCallback unpopulatedCallback){
         String operationDescription = String.format("checkFieldPopulated [C-%s, D-%s, F-%s]: ",docRef.getParent().getId(),docRef.getId(), fieldName);
 
@@ -393,6 +613,13 @@ public class DBManager {
         });
     }
 
+    /**
+     * Attempts to add/update via overwrite a document with given ID in a given collection with given data
+     *
+     * @param collectionName collection where we want to add or update the document
+     * @param documentID ID of document we want to add or update
+     * @param data hashmap of data to be added or used to overwrite old data
+     */
     private void addUpdateDocument(String collectionName, String documentID,
                                    Map<String, Object> data){
         String operationDescription = String.format("addUpdateDocument for [%s,%s]", collectionName, documentID);
@@ -405,7 +632,7 @@ public class DBManager {
                 docRef.set(data)
                         .addOnSuccessListener(aVoid -> {
                             Log.d("Firestore", operationDescription + " succeeded");
-//                            Toast.makeText(OrganizerCreateEventActivity.this, "Event data saved successfully", Toast.LENGTH_SHORT).show())
+                            // Toast.makeText(OrganizerCreateEventActivity.this, "Event data saved successfully", Toast.LENGTH_SHORT).show())
                             // TODO add these toast messages to key operations
                         })
                         .addOnFailureListener(e -> {
@@ -418,10 +645,25 @@ public class DBManager {
         });
     }
 
+    /**
+     * Generates unique ID for a document in a given collection
+     *
+     * @param collectionName name of collection we are generating IDs within
+     * @return an ID string unique within the given collection
+     */
     public String createIDForDocumentIn(String collectionName){
         return FirebaseFirestore.getInstance().collection(collectionName).document().getId();
     }
 
+    /**
+     * Attempts to convert a document to an object castable to the appropriate type and perform specified action on this object.
+     *
+     * @param collectionName name of collection containing document of interest
+     * @param documentID documentID of document of interest
+     * @param documentConverter function which converts from document to object of appropriate type
+     * @param onSuccessCallback operation performed on object castable to appropriate type
+     * @param onFailureCallback function called if unable to retrieve document
+     */
     private void getDocumentAsObject(String collectionName, String documentID,
                                      DocumentConverter documentConverter,
                                      Obj2VoidCallback onSuccessCallback,
@@ -458,7 +700,13 @@ public class DBManager {
         });
     }
 
-    private void iterateOverCollection(CollectionReference collectionRef, ForEachDocumentCallback forEachDocumentCallback){
+    /**
+     * Iterates over an entire collection of documents, performing the specified callback on each document
+     *
+     * @param collectionRef collection to iterate over all documents of
+     * @param forEachDocumentCallback action to perform on each document
+     */
+    private void iterateOverCollection(CollectionReference collectionRef, ProcessQueryDocCallback forEachDocumentCallback){
         String operationDescription = String.format("iterateOverCollection [%s]", collectionRef.getId());
         collectionRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -475,6 +723,11 @@ public class DBManager {
         });
     }
 
+    /**
+     * Removes a given document from the database
+     *
+     * @param doc document to remove
+     */
     private void removeDocument(DocumentReference doc){
         String operationDescription = String.format("removeDocument [C-%s, D-%s]",doc.getParent().getId(), doc.getId());
 
@@ -491,6 +744,13 @@ public class DBManager {
                 });
     }
 
+    /**
+     * Updates a given field in a given document to a given value
+     *
+     * @param doc document in which we want to update a field
+     * @param fieldName name of field which we want to update
+     * @param newVal value which we want to set this field to
+     */
     private void updateField(DocumentReference doc,String fieldName, Object newVal){
         String operationDescription = String.format("updateField [C-%s,D-%s, F-%s]",doc.getParent().getId(),doc.getId(),fieldName);
         doc.update(fieldName,newVal).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -505,6 +765,13 @@ public class DBManager {
         });;
     }
 
+    /**
+     * Creates or overwrites a document in a given collection with a given document ID with given data
+     *
+     * @param colRef reference to collection to create new document
+     * @param docID ID string for document within the collection, if this matches an existing document, the old document will be overwritten
+     * @param data data to put in the new document
+     */
     private void createDocument(CollectionReference colRef, String docID, Map<String, Object> data){
         String operationDescription = String.format("createDocument [C-%s, D-%s]",colRef.getId(), docID);
 
@@ -521,10 +788,24 @@ public class DBManager {
                 });
     }
 
+    /**
+     * Returns the DocumentReference for a registrant in the event's list of registered users
+     *
+     * @param eventID eventID of desired event
+     * @param registrantID userID of a desired registrant
+     * @return DocumentReference to the document of this registrant in the event's sub-collection
+     */
     private DocumentReference getDocOfRegistrantInEvent(String eventID, String registrantID){
         return db.collection(eventsCollection).document(eventID).collection(eventRegistrantsCollection).document(registrantID);
     }
 
+    /**
+     * Returns the DocumentReference for a given event under a given registrants list of registered events
+     *
+     * @param eventID eventID of desired event
+     * @param registrantID userID of a desired registrant
+     * @return DocumentReference to the document of this event in the user's sub-collection
+     */
     private DocumentReference getDocOfEventInRegistrant(String eventID, String registrantID){
         return db.collection(usersCollection).document(registrantID).collection(registeredEventsCollection).document(eventID);
     }

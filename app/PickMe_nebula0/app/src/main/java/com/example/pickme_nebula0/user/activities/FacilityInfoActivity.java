@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -13,13 +12,16 @@ import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.SharedDialogue;
 import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.facility.Facility;
-import com.example.pickme_nebula0.user.User;
 
+/**
+ * Activity for organizer to create/update their facility information.
+ *
+ * @author Stephine Yearley
+ * @see Facility
+ */
 public class FacilityInfoActivity extends AppCompatActivity {
     private DBManager dbManager;
-
     EditText nameField, adrField;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +88,11 @@ public class FacilityInfoActivity extends AppCompatActivity {
         return warning;
     }
 
+    /**
+     * Callback to populate the screen's fields
+     *
+     * @param facility instance of object castable to facility, used to populate the fields on screen
+     */
     private void populateFieldsFromDB(Object facility){
         Facility castedFacility = (Facility) facility;
 
@@ -93,6 +100,9 @@ public class FacilityInfoActivity extends AppCompatActivity {
         adrField.setText(castedFacility.getFacilityAddress());
     }
 
+    /**
+     *  Callback called if we fail to populate ths facility info for an existing facility
+     */
     private void failedToPopulateFieldsFromDB(){
         SharedDialogue.showInvalidDataAlert("Fields could not be populated from DB, the data shown may not match what is in the DB",FacilityInfoActivity.this);
     }
