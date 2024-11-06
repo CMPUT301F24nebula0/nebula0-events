@@ -12,6 +12,7 @@ import java.util.Date;
  * Event
  */
 public class Event {
+    private String qrCodeData;
     private DBManager dbManager;
 
     private String eventID;
@@ -99,7 +100,9 @@ public class Event {
     public Date getCreatedDateTime() { return this.createdDateTime; }
     public int getNumberOfAttendees() { return this.numberOfAttendees; }
     public int getGeolocationRequirement() { return this.geolocationRequirement; }
-
+    public String getQrCodeData() {
+        return qrCodeData;
+    }
     public ArrayList<EntrantRole> getEntrantsInWaitlist() {
         return this.entrantsInWaitlist;
     }
@@ -131,7 +134,7 @@ public class Event {
     public void setCreatedDateTime(Date createdDateTime) { this.createdDateTime = createdDateTime; }
     public void setNumberOfAttendees (int numberOfAttendees) { this.numberOfAttendees = numberOfAttendees; }
     public void setGeolocationRequirement (int geolocationRequirement) { this.geolocationRequirement = geolocationRequirement; }
-
+    public void setQrCodeData(String qrCodeData) { this.qrCodeData = qrCodeData; }
     //------------ WAITLIST LOGIC
 
     /**

@@ -1,5 +1,8 @@
 package com.example.pickme_nebula0.db;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -8,6 +11,7 @@ import androidx.annotation.NonNull;
 import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.event.Event;
 import com.example.pickme_nebula0.facility.Facility;
+import com.example.pickme_nebula0.qr.QRCodeManager;
 import com.example.pickme_nebula0.organizer.activities.OrganizerCreateEventActivity;
 import com.example.pickme_nebula0.user.User;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -42,6 +46,9 @@ public class DBManager {
 
     public String facilitiesCollection = "Facilities";
 
+    private QRCodeManager qrCodeManager;
+
+
     /**
      * Enum describing status of an entrant
      * Waitlisted = user is registered but has not "won the lottery"
@@ -49,6 +56,7 @@ public class DBManager {
      * Confirmed = user has "won the lottery" and has accepted the invite
      * Canceled = user "won the lottery" but took too long to accept, got canceled by organizer
      */
+
     public enum RegistrantStatus{
         WAITLISTED, SELECTED, CONFIRMED, CANCELED
     }
@@ -59,7 +67,9 @@ public class DBManager {
      * Constructor, instantiates the default FirebaseFirestore instance
      */
     public DBManager() {
+
         db = FirebaseFirestore.getInstance();
+        qrCodeManager = new QRCodeManager();
     }
 
 // ------------- \ Function Interfaces / -----------------------------------------------------------
@@ -222,6 +232,7 @@ public class DBManager {
     public void addEvent(Event event){
         // Populate fields with data from object
         Map<String, Object> eventData = new HashMap<>();
+        eventData.put("eventID",event.getEventID());
         eventData.put("organizerID", event.getOrganizerID());
         eventData.put("eventName", event.getEventName());
         eventData.put("eventDescription", event.getEventDescription());
@@ -233,8 +244,15 @@ public class DBManager {
         eventData.put("createdDateTime", new Date());
         eventData.put("numberOfAttendees", event.getEventCapacity());
 
+        String qrUri = qrCodeManager.generateQRCodeURI(event.getEventID());
+
+        Bitmap qrBitmap = qrCodeManager.generateQRCodeBitmap(qrUri);
+
+        String qrBase64 = qrCodeManager.bitmapToBase64(qrBitmap);
+
+        eventData.put("qrCodeData", qrBase64);
         // Create document
-        addUpdateDocument(eventsCollection,event.getEventID(),eventData);
+        addUpdateDocument(eventsCollection, event.getEventID(), eventData);
     }
 
     /**
@@ -384,12 +402,41 @@ public class DBManager {
         String desc = document.getString("eventDescription");
         Date date = document.getDate("eventDate");
         Boolean geolocationRequired = document.getBoolean("geolocationRequired");
-        Integer geolocRequirement = (Integer) document.get("geolocationRequirement");
-        Integer numberOfAttendees = (Integer) document.get("numberOfAttendees");
-        Boolean waitistCapcityReq = document.getBoolean("waitlistCapacityRequired");
-        Integer waitlistCapacity = (Integer) document.get("waitlistCapacity");
+        // Retrieve numeric fields as Long and convert to Integer
+        Long geolocRequirementLong = document.getLong("geolocationRequirement");
+        Integer geolocRequirement = (geolocRequirementLong != null) ? geolocRequirementLong.intValue() : null;
 
-        return new Event(eventID,organizerID,name,desc,date,geolocationRequired,geolocRequirement,waitistCapcityReq,waitlistCapacity,numberOfAttendees);
+        Long numberOfAttendeesLong = document.getLong("numberOfAttendees");
+        Integer numberOfAttendees = (numberOfAttendeesLong != null) ? numberOfAttendeesLong.intValue() : null;
+
+        Boolean waitistCapcityReq = document.getBoolean("waitlistCapacityRequired");
+        Long waitlistCapacityLong = document.getLong("waitlistCapacity");
+        Integer waitlistCapacity = (waitlistCapacityLong != null) ? waitlistCapacityLong.intValue() : null;
+
+        String qrCodeData = document.getString("qrCodeData");
+
+        Event event = new Event(eventID, organizerID, name, desc, date, geolocationRequired, geolocRequirement, waitistCapcityReq , waitlistCapacity, numberOfAttendees);
+        event.setQrCodeData(qrCodeData);
+        return event;
+    }
+
+    public Bitmap getQRCodeBitmap(String eventID) {
+        DocumentReference docRef = db.collection(eventsCollection).document(eventID);
+        final Bitmap[] qrBitmap = {null};
+
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                        String qrBase64 = document.getString("qrCodeData");
+                        if (qrBase64 != null) {
+                            byte[] decodedBytes = Base64.decode(qrBase64, Base64.DEFAULT);
+                            qrBitmap[0] = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+                    }
+                }
+            }
+        });
+        return qrBitmap[0];
     }
 
 // -------------------- / Events \ -----------------------------------------------------------------
