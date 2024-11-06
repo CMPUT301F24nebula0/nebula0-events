@@ -61,7 +61,7 @@ public class DBManager {
         WAITLISTED, SELECTED, CONFIRMED, CANCELED
     }
 
-    private final FirebaseFirestore db;
+    public final FirebaseFirestore db;
 
     /**
      * Constructor, instantiates the default FirebaseFirestore instance
