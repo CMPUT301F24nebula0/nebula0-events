@@ -15,6 +15,14 @@ import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.user.activities.UserInfoActivity;
 
+/**
+ * Activity when user first opens app.
+ * Checks if they are registered.
+ * If yes, sends them to home screen.
+ * If no, sends to user info screen.
+ *
+ * @author Stephine Yearley
+ */
 @SuppressLint("CustomSplashScreen")
 public class LaunchActivity extends AppCompatActivity {
     private DBManager dbManager;

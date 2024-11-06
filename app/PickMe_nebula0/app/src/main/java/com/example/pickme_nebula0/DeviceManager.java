@@ -5,6 +5,8 @@ import android.content.Context;
 import android.provider.Settings;
 
 /**
+ * Static class for retrieving the device ID
+ *
  * @author : Stephine Yearley
  */
 public class DeviceManager {

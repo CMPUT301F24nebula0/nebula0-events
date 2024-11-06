@@ -17,6 +17,13 @@ import com.example.pickme_nebula0.SharedDialogue;
 import com.example.pickme_nebula0.user.User;
 
 // TODO: add profile image LATER
+
+/**
+ * Activity allowing user to register or update their profile information or navigate to FacilityInfoActivity
+ *
+ * @author Stephine Yearley
+ * @see User
+ */
 public class UserInfoActivity extends AppCompatActivity {
     private String deviceID;
     private DBManager dbManager;
@@ -99,6 +106,11 @@ public class UserInfoActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Callback to populate the screen's fields
+     *
+     * @param user instance of user containing data used to populate the fields on screen
+     */
     private void populateFieldsFromDB(Object user){
         User castedUser = (User) user;
         nameField.setText(castedUser.getName());
@@ -107,13 +119,23 @@ public class UserInfoActivity extends AppCompatActivity {
         enableNotifBox.setChecked(castedUser.notifEnabled());
     }
 
+    /**
+     *  Callback called if we fail to populate ths user info screen for an existing user
+     */
     private void failedToPopulateFieldsFromDB(){
         SharedDialogue.showInvalidDataAlert("Fields could not be populated from DB, the data shown may not match what is in the DB",UserInfoActivity.this);
     }
 
-    // TODO: data valildation should probably be done within the User Class, but this will work for now
+    /**
+     * Checks whether given fields values are valid.
+     *
+     * @param name name to validate
+     * @param email email to validate
+     * @param phone phone number to validate
+     * @return a blank string if all is valid, else returns a warning string containing information of invalidities
+     */
     public static String validateUserInfo(String name, String email, String phone){
-
+        // TODO: data valildation should probably be done within the User Class, but this will work for now
         String warning = "";
         // verify name is non-numeric
         if (name.matches(".*\\d.*")){
@@ -137,7 +159,7 @@ public class UserInfoActivity extends AppCompatActivity {
             }
         }
         // verify that, if provided, is 10 numbers (e.g. xxx-xxx-xxxx)
-        if (phone.length() != 0 && phone.length() != 10){
+        if (!phone.isEmpty() && phone.length() != 10){
             String errString = "Phone number must be 10 digits";
             if (warning.isBlank()){
                 warning = errString;
