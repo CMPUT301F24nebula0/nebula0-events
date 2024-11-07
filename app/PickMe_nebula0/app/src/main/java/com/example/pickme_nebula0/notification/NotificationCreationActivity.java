@@ -8,7 +8,6 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.SharedDialogue;
 import com.example.pickme_nebula0.db.DBManager;
@@ -17,6 +16,7 @@ public class NotificationCreationActivity extends AppCompatActivity {
     DBManager dbManager;
     EditText subjectLineField;
     EditText messageField;
+    String eventID;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,42 +27,93 @@ public class NotificationCreationActivity extends AppCompatActivity {
         subjectLineField = findViewById(R.id.editText_nc_subjectLine);
         messageField = findViewById(R.id.editText_nc_message);
 
-        String eventID = getIntent().getStringExtra("eventID");
+        Button msgAllBtn = findViewById(R.id.button_nc_notifAll);
+        Button msgWaitlistedBtn = findViewById(R.id.button_nc_notifWaitlist);
+        Button msgConfirmedBtn = findViewById(R.id.button_nc_notifConfirmed);
+        Button msgUnconfirmedBtn = findViewById(R.id.button_nc_notifUnconfirmed);
+        Button msgCanceledBtn = findViewById(R.id.button_nc_notfiCanceled);
+        Button cancelBtn = findViewById(R.id.button_nc_cancel);
+
+        eventID = getIntent().getStringExtra("eventID");
         if (eventID == null || eventID.isEmpty()) {
             Toast.makeText(this, "Invalid Event ID.", Toast.LENGTH_SHORT).show();
             finish();
         }
 
-        Button cancelBtn = findViewById(R.id.button_nc_cancel);
+
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) { finish(); }
         });
 
-        Button msgAllBtn = findViewById(R.id.button_nc_notifAll);
         msgAllBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String subject = subjectLineField.getText().toString();
-                String msg = messageField.getText().toString();
-
-                String warn = validateNotifInfo(subject,msg);
-                if(!warn.isBlank()){
-                    SharedDialogue.showInvalidDataAlert(warn,NotificationCreationActivity.this);
-                    return;
+                if (getFieldsAndAttemptNotification(null)){
+                    finish();
                 }
-
-                dbManager.notifyAllEntrants(subject,msg,eventID);
-                Toast.makeText(NotificationCreationActivity.this, "Message Sent", Toast.LENGTH_SHORT).show();
-
-                finish();
             }
         });
 
+        msgUnconfirmedBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(getFieldsAndAttemptNotification(DBManager.RegistrantStatus.SELECTED)){
+                    finish();
+                }
 
+            }
+        });
 
+        msgConfirmedBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(getFieldsAndAttemptNotification(DBManager.RegistrantStatus.CONFIRMED)){
+                    finish();
+                }
+            }
+        });
 
+        msgCanceledBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(getFieldsAndAttemptNotification(DBManager.RegistrantStatus.CANCELED)){
+                    finish();
 
+                }
+            }
+        });
+
+        msgWaitlistedBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(getFieldsAndAttemptNotification(DBManager.RegistrantStatus.WAITLISTED)){
+                    finish();
+                }
+            }
+        });
+    }
+
+    private boolean getFieldsAndAttemptNotification(DBManager.RegistrantStatus status){
+        String subject = subjectLineField.getText().toString();
+        String msg = messageField.getText().toString();
+
+        String warn = validateNotifInfo(subject,msg);
+        if(!warn.isBlank()){
+            SharedDialogue.showInvalidDataAlert(warn,NotificationCreationActivity.this);
+            return false;
+        }
+
+        if(status == null){
+            dbManager.notifyAllEntrants(subject,msg,eventID);
+            Toast.makeText(NotificationCreationActivity.this, "Message Sent", Toast.LENGTH_SHORT).show();
+
+        } else{
+            dbManager.notifyEntrantsOfStatus(subject,msg,eventID,status);
+            Toast.makeText(NotificationCreationActivity.this, "Message Sent", Toast.LENGTH_SHORT).show();
+        }
+
+        return true;
     }
 
     public static String validateNotifInfo(String subject, String message){

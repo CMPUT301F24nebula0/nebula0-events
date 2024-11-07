@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -26,6 +27,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -228,7 +230,29 @@ public class DBManager {
 // -------------------- \ Notifications / ----------------------------------------------------------
 
     /**
-     * Generates a notficiation for all entrants in the event associate with given eventID
+     * Generates a notification for entrants of given event that have given status
+     *
+     * @param title
+     * @param message
+     * @param eventID
+     * @param status
+     */
+    public void notifyEntrantsOfStatus(String title, String message,String eventID, RegistrantStatus status){
+        CollectionReference registrantsCollection =
+                db.collection(eventsCollection).document(eventID).collection(eventRegistrantsCollection);
+
+        iterateOverCollection(registrantsCollection,
+                (qds)->{if(qds.getString("status").equals(status.toString())){
+                    createNotification(title,message,qds.getId(),eventID);}
+        });
+    }
+
+    private void doer(QueryDocumentSnapshot qdsRegistrantDoc){
+
+    }
+
+    /**
+     * Generates a notification for all entrants in the event associate with given eventID
      *
      * @param title subject line displayed in notification
      * @param message message body displayed in notification
