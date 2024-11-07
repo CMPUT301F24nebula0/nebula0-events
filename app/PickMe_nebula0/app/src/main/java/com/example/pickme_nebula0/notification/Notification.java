@@ -27,6 +27,9 @@ public class Notification {
         this.notificationID = notificationID;
     }
 
+    // Empty Constructor required for Firestore
+    public Notification(){};
+
     // getters
     public String getNotificationID() {
         return this.notificationID;
