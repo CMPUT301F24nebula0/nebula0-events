@@ -1,14 +1,18 @@
 package com.example.pickme_nebula0.notification;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
+import com.example.pickme_nebula0.event.EventDetailUserActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -39,6 +43,18 @@ public class MessageViewActivity extends AppCompatActivity {
         notifsList = findViewById(R.id.listView_mv_messages);
         notifAdapter = new NotificationArrayAdapter(this,R.id.element_list_notif, notifs);
         notifsList.setAdapter(notifAdapter);
+
+        notifsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
+                // On-click, go the EventDetailUserActivity
+                Notification clickedNotif = (Notification) adapterView.getItemAtPosition(pos);
+
+                Intent intent = new Intent(MessageViewActivity.this, EventDetailUserActivity.class);
+                intent.putExtra("eventID",clickedNotif.getEventID());
+                startActivity(intent);
+            }
+        });
 
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override

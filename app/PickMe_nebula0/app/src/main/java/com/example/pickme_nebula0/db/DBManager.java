@@ -185,6 +185,32 @@ public class DBManager {
     }
 
     /**
+     * Retrieves the status string of given user for a given event.
+     * If successful, call onSuccessCallback with the status string as the argument.
+     * In status cannot be retrieved, calls onFailureCallback.
+     *
+     * @param deviceID deviceID of user we are trying to retrieve event registration status of
+     * @param eventID event of interest
+     * @param onSuccessCallback action performed with status string if it is successfully retrieved
+     * @param onFailureCallback action performed if we cannot retrieve status
+     */
+    public void getUserStatusString(String deviceID,String eventID, Obj2VoidCallback onSuccessCallback, Void2VoidCallback onFailureCallback){
+        db.collection(usersCollection).document(deviceID).collection(registeredEventsCollection).document(eventID).get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            String status = document.getString("status");
+                            onSuccessCallback.run(status);
+                        }
+                    }
+                    else{
+                        onFailureCallback.run();
+                    }
+                });
+    }
+
+    /**
      * Returns an instance of user by extracting data about user from given userDocument
      *
      * @param userDocument instance of DocumentSnapshot for document associated with this user in Users collection
@@ -232,10 +258,10 @@ public class DBManager {
     /**
      * Generates a notification for entrants of given event that have given status
      *
-     * @param title
-     * @param message
-     * @param eventID
-     * @param status
+     * @param title title of notification/message
+     * @param message body of notification/message
+     * @param eventID event this notification is associated with
+     * @param status only entrants with this status are notified
      */
     public void notifyEntrantsOfStatus(String title, String message,String eventID, RegistrantStatus status){
         CollectionReference registrantsCollection =
@@ -245,10 +271,6 @@ public class DBManager {
                 (qds)->{if(qds.getString("status").equals(status.toString())){
                     createNotification(title,message,qds.getId(),eventID);}
         });
-    }
-
-    private void doer(QueryDocumentSnapshot qdsRegistrantDoc){
-
     }
 
     /**
