@@ -10,7 +10,6 @@ import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
@@ -28,18 +27,29 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
-public class EntrantWaitlistFragment extends Fragment {
-
+/**
+ * Fragment for displaying a list of events of given status
+ */
+public class EntrantEventsFragment extends Fragment {
     private FirebaseFirestore db;
     private ArrayList<Event> events;
     private ListView eventList;
     private EventsArrayAdapter eventAdapter;
+    private String status;
 
     private final DBManager dbManager = new DBManager();
 
+    /**
+     * Constructor takes status of event types to display
+     * @param status only events where user has this registration status will be shown
+     */
+    public EntrantEventsFragment(String status){
+        this.status = status;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_entrant_waitlist, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_entrant_eventlist, container, false);
 
         db = FirebaseFirestore.getInstance();
 
@@ -78,7 +88,7 @@ public class EntrantWaitlistFragment extends Fragment {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot document : task.getResult()) {
-                        if (document.getString("status").equalsIgnoreCase("WAITLISTED")){
+                        if (document.getString("status").equalsIgnoreCase(status)){
                             DocumentReference eventDocRef = db.collection("Events").document(document.getId());
                             eventDocRef.get()
                                     .addOnSuccessListener(eventDoc -> {
