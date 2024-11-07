@@ -1,14 +1,18 @@
 package com.example.pickme_nebula0.user.activities;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.DeviceManager;
@@ -169,6 +173,22 @@ public class UserInfoActivity extends AppCompatActivity {
         }
 
         return warning;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == 100) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, you can notify the user in the background
+                Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show();
+
+            } else {
+                // Permission denied, handle accordingly
+                Toast.makeText(this, "Permission denied, can't show notifications", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
 

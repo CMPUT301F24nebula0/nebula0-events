@@ -20,14 +20,14 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrganizerEnrolledFragment extends Fragment {
+public class OrganizerConfirmedFragment extends Fragment {
     private FirebaseFirestore db;
     private DBManager dbManager = new DBManager();
     ArrayList<User> enrolledUsers = new ArrayList<User>();
     private EnrolledAdapter adapter;
     String eventID;
 
-    public OrganizerEnrolledFragment() {
+    public OrganizerConfirmedFragment() {
     }
 
     @Override

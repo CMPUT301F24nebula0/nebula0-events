@@ -54,8 +54,6 @@
                     android:textColor="@android:color/black" />
 
             </LinearLayout>
-
         </LinearLayout>
     </androidx.cardview.widget.CardView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

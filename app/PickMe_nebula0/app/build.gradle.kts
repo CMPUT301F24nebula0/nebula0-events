@@ -51,5 +51,6 @@ dependencies {
     implementation("com.google.zxing:core:3.3.3")
     implementation("com.google.android.material:material:1.4.0")
     implementation("androidx.viewpager2:viewpager2:1.0.0")
+    implementation("androidx.core:core-ktx:1.10.0")
 
 }
