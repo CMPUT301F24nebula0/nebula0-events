@@ -14,6 +14,12 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 
+/**
+ * Activity that lets all users view the messages they've received.
+ * These messages appear as android notification if the user has notifications enabled.
+ *
+ * @author Stephine Yearley
+ */
 public class MessageViewActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
@@ -50,6 +56,9 @@ public class MessageViewActivity extends AppCompatActivity {
         loadMessages();
     }
 
+    /**
+     * Updates the list of messages with all messages stored for this user in the data base
+     */
     private void loadMessages(){
         notifs.clear();
         db.collection("Notifications").document(DeviceManager.getDeviceId()).collection("userNotifs")

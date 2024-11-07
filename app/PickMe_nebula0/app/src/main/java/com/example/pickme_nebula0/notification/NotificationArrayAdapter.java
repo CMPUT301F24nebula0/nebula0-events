@@ -14,6 +14,11 @@ import com.example.pickme_nebula0.R;
 
 import java.util.ArrayList;
 
+/**
+ * Array adapter used for updating and displaying instances of Notification
+ *
+ * @author Stephine Yearley
+ */
 public class NotificationArrayAdapter extends ArrayAdapter<Notification> {
 
     public NotificationArrayAdapter(Context context,int textViewResourceId, ArrayList<Notification> notifs){
@@ -39,7 +44,7 @@ public class NotificationArrayAdapter extends ArrayAdapter<Notification> {
         notifTitle.setText(notif.getTitle());
         notifBody.setText(notif.getMessage());
 
-        // TODO On click, go to even view if applicable
+        // TODO On click, go to event view if applicable
 
 
         return view;

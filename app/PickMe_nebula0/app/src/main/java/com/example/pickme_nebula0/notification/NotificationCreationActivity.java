@@ -12,6 +12,11 @@ import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.SharedDialogue;
 import com.example.pickme_nebula0.db.DBManager;
 
+/**
+ * Activity allowing organizers to create and send notifications/messages to entrants in a given event
+ *
+ * @author Stephine Yearley
+ */
 public class NotificationCreationActivity extends AppCompatActivity {
     DBManager dbManager;
     EditText subjectLineField;
@@ -94,6 +99,15 @@ public class NotificationCreationActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Attempts to send the entered message to all entrants of given status.
+     * Retrieves the entered values in the subject line and message fields.
+     * If valid, attempts to send message and returns true. If invalid,
+     * shows invalid data alert and returns false.
+     *
+     * @param status
+     * @return True if we attempted to send message, False if fields were invalid
+     */
     private boolean getFieldsAndAttemptNotification(DBManager.RegistrantStatus status){
         String subject = subjectLineField.getText().toString();
         String msg = messageField.getText().toString();
@@ -116,6 +130,13 @@ public class NotificationCreationActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Validate given subject line and message body.
+     *
+     * @param subject subject line or title of the message/notification
+     * @param message body of the message/notification
+     * @return a string containing warnings of invalidities, blank if valid
+     */
     public static String validateNotifInfo(String subject, String message){
         String warn = "";
 
