@@ -118,8 +118,8 @@ public class NotificationService extends Service {
         // Create and show the notification (you can customize the notification details)
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.notification_icon)
-                .setContentTitle("New Document Added")
-                .setContentText("A new document has been added to the collection.")
+                .setContentTitle(documentSnapshot.getString("title"))
+                .setContentText(documentSnapshot.getString("message"))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);

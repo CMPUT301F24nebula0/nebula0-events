@@ -7,15 +7,18 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.event.Event;
 import com.example.pickme_nebula0.facility.Facility;
+import com.example.pickme_nebula0.notification.Notification;
 import com.example.pickme_nebula0.qr.QRCodeManager;
 import com.example.pickme_nebula0.organizer.activities.OrganizerCreateEventActivity;
 import com.example.pickme_nebula0.user.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -45,6 +48,8 @@ public class DBManager {
     public String eventRegistrantsCollection = "EventRegistrants";
 
     public String facilitiesCollection = "Facilities";
+
+    public String notificationCollection = "Notifications";
 
     private QRCodeManager qrCodeManager;
 
@@ -155,7 +160,7 @@ public class DBManager {
     /**
      * Updates a user's profile in the database.
      *
-     * @param user - instance of
+     * @param user instance of
      */
     private void updateUser(User user){
         DocumentReference docRef = db.collection(usersCollection).document(user.getUserID());
@@ -219,6 +224,50 @@ public class DBManager {
         removeDocument(userDoc);
     }
 // -------------------- / Users \ ------------------------------------------------------------------
+
+// -------------------- \ Notifications / ----------------------------------------------------------
+
+    /**
+     * Generates a notficiation for all entrants in the event associate with given eventID
+     *
+     * @param title subject line displayed in notification
+     * @param message message body displayed in notification
+     * @param eventID id of event associated with the notification
+     */
+    public void notifyAllEntrants(String title, String message, String eventID){
+        CollectionReference registrantsCollection = db.collection(eventsCollection).document(eventID).collection(eventRegistrantsCollection);
+        iterateOverCollection(registrantsCollection,(qds)-> {createNotification(title,message,qds.getId(),eventID);});
+    }
+
+    /**
+     * Create a notification for a given user.
+     *
+     * @param title subject line displayed in notification
+     * @param message message body displayed in notification
+     * @param userID deviceID of user we are sending the notification to
+     * @param eventID ID of event associated with notification
+     */
+    private void createNotification(String title, String message, String userID, String eventID){
+        CollectionReference userNotifCollection = db.collection(notificationCollection).document(userID).collection("userNotifs");
+        String notifID = createIDForDocumentIn(userNotifCollection);
+        Timestamp timestamp = new Timestamp(new Date());
+
+        Notification notif = new Notification(title,message,userID,eventID,timestamp,notifID);
+
+       userNotifCollection
+               .document(notif.getNotificationID()) // Using eventId as document ID
+               .set(notif)
+               .addOnSuccessListener(aVoid -> {
+                   // Successfully uploaded
+                   Log.d("Firestore", "DocumentSnapshot successfully written!");
+               })
+               .addOnFailureListener(e -> {
+                   // Handle failure
+                   Log.w("Firestore", "Error writing document", e);
+               });
+}
+
+// -------------------- / Notifications \ ---------------------------------------------------------
 
 
 // -------------------- \ Events / -----------------------------------------------------------------
@@ -663,15 +712,15 @@ public class DBManager {
     /**
      * Attempts to add/update via overwrite a document with given ID in a given collection with given data
      *
-     * @param collectionName collection where we want to add or update the document
+     * @param colRef collection where we want to add or update the document
      * @param documentID ID of document we want to add or update
      * @param data hashmap of data to be added or used to overwrite old data
      */
-    private void addUpdateDocument(String collectionName, String documentID,
+    private void addUpdateDocument(CollectionReference colRef, String documentID,
                                    Map<String, Object> data){
-        String operationDescription = String.format("addUpdateDocument for [%s,%s]", collectionName, documentID);
+        String operationDescription = String.format("addUpdateDocument for [%s,%s]", colRef.getId(), documentID);
 
-        DocumentReference docRef = db.collection(collectionName).document(documentID);
+        DocumentReference docRef = colRef.document(documentID);
         docRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) { // we can retrieve (or create) the document
                 DocumentSnapshot document = task.getResult();
@@ -693,13 +742,34 @@ public class DBManager {
     }
 
     /**
+     * Attempts to add/update via overwrite a document with given ID in a given collection with given data
+     *
+     * @param collectionName name ofcollection where we want to add or update the document
+     * @param documentID ID of document we want to add or update
+     * @param data hashmap of data to be added or used to overwrite old data
+     */
+    private void addUpdateDocument(String collectionName, String documentID, Map<String,Object> data){
+        addUpdateDocument(db.collection(collectionName),documentID,data);
+    }
+
+    /**
      * Generates unique ID for a document in a given collection
      *
-     * @param collectionName name of collection we are generating IDs within
+     * @param colRef reference to collection we are generating IDs within
      * @return an ID string unique within the given collection
      */
-    public String createIDForDocumentIn(String collectionName){
-        return FirebaseFirestore.getInstance().collection(collectionName).document().getId();
+    public String createIDForDocumentIn(CollectionReference colRef){
+        return colRef.document().getId();
+    }
+
+    /**
+     * Generates unique ID for a document in a given collection
+     *
+     * @param colName name of collection we are generating IDs within
+     * @return an ID string unique within the given collection
+     */
+    public String createIDForDocumentIn(String colName){
+        return createIDForDocumentIn(db.collection(colName));
     }
 
     /**
