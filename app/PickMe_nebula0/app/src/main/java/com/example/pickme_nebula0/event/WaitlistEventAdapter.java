@@ -19,13 +19,11 @@ import java.util.ArrayList;
 
 public class WaitlistEventAdapter extends ArrayAdapter<Event> {
 
-    private CardView eventCardView;
-    private LinearLayout expandableLayout;
-
     public WaitlistEventAdapter(Context context, ArrayList<Event> events) {
         super(context, 0, events);
     }
 
+    // convert each Event into a View
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -48,10 +46,10 @@ public class WaitlistEventAdapter extends ArrayAdapter<Event> {
         Log.d("ListEventCreation", "Calling ListEventFragment");
 
         // Get references to the CardView and the hidden LinearLayout
-        this.eventCardView = view.findViewById(R.id.event_card_view);
-        this.expandableLayout = view.findViewById(R.id.event_hidden_view);
+        CardView eventCardView = view.findViewById(R.id.event_card_view);
+        LinearLayout expandableLayout = view.findViewById(R.id.event_hidden_view);
 
-        // Set an OnClickListener on the CardView
+        // Set an OnClickListener for each eventCardView
         Log.d("ListEventFragment", "Setting OnClickListener for CardView");
         eventCardView.setOnClickListener(new View.OnClickListener() {
             @Override
