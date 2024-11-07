@@ -24,7 +24,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.Random;
-// TODO switch over to FirebaseMessagingService when account is verified
+// TODO-sy switch over to FirebaseMessagingService when account is verified (google doesn't want my money rn)
 
 public class NotificationService extends Service {
     private FirebaseFirestore db;
@@ -96,7 +96,22 @@ public class NotificationService extends Service {
 
                                 // Trigger notification only if the new timestamp is greater than the last one
                                 if (timestampMillis > lastTimestamp) {
-                                    sendNotification(documentChange.getDocument());
+                                    db.collection("Users")
+                                            .document(DeviceManager.getDeviceId())
+                                            .get()
+                                            .addOnCompleteListener(task -> {
+                                                if (task.isSuccessful()) {
+                                                    DocumentSnapshot document = task.getResult();
+                                                    if (document.exists()) {
+                                                        boolean notifEnabled = document.getBoolean("notificationsEnabled");
+                                                        if(notifEnabled){
+                                                            sendNotification(documentChange.getDocument());
+                                                        }
+                                                    }
+                                                } else {
+                                                    Log.d("Firestore", "get failed with ", task.getException());
+                                                }
+                                            });
 
                                     // Update the last timestamp to the most recent notification's timestamp
                                     if (timestampMillis > newLastTimestamp) {

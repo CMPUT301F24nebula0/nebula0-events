@@ -47,7 +47,7 @@ public class HomePageActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
                     != PackageManager.PERMISSION_GRANTED) {
-                // Request permission
+                // Request permission, users can disable notifications in UserInfoActivity, but we want to have permission
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQUEST_CODE_PERMISSION);
             }
@@ -60,6 +60,7 @@ public class HomePageActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    // function to generate toast notif to let user know the effect of their permission selection
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
