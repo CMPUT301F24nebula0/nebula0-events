@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.organizer.adapters.WaitlistedAdapter;
 import com.example.pickme_nebula0.user.User;
+import com.example.pickme_nebula0.db.DBManager;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -52,10 +53,18 @@ public class OrganizerWaitlistedFragment extends Fragment {
 
     private void loadWaitlistedUsers() {
         waitlistedUsers.clear();
-        db.collection("Events")
+        Log.d("OrganizerWaitlistedFragment",
+                String.format("Fetching waitlisted users from path: %s/%s/%s where %s==%s",
+                        DBManager.eventsCollection,
+                        eventID,
+                        DBManager.eventRegistrantsCollection,
+                        DBManager.eventStatusKey,
+                        DBManager.RegistrantStatus.getStatus(DBManager.RegistrantStatus.WAITLISTED)));
+
+        db.collection(DBManager.eventsCollection)
                 .document(eventID)
-                .collection("eventRegistrants")
-                .whereEqualTo("status", "WAITLISTED")
+                .collection(DBManager.eventRegistrantsCollection)
+                .whereEqualTo(DBManager.eventStatusKey, DBManager.RegistrantStatus.getStatus(DBManager.RegistrantStatus.WAITLISTED))
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -64,10 +73,10 @@ public class OrganizerWaitlistedFragment extends Fragment {
                             // Iterate through each registrant document
                             for (DocumentSnapshot registrantDoc : registrantDocs) {
                                 String registrantID = registrantDoc.getId();
-                                String status = registrantDoc.getString("status");
+                                String status = registrantDoc.getString(DBManager.eventStatusKey);
 
                                 // Fetch the complete User details
-                                db.collection("Users")
+                                db.collection(DBManager.usersCollection)
                                         .document(registrantID)
                                         .get()
                                         .addOnSuccessListener(userDoc -> {
@@ -77,7 +86,7 @@ public class OrganizerWaitlistedFragment extends Fragment {
                                                     // **Manually set userID from document ID**
                                                     user.setUserID(userDoc.getId());
 
-                                                    user.setStatus(status); // Set the status from eventRegistrants
+                                                    user.setStatus(status); // Set the status from EventRegistrants
                                                     waitlistedUsers.add(user);
                                                     adapter.notifyDataSetChanged();
 
