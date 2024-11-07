@@ -42,8 +42,8 @@ public class DBManager {
 
     public String usersCollection = "Users";
     // Sub-collections of Users
-    public String registeredEventsCollection = "registeredEvents";
-    public String organizerEventsCollection = "organizerEvents";
+    public String registeredEventsCollection = "RegisteredEvents";
+    public String organizerEventsCollection = "OrganizerEvents";
 
     public String eventsCollection = "Events";
     // Sub-collections of Event
