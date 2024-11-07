@@ -58,59 +58,6 @@ public class OrganizerEnrolledFragment extends Fragment {
                     enrolledUsers.add(user);
                     adapter.notifyDataSetChanged();
                 });
-//
-//        Log.d("OrganizerEnrolledFragment",
-//                String.format("Fetching waitlisted users from path: %s/%s/%s where %s==%s",
-//                        DBManager.eventsCollection,
-//                        eventID,
-//                        DBManager.eventRegistrantsCollection,
-//                        DBManager.eventStatusKey,
-//                        DBManager.RegistrantStatus.getStatus(DBManager.RegistrantStatus.WAITLISTED)));
-//
-//        db.collection("Events")
-//                .document(eventID)
-//                .collection("eventRegistrants")
-//                .whereEqualTo("status", "ENROLLED")
-//                .get()
-//                .addOnCompleteListener(task -> {
-//                    if (task.isSuccessful()) {
-//                        List<DocumentSnapshot> registrantDocs = task.getResult().getDocuments();
-//                        if (!registrantDocs.isEmpty()) {
-//                            for (DocumentSnapshot registrantDoc : registrantDocs) {
-//                                String registrantID = registrantDoc.getId();
-//                                String status = registrantDoc.getString("status");
-//
-//                                // Fetch the complete User details
-//                                db.collection("Users")
-//                                        .document(registrantID)
-//                                        .get()
-//                                        .addOnSuccessListener(userDoc -> {
-//                                            if (userDoc.exists()) {
-//                                                User user = userDoc.toObject(User.class);
-//                                                if (user != null) {
-//                                                    // Manually set userID from document ID
-//                                                    user.setUserID(userDoc.getId());
-//
-//                                                    user.setStatus(status); // Set the status from eventRegistrants
-//                                                    enrolledUsers.add(user);
-//                                                    adapter.notifyDataSetChanged();
-//
-//                                                    Log.d("OrganizerEnrolledFragment", "Fetched User: " + user.toString());
-//                                                }
-//                                            } else {
-//                                                Log.w("OrganizerEnrolledFragment", "No such user with ID: " + registrantID);
-//                                            }
-//                                        })
-//                                        .addOnFailureListener(e -> {
-//                                            Log.e("OrganizerEnrolledFragment", "Error fetching user with ID: " + registrantID, e);
-//                                        });
-//                            }
-//                        } else {
-//                            Log.d("OrganizerEnrolledFragment", "No enrolled users found for eventID: " + eventID);
-//                        }
-//                    } else {
-//                        Log.e("OrganizerEnrolledFragment", "Error getting enrolled users", task.getException());
-//                    }
-//                });
+
     }
 }

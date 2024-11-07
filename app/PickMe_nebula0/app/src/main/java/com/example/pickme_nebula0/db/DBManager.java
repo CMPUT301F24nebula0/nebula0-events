@@ -458,13 +458,6 @@ public class DBManager {
 
     // note that onSuccessCallback is run for every user fetched
     public void loadUsersRegisteredInEvent(String eventID, RegistrantStatus status, String loggingTag, Obj2VoidCallback onSuccessCallback) {
-        Log.d(loggingTag,
-                String.format("Fetching status users from path: %s/%s/%s where %s==%s",
-                        eventsCollection,
-                        eventID,
-                        eventRegistrantsCollection,
-                        eventStatusKey,
-                        status.toString()));
 
         Query registrantsMatchingStatus = db.collection(eventsCollection)
                 .document(eventID)
@@ -478,7 +471,7 @@ public class DBManager {
                         List<DocumentSnapshot> registrantDocs = task.getResult().getDocuments();
                         if (!registrantDocs.isEmpty()) {
                             for (DocumentSnapshot registrantDoc : registrantDocs) {
-                                // run onSuccessCalllback for each fetched user
+                                // run onSuccessCallback for each fetched user
                                 String registrantID = registrantDoc.getId();
                                 String registrantStatus = registrantDoc.getString(eventStatusKey);
 

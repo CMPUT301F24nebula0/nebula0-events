@@ -59,51 +59,5 @@ public class OrganizerSelectedFragment extends Fragment {
                     selectedUsers.add(user);
                     adapter.notifyDataSetChanged();
                 });
-
-//        db.collection("Events")
-//                .document(eventID)
-//                .collection("eventRegistrants")
-//                .whereEqualTo("status", "SELECTED")
-//                .get()
-//                .addOnCompleteListener(task -> {
-//                    if (task.isSuccessful()) {
-//                        List<DocumentSnapshot> registrantDocs = task.getResult().getDocuments();
-//                        if (!registrantDocs.isEmpty()) {
-//                            for (DocumentSnapshot registrantDoc : registrantDocs) {
-//                                String registrantID = registrantDoc.getId();
-//                                String status = registrantDoc.getString("status");
-//
-//                                // Fetch the complete User details
-//                                db.collection("Users")
-//                                        .document(registrantID)
-//                                        .get()
-//                                        .addOnSuccessListener(userDoc -> {
-//                                            if (userDoc.exists()) {
-//                                                User user = userDoc.toObject(User.class);
-//                                                if (user != null) {
-//                                                    // Manually set userID from document ID
-//                                                    user.setUserID(userDoc.getId());
-//
-//                                                    user.setStatus(status); // Set the status from eventRegistrants
-//                                                    selectedUsers.add(user);
-//                                                    adapter.notifyDataSetChanged();
-//
-//                                                    Log.d("OrganizerSelectedFragment", "Fetched User: " + user.toString());
-//                                                }
-//                                            } else {
-//                                                Log.w("OrganizerSelectedFragment", "No such user with ID: " + registrantID);
-//                                            }
-//                                        })
-//                                        .addOnFailureListener(e -> {
-//                                            Log.e("OrganizerSelectedFragment", "Error fetching user with ID: " + registrantID, e);
-//                                        });
-//                            }
-//                        } else {
-//                            Log.d("OrganizerSelectedFragment", "No selected users found for eventID: " + eventID);
-//                        }
-//                    } else {
-//                        Log.e("OrganizerSelectedFragment", "Error getting selected users", task.getException());
-//                    }
-//                });
     }
 }

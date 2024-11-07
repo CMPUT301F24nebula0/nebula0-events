@@ -60,52 +60,6 @@ public class OrganizerWaitlistedFragment extends Fragment {
                     waitlistedUsers.add(user);
                     adapter.notifyDataSetChanged();
                 });
-//
-//        db.collection(DBManager.eventsCollection)
-//                .document(eventID)
-//                .collection(DBManager.eventRegistrantsCollection)
-//                .whereEqualTo(DBManager.eventStatusKey, DBManager.RegistrantStatus.getStatus(DBManager.RegistrantStatus.WAITLISTED))
-//                .get()
-//                .addOnCompleteListener(task -> {
-//                    if (task.isSuccessful()) {
-//                        List<DocumentSnapshot> registrantDocs = task.getResult().getDocuments();
-//                        if (!registrantDocs.isEmpty()) {
-//                            // Iterate through each registrant document
-//                            for (DocumentSnapshot registrantDoc : registrantDocs) {
-//                                String registrantID = registrantDoc.getId();
-//                                String status = registrantDoc.getString(DBManager.eventStatusKey);
-//
-//                                // Fetch the complete User details
-//                                db.collection(DBManager.usersCollection)
-//                                        .document(registrantID)
-//                                        .get()
-//                                        .addOnSuccessListener(userDoc -> {
-//                                            if (userDoc.exists()) {
-//                                                User user = userDoc.toObject(User.class);
-//                                                if (user != null) {
-//                                                    // **Manually set userID from document ID**
-//                                                    user.setUserID(userDoc.getId());
-//
-//                                                    user.setStatus(status); // Set the status from EventRegistrants
-//                                                    waitlistedUsers.add(user);
-//                                                    adapter.notifyDataSetChanged();
-//
-//                                                    Log.d("OrganizerWaitlistedFragment", "Fetched User: " + user.toString());
-//                                                }
-//                                            } else {
-//                                                Log.w("OrganizerWaitlistedFragment", "No such user with ID: " + registrantID);
-//                                            }
-//                                        })
-//                                        .addOnFailureListener(e -> {
-//                                            Log.e("OrganizerWaitlistedFragment", "Error fetching user with ID: " + registrantID, e);
-//                                        });
-//                            }
-//                        } else {
-//                            Log.d("OrganizerWaitlistedFragment", "No waitlisted users found for eventID: " + eventID);
-//                        }
-//                    } else {
-//                        Log.e("OrganizerWaitlistedFragment", "Error getting waitlisted users", task.getException());
-//                    }
-//                });
+
     }
 }

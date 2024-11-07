@@ -59,59 +59,5 @@ public class OrganizerCancelledFragment extends Fragment {
                     adapter.notifyDataSetChanged();
                 });
 
-//
-//        Log.d("OrganizerCancelledFragment",
-//                String.format("Fetching cancelled users from path: %s/%s/%s where %s==%s",
-//                        DBManager.eventsCollection,
-//                        eventID,
-//                        DBManager.eventRegistrantsCollection,
-//                        DBManager.eventStatusKey,
-//                        DBManager.RegistrantStatus.getStatus(DBManager.RegistrantStatus.CANCELED)));
-//
-//        db.collection(DBManager.eventsCollection)
-//                .document(eventID)
-//                .collection(DBManager.eventRegistrantsCollection)
-//                .whereEqualTo(DBManager.eventStatusKey, DBManager.RegistrantStatus.getStatus(DBManager.RegistrantStatus.CANCELED))
-//                .get()
-//                .addOnCompleteListener(task -> {
-//                    if (task.isSuccessful()) {
-//                        List<DocumentSnapshot> registrantDocs = task.getResult().getDocuments();
-//                        if (!registrantDocs.isEmpty()) {
-//                            for (DocumentSnapshot registrantDoc : registrantDocs) {
-//                                String registrantID = registrantDoc.getId();
-//                                String status = registrantDoc.getString(DBManager.eventStatusKey);
-//
-//                                // Fetch the complete User details
-//                                db.collection(DBManager.usersCollection)
-//                                        .document(registrantID)
-//                                        .get()
-//                                        .addOnSuccessListener(userDoc -> {
-//                                            if (userDoc.exists()) {
-//                                                User user = userDoc.toObject(User.class);
-//                                                if (user != null) {
-//                                                    // Manually set userID from document ID
-//                                                    user.setUserID(userDoc.getId());
-//
-//                                                    user.setStatus(status); // Set the status from eventRegistrants
-//                                                    cancelledUsers.add(user);
-//                                                    adapter.notifyDataSetChanged();
-//
-//                                                    Log.d("OrganizerCancelledFragment", "Fetched User: " + user.toString());
-//                                                }
-//                                            } else {
-//                                                Log.w("OrganizerCancelledFragment", "No such user with ID: " + registrantID);
-//                                            }
-//                                        })
-//                                        .addOnFailureListener(e -> {
-//                                            Log.e("OrganizerCancelledFragment", "Error fetching user with ID: " + registrantID, e);
-//                                        });
-//                            }
-//                        } else {
-//                            Log.d("OrganizerCancelledFragment", "No cancelled users found for eventID: " + eventID);
-//                        }
-//                    } else {
-//                        Log.e("OrganizerCancelledFragment", "Error getting cancelled users", task.getException());
-//                    }
-//                });
     }
 }
