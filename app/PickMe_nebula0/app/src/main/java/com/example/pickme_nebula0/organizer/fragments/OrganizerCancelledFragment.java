@@ -52,7 +52,7 @@ public class OrganizerCancelledFragment extends Fragment {
         cancelledUsers.clear();
         db.collection("Events")
                 .document(eventID)
-                .collection("eventRegistrants")
+                .collection("EventRegistrants")
                 .whereEqualTo("status", "CANCELED")
                 .get()
                 .addOnCompleteListener(task -> {

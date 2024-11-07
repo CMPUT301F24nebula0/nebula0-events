@@ -19,13 +19,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrganizerEnrolledFragment extends Fragment {
+public class OrganizerConfirmedFragment extends Fragment {
     private FirebaseFirestore db;
     ArrayList<User> enrolledUsers = new ArrayList<User>();
     private EnrolledAdapter adapter;
     String eventID;
 
-    public OrganizerEnrolledFragment() {
+    public OrganizerConfirmedFragment() {
     }
 
     @Override
@@ -52,8 +52,8 @@ public class OrganizerEnrolledFragment extends Fragment {
         enrolledUsers.clear();
         db.collection("Events")
                 .document(eventID)
-                .collection("eventRegistrants")
-                .whereEqualTo("status", "ENROLLED")
+                .collection("EventRegistrants")
+                .whereEqualTo("status", "CONFIRMED")
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {

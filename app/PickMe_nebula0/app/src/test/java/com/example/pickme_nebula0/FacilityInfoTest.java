@@ -4,6 +4,11 @@ import com.example.pickme_nebula0.user.activities.FacilityInfoActivity;
 
 import org.junit.Test;
 
+/**
+ * Tests input validation for FacilityInfoActivity where organizers create/manage a facility profile
+ * @author Stephine Yearley
+ * @see FacilityInfoActivity
+ */
 public class FacilityInfoTest {
     @Test
     public void acceptsValidInput(){

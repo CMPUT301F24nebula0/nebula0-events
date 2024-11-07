@@ -53,7 +53,7 @@ public class OrganizerSelectedFragment extends Fragment {
         selectedUsers.clear();
         db.collection("Events")
                 .document(eventID)
-                .collection("eventRegistrants")
+                .collection("EventRegistrants")
                 .whereEqualTo("status", "SELECTED")
                 .get()
                 .addOnCompleteListener(task -> {

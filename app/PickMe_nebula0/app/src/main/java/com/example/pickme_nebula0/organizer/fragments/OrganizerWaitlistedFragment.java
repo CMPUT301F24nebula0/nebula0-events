@@ -54,7 +54,7 @@ public class OrganizerWaitlistedFragment extends Fragment {
         waitlistedUsers.clear();
         db.collection("Events")
                 .document(eventID)
-                .collection("eventRegistrants")
+                .collection("EventRegistrants")
                 .whereEqualTo("status", "WAITLISTED")
                 .get()
                 .addOnCompleteListener(task -> {
