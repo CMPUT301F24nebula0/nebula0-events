@@ -1,5 +1,7 @@
 package com.example.pickme_nebula0.user;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -16,12 +18,21 @@ public class User {
     protected String profilePicture;
     protected Boolean notifEnabled;
     private final ArrayList<String> roles = new ArrayList<String>(Arrays.asList("admin", "entrant", "organizer"));
+    protected String status;
+    boolean admin;
+    boolean notificationsEnabled;
+    protected String phone;
+    protected String profilePic;
     // todo - start as entrant only then add organizer, admin role conditionally
 
     public User(){
 
     }
 
+    public User(String userID, String status) {
+        this.userID = userID;
+        this.status = status;
+    }
     /**
      * Minimum constructor for this class
      *
@@ -34,6 +45,16 @@ public class User {
         this.name = name;
         this.email = email;
         this.notifEnabled = true;
+    }
+
+    public User(Boolean admin, String email, String nam, boolean notificationsEnabled, String phone, String profilePic)
+    {
+        this.admin = admin;
+        this.email = email;
+        this.name = nam;
+        this.notificationsEnabled = notificationsEnabled;
+        this.phone = phone;
+        this.profilePic = profilePic;
     }
 
     /**
@@ -98,9 +119,37 @@ public class User {
      *
      * @param  firstName  the first name of the user
      */
-    public void setName(String firstName) {
+    public void setName(String name) {
         this.name = name;
     }
+
+    public boolean getAdmin() {
+        return this.admin;
+    }
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
+    }
+
+    public boolean getNotificationsEnabled() {
+        return this.notificationsEnabled;
+    }
+    public void setNotificationsEnabled(boolean notificationsEnabled) {
+        this.notificationsEnabled = notificationsEnabled;
+    }
+    public String getPhone() {
+        return this.phone;
+    }
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+    public String getProfilePic() {
+        return this.profilePic;
+    }
+    public void setProfilePic(String profilePic) {
+        this.profilePic = profilePic;
+    }
+
+
 
     /**
      * Returns the email of the user
@@ -137,6 +186,9 @@ public class User {
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
+
+    public String getStatus() { return this.status; }
+    public void setStatus(String status) { this.status = status;}
 
     /**
      * Returns the role of the user
@@ -195,6 +247,19 @@ public class User {
         this.profilePicture = null;
     }
 
-
+    @NonNull
+    @Override
+    public String toString() {
+        return "User{" +
+                "userID='" + userID + '\'' +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", role='" + role + '\'' +
+                ", profilePicture='" + profilePicture + '\'' +
+                ", notifEnabled=" + notifEnabled +
+                ", status='" + status + '\'' +
+                '}';
+    }
 
 }

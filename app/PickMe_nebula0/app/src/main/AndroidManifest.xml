@@ -34,6 +34,8 @@
         <activity android:name=".organizer.activities.OrganizerHomeActivity"></activity>
         <activity android:name=".organizer.activities.OrganizerCreateEventActivity"></activity>
         <activity android:name=".event.EventDetailActivity"></activity>
+        <activity android:name=".organizer.activities.OrganizerEventParticipantsActivity"></activity>
+        <activity android:name=".user.activities.UserDetailActivity"></activity>
 
     </application>
 

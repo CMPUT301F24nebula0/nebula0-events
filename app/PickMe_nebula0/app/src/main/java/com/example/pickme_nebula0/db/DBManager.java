@@ -245,11 +245,8 @@ public class DBManager {
         eventData.put("numberOfAttendees", event.getEventCapacity());
 
         String qrUri = qrCodeManager.generateQRCodeURI(event.getEventID());
-
         Bitmap qrBitmap = qrCodeManager.generateQRCodeBitmap(qrUri);
-
         String qrBase64 = qrCodeManager.bitmapToBase64(qrBitmap);
-
         eventData.put("qrCodeData", qrBase64);
         // Create document
         addUpdateDocument(eventsCollection, event.getEventID(), eventData);

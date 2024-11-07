@@ -1,5 +1,6 @@
 package com.example.pickme_nebula0.event;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.db.DBManager;
+import com.example.pickme_nebula0.organizer.activities.OrganizerEventParticipantsActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class EventDetailActivity extends AppCompatActivity {
@@ -22,13 +24,14 @@ public class EventDetailActivity extends AppCompatActivity {
     private TextView eventDetailsTextView;
     private ImageView qrCodeImageView;
     private DBManager dbManager;
+    private Button participantsButton;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_detail);
         final Button backButton = findViewById(R.id.backButton);
-
+        participantsButton = findViewById(R.id.participantsButton);
         dbManager = new DBManager();
 
         backButton.setOnClickListener(new View.OnClickListener() {
@@ -48,8 +51,15 @@ public class EventDetailActivity extends AppCompatActivity {
 
         //
         fetchEventDetails(eventID);
+
+        participantsButton.setOnClickListener(view -> navigateTo(OrganizerEventParticipantsActivity.class));
     }
 
+    private void navigateTo(Class<?> targetActivity) {
+        Intent intent = new Intent(EventDetailActivity.this, targetActivity);
+        intent.putExtra("eventID", getIntent().getStringExtra("eventID"));
+        startActivity(intent);
+    }
     private void fetchEventDetails(String eventID) {
         dbManager.getEvent(eventID, eventObj -> {
             if (eventObj instanceof Event) {
