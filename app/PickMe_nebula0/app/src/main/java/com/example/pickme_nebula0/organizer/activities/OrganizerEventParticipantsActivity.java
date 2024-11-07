@@ -12,6 +12,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.organizer.fragments.OrganizerCancelledFragment;
+import com.example.pickme_nebula0.organizer.fragments.OrganizerEnrolledFragment;
 import com.example.pickme_nebula0.organizer.fragments.OrganizerSelectedFragment;
 import com.example.pickme_nebula0.organizer.fragments.OrganizerWaitlistedFragment;
 import com.google.android.material.tabs.TabLayout;
@@ -65,11 +66,9 @@ public class OrganizerEventParticipantsActivity extends AppCompatActivity {
         @Override
         public Fragment createFragment(int position) {
             if (position == 0) { return new OrganizerWaitlistedFragment(); }
-            else { return new OrganizerWaitlistedFragment(); }
-            //TODO: TaekwanY
-//            else if (position == 1) { return new OrganizerSelectedFragment(); }
-//            else if (position == 2) { return new OrganizerSelectedFragment(); }
-//            else { return new OrganizerCancelledFragment(); }
+            else if (position == 1) { return new OrganizerSelectedFragment(); }
+            else if (position == 2) { return new OrganizerEnrolledFragment(); }
+            else { return new OrganizerCancelledFragment(); }
         }
 
         @Override

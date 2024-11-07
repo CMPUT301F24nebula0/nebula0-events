@@ -50,4 +50,8 @@ public class OrganizerWaitlistedFragment extends Fragment {
         // backend implementation
     }
 
+    private void loadUserData(String userID) {
+        // TODO: TaekwanY
+    }
+
 }
