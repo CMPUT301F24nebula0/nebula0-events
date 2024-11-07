@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pickme_nebula0.R;
+import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.organizer.adapters.EnrolledAdapter;
 import com.example.pickme_nebula0.user.User;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -21,6 +22,7 @@ import java.util.List;
 
 public class OrganizerConfirmedFragment extends Fragment {
     private FirebaseFirestore db;
+    private DBManager dbManager = new DBManager();
     ArrayList<User> enrolledUsers = new ArrayList<User>();
     private EnrolledAdapter adapter;
     String eventID;
@@ -50,50 +52,12 @@ public class OrganizerConfirmedFragment extends Fragment {
 
     private void loadEnrolledUsers() {
         enrolledUsers.clear();
-        db.collection("Events")
-                .document(eventID)
-                .collection("EventRegistrants")
-                .whereEqualTo("status", "CONFIRMED")
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        List<DocumentSnapshot> registrantDocs = task.getResult().getDocuments();
-                        if (!registrantDocs.isEmpty()) {
-                            for (DocumentSnapshot registrantDoc : registrantDocs) {
-                                String registrantID = registrantDoc.getId();
-                                String status = registrantDoc.getString("status");
-
-                                // Fetch the complete User details
-                                db.collection("Users")
-                                        .document(registrantID)
-                                        .get()
-                                        .addOnSuccessListener(userDoc -> {
-                                            if (userDoc.exists()) {
-                                                User user = userDoc.toObject(User.class);
-                                                if (user != null) {
-                                                    // Manually set userID from document ID
-                                                    user.setUserID(userDoc.getId());
-
-                                                    user.setStatus(status); // Set the status from eventRegistrants
-                                                    enrolledUsers.add(user);
-                                                    adapter.notifyDataSetChanged();
-
-                                                    Log.d("OrganizerEnrolledFragment", "Fetched User: " + user.toString());
-                                                }
-                                            } else {
-                                                Log.w("OrganizerEnrolledFragment", "No such user with ID: " + registrantID);
-                                            }
-                                        })
-                                        .addOnFailureListener(e -> {
-                                            Log.e("OrganizerEnrolledFragment", "Error fetching user with ID: " + registrantID, e);
-                                        });
-                            }
-                        } else {
-                            Log.d("OrganizerEnrolledFragment", "No enrolled users found for eventID: " + eventID);
-                        }
-                    } else {
-                        Log.e("OrganizerEnrolledFragment", "Error getting enrolled users", task.getException());
-                    }
+        dbManager.loadUsersRegisteredInEvent(eventID, DBManager.RegistrantStatus.CONFIRMED, "OrganizerEnrolledFragment",
+                (userObj) -> {
+                    User user = (User) userObj;
+                    enrolledUsers.add(user);
+                    adapter.notifyDataSetChanged();
                 });
+
     }
 }

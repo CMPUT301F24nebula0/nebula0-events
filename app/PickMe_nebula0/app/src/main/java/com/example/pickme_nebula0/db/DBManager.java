@@ -24,12 +24,14 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,16 +41,19 @@ import java.util.Map;
  * @see Event,User,Facility
  */
 public class DBManager {
-
+    // USERS COLLECTION
     public String usersCollection = "Users";
     // Sub-collections of Users
     public String registeredEventsCollection = "registeredEvents";
     public String organizerEventsCollection = "organizerEvents";
 
+    // EVENTS COLLECTION
     public String eventsCollection = "Events";
     // Sub-collections of Event
     public String eventRegistrantsCollection = "EventRegistrants";
+    public String eventStatusKey = "status";
 
+    // FACILITIES COLLECTION
     public String facilitiesCollection = "Facilities";
 
     public String notificationCollection = "Notifications";
@@ -65,7 +70,7 @@ public class DBManager {
      */
 
     public enum RegistrantStatus{
-        WAITLISTED, SELECTED, CONFIRMED, CANCELED
+        WAITLISTED, SELECTED, CONFIRMED, CANCELED;
     }
 
     public final FirebaseFirestore db;
@@ -532,6 +537,64 @@ public class DBManager {
     }
 
 // -------------------- / Events \ -----------------------------------------------------------------
+
+    /**
+     * Fetches all registered users of an Event who match the given status.
+     * Note that onSuccessCallback is run for every user fetched.
+     * This was adapted from Organizer Fragments.
+     * @param eventID
+     * @param status    One of the statuses in RegistrantStatus. Stored in the DB as a string.
+     * @param onSuccessCallback The loaded user object is passed as a parameter to this callback function.
+     *                          Example usage: dataList.add(user); adapter.NotifyDatasetChanged
+     */
+    public void loadUsersRegisteredInEvent(String eventID, RegistrantStatus status, Obj2VoidCallback onSuccessCallback) {
+        loadUsersRegisteredInEvent(eventID, status, "Firestore", onSuccessCallback);
+    }
+
+    // note that onSuccessCallback is run for every user fetched
+    public void loadUsersRegisteredInEvent(String eventID, RegistrantStatus status, String loggingTag, Obj2VoidCallback onSuccessCallback) {
+
+        Query registrantsMatchingStatus = db.collection(eventsCollection)
+                .document(eventID)
+                .collection(eventRegistrantsCollection)
+                .whereEqualTo(eventStatusKey, status.toString());
+
+        registrantsMatchingStatus.get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        // fetched documents for all registrants in Event
+                        List<DocumentSnapshot> registrantDocs = task.getResult().getDocuments();
+                        if (!registrantDocs.isEmpty()) {
+                            for (DocumentSnapshot registrantDoc : registrantDocs) {
+                                // run onSuccessCallback for each fetched user
+                                String registrantID = registrantDoc.getId();
+                                String registrantStatus = registrantDoc.getString(eventStatusKey);
+
+                                // FETCH COMPLETE USER DETAILS
+                                // userObj is GUARANTEED to return a non null object
+                                // see getUser and userConverter
+                                // userID will always be set as document ID
+                                getUser(registrantID, (userObj) -> {
+                                    User user = (User) userObj;
+                                    user.setStatus(registrantStatus); // Set the status from EventRegistrants
+
+                                    // example success callback:
+//                                                    enrolledUsers.add(user);
+//                                                    adapter.notifyDataSetChanged();
+
+                                    onSuccessCallback.run(user);
+
+                                }, () -> Log.e(loggingTag, "Error fetching user from userID: " + registrantID));
+
+                            }
+                        } else {
+                            Log.d(loggingTag, "No enrolled users found for eventID: " + eventID);
+                        }
+                    } else {
+                        Log.e(loggingTag, "Error getting enrolled users", task.getException());
+                    }
+                });
+    }
 
 // ----------------- \ Facilities / --------------------------------------------------------
 
