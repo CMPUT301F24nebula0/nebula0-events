@@ -464,12 +464,12 @@ public class DBManager {
                         eventID,
                         eventRegistrantsCollection,
                         eventStatusKey,
-                        RegistrantStatus.getStatus(status)));
+                        status.toString()));
 
         Query registrantsMatchingStatus = db.collection(eventsCollection)
                 .document(eventID)
                 .collection(eventRegistrantsCollection)
-                .whereEqualTo(eventStatusKey, RegistrantStatus.getStatus(status));
+                .whereEqualTo(eventStatusKey, status.toString());
 
         registrantsMatchingStatus.get()
                 .addOnCompleteListener(task -> {
