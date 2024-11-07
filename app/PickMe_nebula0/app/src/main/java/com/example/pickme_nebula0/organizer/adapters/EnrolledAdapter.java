@@ -1,6 +1,7 @@
 package com.example.pickme_nebula0.organizer.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.user.User;
+import com.example.pickme_nebula0.user.activities.UserDetailActivity;
 
 import java.util.ArrayList;
 
@@ -34,6 +36,11 @@ public class EnrolledAdapter extends RecyclerView.Adapter<EnrolledAdapter.Enroll
     public void onBindViewHolder(@NonNull EnrolledViewHolder holder, int position) {
         User user = enrolledUsers.get(position);
         holder.userNameTextView.setText(user.getName());
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, UserDetailActivity.class);
+            intent.putExtra("userID", user.getUserID());
+            context.startActivity(intent);
+        });
     }
 
     @Override

@@ -57,6 +57,7 @@ public class EventDetailActivity extends AppCompatActivity {
 
     private void navigateTo(Class<?> targetActivity) {
         Intent intent = new Intent(EventDetailActivity.this, targetActivity);
+        intent.putExtra("eventID", getIntent().getStringExtra("eventID"));
         startActivity(intent);
     }
     private void fetchEventDetails(String eventID) {

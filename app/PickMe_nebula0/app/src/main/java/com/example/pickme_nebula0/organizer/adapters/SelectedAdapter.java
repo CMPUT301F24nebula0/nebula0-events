@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.user.User;
-import com.example.pickme_nebula0.user.UserDetailActivity;
+import com.example.pickme_nebula0.user.activities.UserDetailActivity;
 
 import java.util.ArrayList;
 

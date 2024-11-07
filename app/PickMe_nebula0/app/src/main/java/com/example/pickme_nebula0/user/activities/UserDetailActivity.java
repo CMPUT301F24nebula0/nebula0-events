@@ -1,4 +1,4 @@
-package com.example.pickme_nebula0.user;
+package com.example.pickme_nebula0.user.activities;
 
 import android.os.Bundle;
 import android.view.View;
@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.db.DBManager;
+import com.example.pickme_nebula0.user.User;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class UserDetailActivity extends AppCompatActivity {
@@ -33,7 +34,8 @@ public class UserDetailActivity extends AppCompatActivity {
 
         userDetailsTextView = findViewById(R.id.user_details_text_view);
 
-        String userID = getIntent().getStringExtra("eventID");
+        // **Correct the key from "eventID" to "userID"**
+        String userID = getIntent().getStringExtra("userID");
         if (userID == null || userID.isEmpty()) {
             Toast.makeText(this, "Invalid User ID.", Toast.LENGTH_SHORT).show();
             finish();
@@ -52,6 +54,8 @@ public class UserDetailActivity extends AppCompatActivity {
                     details.append("UserID: ").append(user.getUserID()).append("\n\n");
                     details.append("User Name: ").append(user.getName()).append("\n\n");
                     details.append("User Email: ").append(user.getEmail()).append("\n\n");
+                    // Append other user details as needed
+                    userDetailsTextView.setText(details.toString());
                 });
             } else {
                 runOnUiThread(() -> {
@@ -64,5 +68,4 @@ public class UserDetailActivity extends AppCompatActivity {
             finish();
         }));
     }
-
 }

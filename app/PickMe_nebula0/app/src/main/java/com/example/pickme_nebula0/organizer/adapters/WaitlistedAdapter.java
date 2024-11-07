@@ -2,6 +2,7 @@ package com.example.pickme_nebula0.organizer.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,13 +14,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.user.User;
-import com.example.pickme_nebula0.user.UserDetailActivity;
+import com.example.pickme_nebula0.user.activities.UserDetailActivity;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 
 public class WaitlistedAdapter extends RecyclerView.Adapter<WaitlistedAdapter.WaitlistedViewHolder> {
     private ArrayList<User> waitlistedUsers;
     private Context context;
+    private FirebaseFirestore db;
 
     public WaitlistedAdapter(Context context, ArrayList<User> waitlistedUsers) {
         this.context = context;
@@ -30,12 +33,16 @@ public class WaitlistedAdapter extends RecyclerView.Adapter<WaitlistedAdapter.Wa
     @Override
     public WaitlistedViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewTypes) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_user, parent, false);
+        db = FirebaseFirestore.getInstance();
         return new WaitlistedViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull WaitlistedViewHolder holder, int position) {
         User user = waitlistedUsers.get(position);
+        Log.d("User", user.toString());
+
+
         holder.userNameTextView.setText(user.getName());
 
         holder.itemView.setOnClickListener(v -> {

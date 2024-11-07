@@ -1,6 +1,7 @@
 package com.example.pickme_nebula0.organizer.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,17 +13,21 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.organizer.adapters.WaitlistedAdapter;
 import com.example.pickme_nebula0.user.User;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class OrganizerWaitlistedFragment extends Fragment {
     private FirebaseFirestore db;
     ArrayList<User> waitlistedUsers = new ArrayList<User>();
     private WaitlistedAdapter adapter;
+    String eventID;
 
     public OrganizerWaitlistedFragment() {
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -32,6 +37,7 @@ public class OrganizerWaitlistedFragment extends Fragment {
 
         adapter = new WaitlistedAdapter(getContext(), waitlistedUsers);
         recyclerView.setAdapter(adapter);
+        eventID = getActivity().getIntent().getStringExtra("eventID");
 
         db = FirebaseFirestore.getInstance();
 
@@ -46,12 +52,51 @@ public class OrganizerWaitlistedFragment extends Fragment {
 
     private void loadWaitlistedUsers() {
         waitlistedUsers.clear();
-        // TODO: TaekwanY
-        // backend implementation
-    }
+        db.collection("Events")
+                .document(eventID)
+                .collection("eventRegistrants")
+                .whereEqualTo("status", "WAITLISTED")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        List<DocumentSnapshot> registrantDocs = task.getResult().getDocuments();
+                        if (!registrantDocs.isEmpty()) {
+                            // Iterate through each registrant document
+                            for (DocumentSnapshot registrantDoc : registrantDocs) {
+                                String registrantID = registrantDoc.getId();
+                                String status = registrantDoc.getString("status");
 
-    private void loadUserData(String userID) {
-        // TODO: TaekwanY
-    }
+                                // Fetch the complete User details
+                                db.collection("Users")
+                                        .document(registrantID)
+                                        .get()
+                                        .addOnSuccessListener(userDoc -> {
+                                            if (userDoc.exists()) {
+                                                User user = userDoc.toObject(User.class);
+                                                if (user != null) {
+                                                    // **Manually set userID from document ID**
+                                                    user.setUserID(userDoc.getId());
 
+                                                    user.setStatus(status); // Set the status from eventRegistrants
+                                                    waitlistedUsers.add(user);
+                                                    adapter.notifyDataSetChanged();
+
+                                                    Log.d("OrganizerWaitlistedFragment", "Fetched User: " + user.toString());
+                                                }
+                                            } else {
+                                                Log.w("OrganizerWaitlistedFragment", "No such user with ID: " + registrantID);
+                                            }
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e("OrganizerWaitlistedFragment", "Error fetching user with ID: " + registrantID, e);
+                                        });
+                            }
+                        } else {
+                            Log.d("OrganizerWaitlistedFragment", "No waitlisted users found for eventID: " + eventID);
+                        }
+                    } else {
+                        Log.e("OrganizerWaitlistedFragment", "Error getting waitlisted users", task.getException());
+                    }
+                });
+    }
 }
