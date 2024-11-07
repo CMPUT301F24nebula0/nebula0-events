@@ -34,6 +34,7 @@
         <activity android:name=".user.activities.FacilityInfoActivity"></activity>
         <activity android:name=".start.activities.HomePageActivity"></activity>
         <activity android:name=".qr.QRCodeActivity"></activity>
+        <activity android:name=".notification.MessageViewActivity"></activity>
         <activity android:name=".admin.activities.AdminHomeActivity"></activity>
         <activity android:name=".entrant.activities.EntrantHomeActivity"></activity>
         <activity android:name=".organizer.activities.OrganizerHomeActivity"></activity>

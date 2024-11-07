@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.admin.activities.AdminHomeActivity;
 import com.example.pickme_nebula0.entrant.activities.EntrantHomeActivity;
+import com.example.pickme_nebula0.notification.MessageViewActivity;
 import com.example.pickme_nebula0.organizer.activities.OrganizerHomeActivity;
 import com.example.pickme_nebula0.user.activities.UserInfoActivity;
 
@@ -36,12 +37,14 @@ public class HomePageActivity extends AppCompatActivity {
         final Button adminButton = findViewById(R.id.adminButton);
         final Button entrantButton = findViewById(R.id.entrantButton);
         final Button organizerButton = findViewById(R.id.organizerButton);
+        final Button messagesButton = findViewById(R.id.button_messages);
 
         // actions once buttons are pressed
         profileButton.setOnClickListener(view -> navigateTo(UserInfoActivity.class));
         adminButton.setOnClickListener(view -> navigateTo(AdminHomeActivity.class));
         entrantButton.setOnClickListener(view -> navigateTo(EntrantHomeActivity.class));
         organizerButton.setOnClickListener(view -> navigateTo(OrganizerHomeActivity.class));
+        messagesButton.setOnClickListener(view -> navigateTo(MessageViewActivity.class));
 
         // Check if notification permission is granted
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
