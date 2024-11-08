@@ -1,7 +1,5 @@
 package com.example.pickme_nebula0.organizer;
 
-import static com.example.pickme_nebula0.db.DBManagerStatic.notifyEntrantsOfStatus;
-
 import android.util.Log;
 
 import com.example.pickme_nebula0.db.DBManager;
