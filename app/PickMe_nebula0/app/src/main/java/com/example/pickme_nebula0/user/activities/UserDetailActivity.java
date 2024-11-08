@@ -50,8 +50,7 @@ public class UserDetailActivity extends AppCompatActivity {
         delButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dbManager.deleteUser(userID);
-                return;
+                dbManager.deleteUser(userID,()->{finish();});
             }
         });
 
