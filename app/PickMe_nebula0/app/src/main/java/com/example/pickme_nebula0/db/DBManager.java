@@ -384,7 +384,7 @@ public class DBManager {
         createDocument(eventRegColRef,registrantID,data);
 
         // In Users, update user to have waitlisted event
-        CollectionReference userEventsColRef = db.collection(usersCollection).document(eventID).collection(registeredEventsCollection);
+        CollectionReference userEventsColRef = db.collection(usersCollection).document(registrantID).collection(registeredEventsCollection);
         createDocument(userEventsColRef,eventID,data);
     }
 
