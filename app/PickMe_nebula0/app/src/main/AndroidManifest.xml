@@ -43,6 +43,7 @@
         <activity android:name=".event.EventDetailUserActivity"></activity>
         <activity android:name=".organizer.activities.OrganizerEventParticipantsActivity"></activity>
         <activity android:name=".user.activities.UserDetailActivity"></activity>
+        <activity android:name=".admin.activities.EventDetailAdminActivity"></activity>
 
 
     </application>

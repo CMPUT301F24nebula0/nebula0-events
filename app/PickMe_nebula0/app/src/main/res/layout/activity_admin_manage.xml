@@ -6,38 +6,21 @@
     android:background="#E0E0E0">
 
     <!-- Profile Picture and Admin Title -->
-    <LinearLayout
-        android:id="@+id/titleLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <ImageView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginEnd="16dp"
-            android:background="#D3D3D3"
-            android:src="@drawable/ic_profile_placeholder" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Admin"
-            android:textSize="24sp"
-            android:textStyle="bold" />
-
-
-    </LinearLayout>
 
     <!-- Tabs -->
+
+    <Button
+        android:id="@+id/button_admin_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/view_flipper"
+        android:layout_marginTop="21dp"
+        android:text="Back" />
+
     <LinearLayout
         android:id="@+id/Admin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/titleLayout"
         android:layout_marginTop="16dp"
         android:orientation="horizontal"
 
@@ -115,35 +98,26 @@
             <ScrollView
                 android:id="@+id/Event_details"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="566dp"
                 android:padding="16dp">
                 <!-- Content for Manage Events -->
                 <LinearLayout
-                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
                     <!-- ListView to display events -->
                     <ListView
                         android:id="@+id/eventListView"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textColor="#000000"
-
+                        android:layout_height="537dp"
                         android:background="#FFFFFF"
+
                         android:divider="@color/black"
-                        android:dividerHeight="1dp" />
+                        android:dividerHeight="1dp"
+                        android:textColor="#000000" />
 
                     <!-- Search Bar for filtering events -->
-                    <EditText
-                        android:id="@+id/searchEvents"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@android:color/white"
-                        android:drawableStart="@android:drawable/ic_menu_search"
-                        android:hint="Search Events"
-                        android:padding="10dp"
-                        android:textColor="@android:color/black" />
 
 
                 </LinearLayout>
@@ -165,20 +139,14 @@
                 <ListView
                     android:id="@+id/ProfileListView"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:divider="@android:color/darker_gray"
-                    android:dividerHeight="1dp" />
+                    android:layout_height="537dp"
+                    android:background="#FFFFFF"
+
+                    android:divider="@color/black"
+                    android:dividerHeight="1dp"
+                    android:textColor="#000000" />
 
                 <!-- Search Bar for filtering events -->
-                <EditText
-                    android:id="@+id/BrowseProfiles"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Search Profiles"
-                    android:padding="10dp"
-                    android:background="@android:color/white"
-                    android:textColor="@android:color/black"
-                    android:drawableStart="@android:drawable/ic_menu_search" />
                 </LinearLayout>
 
             </ScrollView>
@@ -199,20 +167,14 @@
                     <ListView
                         android:id="@+id/ImageListView"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:divider="@android:color/darker_gray"
-                        android:dividerHeight="1dp" />
+                        android:layout_height="537dp"
+                        android:background="#FFFFFF"
+
+                        android:divider="@color/black"
+                        android:dividerHeight="1dp"
+                        android:textColor="#000000" />
 
                     <!-- Search Bar for filtering events -->
-                    <EditText
-                        android:id="@+id/BrowseImages"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Search image"
-                        android:padding="10dp"
-                        android:background="@android:color/white"
-                        android:textColor="@android:color/black"
-                        android:drawableStart="@android:drawable/ic_menu_search" />
                 </LinearLayout>
             </ScrollView>
 
@@ -232,20 +194,14 @@
                     <ListView
                         android:id="@+id/QRcodeListView"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:divider="@android:color/darker_gray"
-                        android:dividerHeight="1dp" />
+                        android:layout_height="537dp"
+                        android:background="#FFFFFF"
+
+                        android:divider="@color/black"
+                        android:dividerHeight="1dp"
+                        android:textColor="#000000" />
 
                     <!-- Search Bar for filtering events -->
-                    <EditText
-                        android:id="@+id/BrowseQRcodes"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Search Hash data"
-                        android:padding="10dp"
-                        android:background="@android:color/white"
-                        android:textColor="@android:color/black"
-                        android:drawableStart="@android:drawable/ic_menu_search" />
                 </LinearLayout>
             </ScrollView>
 
@@ -265,20 +221,14 @@
                     <ListView
                         android:id="@+id/facilitiesListView"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:divider="@android:color/darker_gray"
-                        android:dividerHeight="1dp" />
+                        android:layout_height="537dp"
+                        android:background="#FFFFFF"
+
+                        android:divider="@color/black"
+                        android:dividerHeight="1dp"
+                        android:textColor="#000000" />
 
                     <!-- Search Bar for filtering events -->
-                    <EditText
-                        android:id="@+id/Browsefacilities"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Search facilities"
-                        android:padding="10dp"
-                        android:background="@android:color/white"
-                        android:textColor="@android:color/black"
-                        android:drawableStart="@android:drawable/ic_menu_search" />
                 </LinearLayout>
             </ScrollView>
 

@@ -1,10 +1,12 @@
 package com.example.pickme_nebula0.admin.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,15 +16,42 @@ import android.widget.ViewFlipper;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
+import com.example.pickme_nebula0.event.Event;
+import com.example.pickme_nebula0.event.EventDetailUserActivity;
+import com.example.pickme_nebula0.event.EventsArrayAdapter;
+import com.example.pickme_nebula0.notification.MessageViewActivity;
+import com.example.pickme_nebula0.notification.Notification;
+import com.example.pickme_nebula0.notification.NotificationArrayAdapter;
+import com.example.pickme_nebula0.user.User;
+import com.example.pickme_nebula0.user.UserArrayAdapter;
+import com.example.pickme_nebula0.user.activities.UserDetailActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Allows admin to browse and delete items.
+ *
+ * @author Stephine Yearley
+ * @author Sina Shaban
+ */
 public class AdminHomeActivity extends AppCompatActivity {
     private String deviceID;
     private FirebaseFirestore db;
+
+    // Events
+    private ArrayList<Event> events;
+    private ListView eventsList;
+    private EventsArrayAdapter eventAdapter;
+
+    // Profiles
+    private ArrayList<User> users;
+    private ListView usersList;
+    private UserArrayAdapter userAdapter;
 
     // UI Elements
     ViewFlipper viewFlipper;
@@ -31,57 +60,66 @@ public class AdminHomeActivity extends AppCompatActivity {
     Button btnManageImages;
     Button btnManageFacilities;
     Button btnManageQR;
-    private List<String> eventList;
-    private ArrayAdapter<String> eventAdapter;
+    Button btnBack;
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateAll();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_manage);
 
+        db = FirebaseFirestore.getInstance();
+
+        // UI components
         viewFlipper = findViewById(R.id.admin_view_flipper);
         btnManageEvents = findViewById(R.id.manage_event);
         btnManageUsers = findViewById(R.id.manage_users);
         btnManageImages = findViewById(R.id.manage_image);
         btnManageFacilities = findViewById(R.id.manage_facilities);
         btnManageQR = findViewById(R.id.manage_qr_code);
+        btnBack = findViewById(R.id.button_admin_back);
+
+        // Set up list view for events
+        events = new ArrayList<Event>();
+        eventsList = findViewById(R.id.eventListView);
+        eventAdapter = new EventsArrayAdapter(AdminHomeActivity.this,R.id.item_event, events);
+        eventsList.setAdapter(eventAdapter);
+        // for user profiles
+        users = new ArrayList<User>();
+        usersList = findViewById(R.id.ProfileListView);
+        userAdapter = new UserArrayAdapter(AdminHomeActivity.this,R.id.item_user, users);
+        usersList.setAdapter(userAdapter);
+
+
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         // upon clicking the manage events button, show the manage events layout
-
         btnManageEvents.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Show Manage Events layout
                 viewFlipper.setDisplayedChild(0);
 
-                // Set up event list and search functionality within Manage Events
-                ListView eventListView = findViewById(R.id.eventListView);
-                EditText searchEvents = findViewById(R.id.searchEvents);
-
-                // Sample event list data , In future this will be fetched from the database
-                eventList = new ArrayList<>();
-                eventList.add("Swimming 1 - 2025-01-01");
-                eventList.add("Field Hockey 2 - 2025-09-21");
-
-
-                // Setting up the adapter and attaching it to the ListView
-                eventAdapter = new ArrayAdapter<>(AdminHomeActivity.this, android.R.layout.simple_list_item_1, eventList);
-                eventListView.setAdapter(eventAdapter);
-
-                // Filter events based on search input
-                // just to Acknowledge that I use ChatGPT with the prompt: add functionality to filter events based on search input
-                searchEvents.addTextChangedListener(new TextWatcher() {
+                // On click, show event details an allow admin to delete
+                eventsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+                    public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
+                        Event clickedEvent = (Event) adapterView.getItemAtPosition(pos);
 
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        eventAdapter.getFilter().filter(s);
+                        Intent intent = new Intent(AdminHomeActivity.this, EventDetailAdminActivity.class);
+                        intent.putExtra("eventID",clickedEvent.getEventID());
+                        startActivity(intent);
                     }
-
-                    @Override
-                    public void afterTextChanged(Editable s) { }
                 });
 
                 // Confirmation message for debugging and UI verification
@@ -94,6 +132,23 @@ public class AdminHomeActivity extends AppCompatActivity {
             //TODO;
             public void onClick(View v) {
                 viewFlipper.setDisplayedChild(1); // Show Manage Profile layout
+
+                // On click, show user details an allow admin to delete
+                usersList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
+                        User clickedUser = (User) adapterView.getItemAtPosition(pos);
+
+                        Toast.makeText(AdminHomeActivity.this, clickedUser.getUserID(), Toast.LENGTH_SHORT).show();
+
+
+                        Intent intent = new Intent(AdminHomeActivity.this, UserDetailActivity.class);
+                        intent.putExtra("userID",clickedUser.getUserID());
+                        intent.putExtra("admin",true);
+                        startActivity(intent);
+                    }
+                });
+
                 Toast.makeText(AdminHomeActivity.this, "Switched to Manage Users layout", Toast.LENGTH_SHORT).show();
             }
         });
@@ -125,7 +180,55 @@ public class AdminHomeActivity extends AppCompatActivity {
                 Toast.makeText(AdminHomeActivity.this, "Switched to Manage Facilities layout", Toast.LENGTH_SHORT).show();
             }
         });
+    }
 
+    private void updateAll(){
+        updateEvents();
+        updateProfiles();
+        updateImages();
+        updateQRCodes();
+        updateFacilities();
+    }
+
+    private void updateEvents(){
+        events.clear();
+        db.collection("Events")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            Event e = document.toObject(Event.class);
+                            events.add(e);
+                        }
+                        eventAdapter.notifyDataSetChanged();
+                    }
+                });
+    }
+
+    private void updateProfiles(){
+        users.clear();
+        db.collection("Users")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            User u = document.toObject(User.class);
+                            users.add(u);
+                        }
+                        userAdapter.notifyDataSetChanged();
+                    }
+                });
+    }
+
+    private void updateImages(){
+
+    }
+
+    private void updateQRCodes(){
+
+    }
+
+    private void updateFacilities(){
 
     }
 }

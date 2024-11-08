@@ -154,6 +154,7 @@ public class DBManager {
      */
     private void createNewUser(User user){
         Map<String, Object> userData = new HashMap<>();
+        userData.put("userID",user.getUserID());
         userData.put("name", user.getName());
         userData.put("email", user.getEmail());
         userData.put("phone", user.getPhoneNumber());
@@ -350,6 +351,11 @@ public class DBManager {
         eventData.put("qrCodeData", qrBase64);
         // Create document
         addUpdateDocument(eventsCollection, event.getEventID(), eventData);
+        // Add this event to the organizer's list of created events
+        CollectionReference orgsCreatedEventsCol = db.collection(usersCollection).document(event.getOrganizerID()).collection(organizerEventsCollection);
+        Map<String,Object> orgEventData = new HashMap<>();
+        orgEventData.put("status", "OPEN");
+        addUpdateDocument(orgsCreatedEventsCol,event.getEventID(),orgEventData);
     }
 
     /**
@@ -452,37 +458,42 @@ public class DBManager {
      * @param eventID eventID of event to be removed
      */
     public void deleteEvent(String eventID){
-        // Remove Event from all users who signed up
+
         DocumentReference eventDoc = db.collection(eventsCollection).document(eventID);
         CollectionReference collectionOfEventRegistrants = eventDoc.collection(eventRegistrantsCollection);
-        iterateOverCollection(collectionOfEventRegistrants, this::removeEventFromRegistrant);
 
-        // Remove Event from organizer
-        getDocumentAsObject(eventsCollection,eventID,this::eventConverter,this::removeEventFromOrganizer,()->{});
+        eventDoc
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Event e =  task.getResult().toObject(Event.class);
 
-        // Remove Event from Events
-        removeDocument(eventDoc);
+                        // Remove Event from organizer
+                        removeEventFromOrganizer(e.getOrganizerID(),eventID);
+
+                        // Remove Event from all users who signed up
+                        iterateOverCollection(collectionOfEventRegistrants, (regDoc)->{removeEventFromRegistrant(regDoc.getId(),eventID);});
+
+                        // Remove Event from Events
+                        removeDocument(eventDoc);
+                    }
+                });
+
+
     }
 
-    /**
-     * Removes a given event from an organizer's list of events
-     *
-     * @param event object castable to event
-     */
-    private void removeEventFromOrganizer(Object event){
-        Event castedEvent = (Event) event;
-        removeDocument(db.collection(usersCollection).document(castedEvent.getOrganizerID()).collection(organizerEventsCollection).document(castedEvent.getEventID()));
+    private void removeEventFromOrganizer(String organizerID, String eventID){
+        DocumentReference documentReference = db.collection(usersCollection).document(organizerID).collection(organizerEventsCollection).document(eventID);
+        removeDocument(documentReference);
     }
 
     /**
      * Removes the given registeredEvent document from the user given a eventRegistrant document.
      *
-     * @param eventRegistrantDoc DocumentSnapshot of a db.collection(Events).document(<eventID>).collection(eventRegistrants).document(<userID>)
+     * @param registrantID userID of registrant to remove from event
+     * @param eventID eventID of event we are removing the registrant from
      */
-    private void removeEventFromRegistrant(DocumentSnapshot eventRegistrantDoc){
-        String registrantID = eventRegistrantDoc.getId();
-        String eventID = eventRegistrantDoc.getReference().getParent().getId();
-
+    private void removeEventFromRegistrant(String registrantID,String eventID){
         removeDocument(getDocOfEventInRegistrant(eventID,registrantID));
     }
 
