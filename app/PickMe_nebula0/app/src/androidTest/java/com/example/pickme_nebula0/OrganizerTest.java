@@ -193,6 +193,8 @@ public class OrganizerTest {
 //        onView(withId(R.id.past_events_recycler_view))
 //                .perform(clone(withText("curling"), click()));
 //
+
+
 //        // Verify that the event details are displayed
 //        onView(withText("Event Name: curling"))
 //                .check(matches(isDisplayed()));

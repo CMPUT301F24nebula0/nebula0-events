@@ -66,6 +66,7 @@ and the firebase ; Therefore I made a changes for the half way summation that le
 //        eventDateField.setFocusable(false);
 //        eventDateField.setOnClickListener(v -> showDatePickerDialog());
 
+
         // Geolocation Requirement Switch Logic
         geolocationRequirementSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
