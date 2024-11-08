@@ -154,6 +154,7 @@ public class DBManager {
      */
     private void createNewUser(User user){
         Map<String, Object> userData = new HashMap<>();
+        userData.put("userID",user.getUserID());
         userData.put("name", user.getName());
         userData.put("email", user.getEmail());
         userData.put("phone", user.getPhoneNumber());

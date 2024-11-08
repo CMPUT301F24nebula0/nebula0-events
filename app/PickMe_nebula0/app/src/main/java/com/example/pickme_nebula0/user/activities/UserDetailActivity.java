@@ -48,6 +48,7 @@ public class UserDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 dbManager.deleteUser(userID);
+                return;
             }
         });
 

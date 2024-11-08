@@ -26,6 +26,7 @@ import com.example.pickme_nebula0.notification.Notification;
 import com.example.pickme_nebula0.notification.NotificationArrayAdapter;
 import com.example.pickme_nebula0.user.User;
 import com.example.pickme_nebula0.user.UserArrayAdapter;
+import com.example.pickme_nebula0.user.activities.UserDetailActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -136,11 +137,15 @@ public class AdminHomeActivity extends AppCompatActivity {
                 usersList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
-//                        Event clickedEvent = (Event) adapterView.getItemAtPosition(pos);
-//
-//                        Intent intent = new Intent(AdminHomeActivity.this, EventDetailAdminActivity.class);
-//                        intent.putExtra("eventID",clickedEvent.getEventID());
-//                        startActivity(intent);
+                        User clickedUser = (User) adapterView.getItemAtPosition(pos);
+
+                        Toast.makeText(AdminHomeActivity.this, clickedUser.getUserID(), Toast.LENGTH_SHORT).show();
+
+
+                        Intent intent = new Intent(AdminHomeActivity.this, UserDetailActivity.class);
+                        intent.putExtra("userID",clickedUser.getUserID());
+                        intent.putExtra("admin",true);
+                        startActivity(intent);
                     }
                 });
 
