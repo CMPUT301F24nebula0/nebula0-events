@@ -53,6 +53,15 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         // get deviceID as the foreignKey
         String deviceID = DeviceManager.getDeviceId();
 
+
+/*
+@Author: Sina Shaban
+I just made a bit change in the way that we select the date there was a problem regarding dependency of Espresso picker
+and the firebase ; Therefore I made a changes for the half way summation that lets as write the date in the format
+(YYYY-MM-DD) instead of picking from a calender , I will also put a note so we should modify it for our final submission
+
+ */
+
 //        // DatePicker logic
 //        eventDateField.setFocusable(false);
 //        eventDateField.setOnClickListener(v -> showDatePickerDialog());
