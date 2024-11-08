@@ -1,10 +1,15 @@
 package com.example.pickme_nebula0.organizer;
 
+import android.util.Log;
+
+import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.entrant.EntrantRole;
 import com.example.pickme_nebula0.event.Event;
 import com.example.pickme_nebula0.user.User;
+import com.google.common.collect.Sets;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 /**
@@ -13,6 +18,7 @@ import java.util.Date;
 public class OrganizerRole extends User {
     private String organizerID;
     private ArrayList<Event> events = new ArrayList<Event>();
+    private DBManager dbManager = new DBManager();
 
     /**
      * Constructor
@@ -103,33 +109,104 @@ public class OrganizerRole extends User {
     }
 
 
-    // moved under notification section
-
     // US 02.05.02
     // As an organizer I want to set the system to sample a specified number of attendees to register for the event
-    public ArrayList<EntrantRole> sampleEntrants(Event event, int entrantNum) {
-        // get all entrants from an event
-        // randomly select entrant_num entrants from the Event's entrants
-        // then update Event's chosen entrants
 
-        ArrayList<EntrantRole> entrantsChosen = event.getEntrantsChosen();
-        return entrantsChosen;
+    /**
+     * US 02.05.02
+     * As an organizer I want to set the system to sample a specified number of attendees to register for the event
+     *
+     * Samples all users in the waitlist, based on the event capacity of the given event,
+     * or samples all if event capacity is none.
+     * Sets their status to SELECTED and updates the corresponding EventRegistrants status.
+     * Passes the list of selected users to onSuccessCallback (as an Object.)
+     * @param eventID
+     * @param onSuccessCallback
+     */
+    public static void sampleAndSelectUsers(String eventID, DBManager.Obj2VoidCallback onSuccessCallback) {
+        DBManager dbManager = new DBManager();
+        // get waitlist capacity first via event
+        dbManager.getEvent(eventID, (eventObj) -> {
+            Event event = (Event) eventObj;
+            int eventCapacity = event.getEventCapacity();
+
+            // get random sample of users and add them to selected list
+            sampleUsers(eventID, eventCapacity, (userListObj) -> {
+                ArrayList<User> usersSelected = (ArrayList<User>) userListObj;
+                Log.d("TEST", String.format("Sampled %s users from event capacity %s", eventCapacity, usersSelected.size()));
+
+                for (User user : usersSelected) {
+                    Log.d("TEST", String.format("Sampled user %s for initial event selection", user.getName()));
+                    dbManager.setRegistrantStatus(eventID, user.getUserID(), DBManager.RegistrantStatus.SELECTED);
+
+                    // possible race condition
+                    // consider calling from onSuccessCallback instead
+                    dbManager.notifyEntrantsOfStatus("Not Selected For Event",
+                            "You will remain waitlisted in case a spot opens up",
+                            eventID, DBManager.RegistrantStatus.WAITLISTED);
+                }
+                onSuccessCallback.run(usersSelected);
+            });
+
+        }, () -> {Log.d("Firestore", "Could not fetch event to check event capacity.");});
     }
 
-    // US 02.05.03
-    // As an organizer I want to be able to draw a replacement applicant from the pooling system
-    // when a previously selected applicant cancels or rejects the invitation
-    public EntrantRole resampleEntrant(Event event) {
-        // remove cancelled applicant from invitation list (if found)
+    /**
+     * Utility function that randomly samples users registered for an event
+     * and passes this list to the onSuccessCallback (as an Object.)
+     * @param eventID
+     * @param sampleNum
+     * @param onSuccessCallback
+     */
+    public static void sampleUsers(String eventID, int sampleNum, DBManager.Obj2VoidCallback onSuccessCallback) {
+        DBManager dbManager = new DBManager();
 
-        // fetch list of Entrants who elected to be resampled
-        // randomly select one of these entrants
-        // add entrant to list of invited entrants
+        // load users registered in event
+        // then shuffle and sample
+        dbManager.loadAllUsersRegisteredInEvent(eventID, DBManager.RegistrantStatus.WAITLISTED,
+            (userListObj) -> {
+                ArrayList<User> users = (ArrayList<User>) userListObj;
+                ArrayList<User> usersToSelect = new ArrayList<>();
 
+                if (sampleNum == -1 || users.size() <= sampleNum) {
+                    usersToSelect.addAll(users);
+                } else {
+                    ArrayList<User> randomUsers = new ArrayList<>(users);
+                    Collections.shuffle(randomUsers);
+                    usersToSelect = new ArrayList<>(randomUsers.subList(0, sampleNum));
+                }
 
-        EntrantRole resampled_entrant = null;
-        return resampled_entrant;
+                onSuccessCallback.run(usersToSelect);
+
+            });
     }
+
+    /**
+     * US 02.05.03
+     * As an organizer I want to be able to draw a replacement applicant from the pooling system
+     * when a previously selected applicant cancels or rejects the invitation.
+     *
+     * Resample users whose status remains waitlisted.
+     * Sets their status to SELECTED and updates the corresponding EventRegistrants status.
+     * Passes the list of resampled users to onSuccessCallback (as an Object.)
+     * @param eventID
+     * @param resampleNum
+     * @param onSuccessCallback
+     */
+    public static void resampleAndSelectUsers(String eventID, int resampleNum, DBManager.Obj2VoidCallback onSuccessCallback) {
+        // assumes all entrants in waitlist elected to be resampled
+        DBManager dbManager = new DBManager();
+        sampleUsers(eventID, resampleNum, (userListObj) -> {
+            ArrayList<User> usersResampled = (ArrayList<User>) userListObj;
+            for (User user : usersResampled) {
+                Log.d("TEST", String.format("Resampled user %s", user.getName()));
+                dbManager.setRegistrantStatus(eventID, user.getUserID(), DBManager.RegistrantStatus.SELECTED);
+            }
+
+            onSuccessCallback.run(usersResampled);
+        });
+    }
+
 
     // US 02.06.01 As an organizer I want to view a list of all chosen entrants who are invited to apply
     public ArrayList<EntrantRole> getInvitedEntrants(Event event) {
