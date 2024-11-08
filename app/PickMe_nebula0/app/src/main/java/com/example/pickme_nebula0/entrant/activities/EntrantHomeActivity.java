@@ -11,26 +11,31 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.pickme_nebula0.R;
+import com.example.pickme_nebula0.entrant.fragments.EntrantEventsFragment;
 import com.example.pickme_nebula0.qr.QRCodeActivity;
-import com.example.pickme_nebula0.entrant.fragments.EntrantSelectedFragment;
-import com.example.pickme_nebula0.entrant.fragments.EntrantJoinedFragment;
-import com.example.pickme_nebula0.entrant.fragments.EntrantWaitlistFragment;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
+/**
+ * Activity for displaying events the user has signed up for
+ */
 public class EntrantHomeActivity extends AppCompatActivity {
 
     // tabs
-    private final String[] tabTitles = new String[]{"Waitlist", "Selected", "Joined Events"};
+    private final String[] tabTitles = new String[]{"Waitlist", "Selected", "Confirmed","Canceled"};
+    EntrantEventsFragment waitlistFrag, selectedFrag, confirmedFrag, canceledFrag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // attach screen layout xml file
+        waitlistFrag = new EntrantEventsFragment("WAITLISTED");
+        selectedFrag = new EntrantEventsFragment("SELECTED");
+        confirmedFrag = new EntrantEventsFragment("CONFIRMED");
+        canceledFrag = new EntrantEventsFragment("CANCELED");
+
         setContentView(R.layout.activity_entrant_home);
 
-        // binding elements
         ViewPager2 viewPager = findViewById(R.id.view_pager);
         TabLayout tabLayout = findViewById(R.id.tab_layout);
         FragmentStateAdapter pagerAdapter = new ScreenSlidePagerAdapter(this);
@@ -65,11 +70,13 @@ public class EntrantHomeActivity extends AppCompatActivity {
         public Fragment createFragment(int position) {
             switch (position) {
                 case 0:
-                    return new EntrantWaitlistFragment();
+                    return waitlistFrag;
                 case 1:
-                    return new EntrantSelectedFragment();
+                    return selectedFrag;
+                case 2:
+                    return confirmedFrag;
                 default:
-                    return new EntrantJoinedFragment();
+                    return canceledFrag;
             }
         }
 
@@ -78,4 +85,25 @@ public class EntrantHomeActivity extends AppCompatActivity {
             return tabTitles.length;
         }
     }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        // TODO - tidy this by making a list of fragments and iterate
+        if (waitlistFrag.isAdded()) {
+            waitlistFrag.loadEvents();
+        }
+        if (confirmedFrag.isAdded()) {
+            confirmedFrag.loadEvents();
+        }
+        if (selectedFrag.isAdded()) {
+            selectedFrag.loadEvents();
+        }
+        if (canceledFrag.isAdded()) {
+            canceledFrag.loadEvents();
+        }
+    }
+
+
+
 }
