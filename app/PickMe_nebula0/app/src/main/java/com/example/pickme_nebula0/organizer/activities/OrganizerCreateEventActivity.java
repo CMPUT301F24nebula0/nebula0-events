@@ -41,7 +41,7 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         // components on screen
         EditText eventNameField = findViewById(R.id.event_name_field);
         EditText eventDescriptionField = findViewById(R.id.event_description_field);
-        eventDateField = findViewById(R.id.event_date_field);
+        EditText eventDateField = findViewById(R.id.event_date_field);
         Switch geolocationRequirementSwitch = findViewById(R.id.geolocation_requirement_switch);
         EditText geolocationRequirementField = findViewById(R.id.geolocation_requirement_field);
         Switch waitlistCapacityRequiredSwitch = findViewById(R.id.waitlist_capacity_required_switch);
@@ -53,9 +53,9 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         // get deviceID as the foreignKey
         String deviceID = DeviceManager.getDeviceId();
 
-        // DatePicker logic
-        eventDateField.setFocusable(false);
-        eventDateField.setOnClickListener(v -> showDatePickerDialog());
+//        // DatePicker logic
+//        eventDateField.setFocusable(false);
+//        eventDateField.setOnClickListener(v -> showDatePickerDialog());
 
         // Geolocation Requirement Switch Logic
         geolocationRequirementSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
