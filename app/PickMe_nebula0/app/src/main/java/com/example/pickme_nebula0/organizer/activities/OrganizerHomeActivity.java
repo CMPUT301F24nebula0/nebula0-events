@@ -44,7 +44,7 @@ public class OrganizerHomeActivity extends AppCompatActivity {
         ).attach();
 
         // back button
-        backButton.setOnClickListener(new View.OnClickListener() {
+        createEventButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getOnBackPressedDispatcher().onBackPressed();
@@ -52,7 +52,8 @@ public class OrganizerHomeActivity extends AppCompatActivity {
         });
 
         // once create event button pressed
-        createEventButton.setOnClickListener(view -> navigateTo(OrganizerCreateEventActivity.class));
+        backButton.setOnClickListener(view ->
+                navigateTo(OrganizerCreateEventActivity.class));
 
         // to keep track of which tab is selected
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {

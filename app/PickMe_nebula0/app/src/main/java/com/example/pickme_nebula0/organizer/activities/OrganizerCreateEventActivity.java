@@ -41,7 +41,7 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         // components on screen
         EditText eventNameField = findViewById(R.id.event_name_field);
         EditText eventDescriptionField = findViewById(R.id.event_description_field);
-        eventDateField = findViewById(R.id.event_date_field);
+        EditText eventDateField = findViewById(R.id.event_date_field);
         Switch geolocationRequirementSwitch = findViewById(R.id.geolocation_requirement_switch);
         EditText geolocationRequirementField = findViewById(R.id.geolocation_requirement_field);
         Switch waitlistCapacityRequiredSwitch = findViewById(R.id.waitlist_capacity_required_switch);
@@ -54,8 +54,11 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         String deviceID = DeviceManager.getDeviceId();
 
         // DatePicker logic
-        eventDateField.setFocusable(false);
-        eventDateField.setOnClickListener(v -> showDatePickerDialog());
+
+        // just to not that I disable the field to pick the date and instade for now i put it as just static writing of the date in format yyyy-mm-dd
+        //@autor : Sina shaban
+//        eventDateField.setFocusable(false);
+//        eventDateField.setOnClickListener(v -> showDatePickerDialog());
 
         // Geolocation Requirement Switch Logic
         geolocationRequirementSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -193,7 +196,8 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         if (eventDate.isEmpty()) {
             warningMessage.append("\n- The event date cannot be blank.");
             valid = false;
-        } else {
+        }
+        else {
             try {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 Date selectedDate = dateFormat.parse(eventDate);

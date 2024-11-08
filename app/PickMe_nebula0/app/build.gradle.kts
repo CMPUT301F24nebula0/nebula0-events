@@ -34,7 +34,13 @@ android {
 }
 
 dependencies {
+    testImplementation(libs.ext.junit)
+    testImplementation(libs.espresso.core)
+    testImplementation(libs.espresso.core)
     // Import the Firebase BoM
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
     testImplementation ("org.robolectric:robolectric:4.7.3") // Use the latest version available
 
     implementation(platform("com.google.firebase:firebase-bom:32.7.1"))
@@ -45,6 +51,7 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.play.services.tasks)
     testImplementation(libs.junit)
+    testImplementation(libs.runner)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation("com.journeyapps:zxing-android-embedded:4.1.0")
