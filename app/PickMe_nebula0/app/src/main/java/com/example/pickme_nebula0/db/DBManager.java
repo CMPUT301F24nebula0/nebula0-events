@@ -24,17 +24,10 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Class encompassing database access and modification
@@ -44,24 +37,23 @@ import java.util.concurrent.TimeUnit;
  */
 public class DBManager {
     // USERS COLLECTION
-    public static String usersCollection = "Users";
+    public String usersCollection = "Users";
     // Sub-collections of Users
-    public static String registeredEventsCollection = "RegisteredEvents";
-    public static String organizerEventsCollection = "OrganizerEvents";
+    public String registeredEventsCollection = "RegisteredEvents";
+    public String organizerEventsCollection = "OrganizerEvents";
 
     // EVENTS COLLECTION
-    public static String eventsCollection = "Events";
+    public String eventsCollection = "Events";
     // Sub-collections of Event
-    public static String eventRegistrantsCollection = "EventRegistrants";
-    public static String eventStatusKey = "status";
+    public String eventRegistrantsCollection = "EventRegistrants";
+    public String eventStatusKey = "status";
 
     // FACILITIES COLLECTION
-    public static String facilitiesCollection = "Facilities";
+    public String facilitiesCollection = "Facilities";
 
-    public static String notificationCollection = "Notifications";
+    public String notificationCollection = "Notifications";
 
     private QRCodeManager qrCodeManager;
-    public static String FIRESTORE_TAG = "Firestore";
 
 
     /**
@@ -385,14 +377,14 @@ public class DBManager {
      */
     public void addRegistrantToWaitlist(String eventID, String registrantID){
         Map<String, Object> data = new HashMap<>();
-        data.put(eventStatusKey, RegistrantStatus.WAITLISTED);
+        data.put("status", RegistrantStatus.WAITLISTED);
 
         // In Events, update event to have waitlisted registrant
         CollectionReference eventRegColRef = db.collection(eventsCollection).document(eventID).collection(eventRegistrantsCollection);
         createDocument(eventRegColRef,registrantID,data);
 
         // In Users, update user to have waitlisted event
-        CollectionReference userEventsColRef = db.collection(usersCollection).document(registrantID).collection(registeredEventsCollection);
+        CollectionReference userEventsColRef = db.collection(usersCollection).document(eventID).collection(registeredEventsCollection);
         createDocument(userEventsColRef,eventID,data);
     }
 
@@ -1084,78 +1076,6 @@ public class DBManager {
      */
     private DocumentReference getDocOfEventInRegistrant(String eventID, String registrantID){
         return db.collection(usersCollection).document(registrantID).collection(registeredEventsCollection).document(eventID);
-    }
-
-    // passes a list of Users to the callback (as an Object)
-
-    /**
-     * Ensures all users registered in an event are fetched before calling onSuccessCallback.
-     * Passes list of Users to the callback (ArrayList<User> as an Object class.)
-     * @param eventID
-     * @param status
-     * @param onSuccessCallback
-     */
-    public void loadAllUsersRegisteredInEvent(String eventID, RegistrantStatus status, DBManager.Obj2VoidCallback onSuccessCallback) {
-        Query waitlistedUsersQuery = db.collection(eventsCollection)
-                .document(eventID)
-                .collection(eventRegistrantsCollection)
-                .whereEqualTo(eventStatusKey, status);
-
-        ExecutorService executor = Executors.newFixedThreadPool(5);
-        List<Future<User>> futures = new ArrayList<>();
-
-        waitlistedUsersQuery.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                ArrayList<User> waitlistedUsers = new ArrayList<>();
-
-                for (QueryDocumentSnapshot registeredUserDoc : task.getResult()) {
-                    String userID = registeredUserDoc.getId();
-
-                    // submit task to the executor for each event
-                    Future<User> future = executor.submit(() -> {
-                        final CompletableFuture<User> userFuture = new CompletableFuture<>();
-
-                        // fetch actual event asynchronously
-                        getUser(userID, (userFetched) -> {
-                                userFuture.complete((User) userFetched);
-                            }, () -> {
-                                Log.d(DBManager.FIRESTORE_TAG, "Could not get registered user " + userID);
-                                userFuture.completeExceptionally(new Exception("Failed to fetch waitlisted user"));
-                            });
-
-                        return userFuture.get();
-                    });
-
-                    futures.add(future);
-                }
-
-                // wait for all users to be fetched
-                executor.submit(() -> {
-                    try {
-                        for (Future<User> future : futures) {
-                            User user = future.get();  // blocks until user is fetched
-                            waitlistedUsers.add(user);
-                        }
-                        Log.d(DBManager.FIRESTORE_TAG, "All users fetched. Total users: " + waitlistedUsers.size());
-                    } catch (Exception e) {
-                        Log.d(DBManager.FIRESTORE_TAG, "Error while fetching users: " + e.getMessage());
-                    } finally {
-                        executor.shutdown();
-                        try {
-                            if (!executor.awaitTermination(800, TimeUnit.MILLISECONDS)) {
-                                executor.shutdownNow();
-                            }
-                        } catch (InterruptedException e) {
-                            executor.shutdownNow();
-                        }
-
-                        onSuccessCallback.run(waitlistedUsers);
-                    }
-                });
-            } else {
-                Log.d(DBManager.FIRESTORE_TAG, "Error querying users from EventRegistrants: " + task.getException());
-            }
-        });
     }
 
 
