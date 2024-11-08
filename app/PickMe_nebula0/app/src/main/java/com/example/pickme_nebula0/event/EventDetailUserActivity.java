@@ -12,6 +12,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.db.DBManager;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This activity show the user event details and conditionally rendered elements based on their
@@ -23,14 +29,20 @@ public class EventDetailUserActivity extends AppCompatActivity {
     private String eventID;
     private final String userID = DeviceManager.getDeviceId();
     private DBManager dbManager;
-    private Button acceptBtn, declineBtn, unregBtn,backBtn;
+    private Button acceptBtn, declineBtn, unregBtn,backBtn,regBtn;
     private TextView eventDetailsTextView,userStatusTextView;
+    private FirebaseFirestore db;
+
+    private boolean fromQR;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_detail_user);
 
+        db = FirebaseFirestore.getInstance();
         dbManager = new DBManager();
+
+        fromQR =getIntent().getBooleanExtra("fromQR",false);
 
         // Retrieve eventID from intent, go back if we fail to get valid eventID
         eventID = getIntent().getStringExtra("eventID");
@@ -39,24 +51,33 @@ public class EventDetailUserActivity extends AppCompatActivity {
             finish();
         }
 
+
         // Link components
-        final Button backBtn = findViewById(R.id.button_edu_back);
+        backBtn = findViewById(R.id.button_edu_back);
         acceptBtn = findViewById(R.id.button_edu_accept);
         declineBtn = findViewById(R.id.button_edu_decline);
         unregBtn = findViewById(R.id.button_edu_unregister);
         eventDetailsTextView = findViewById(R.id.textView_edu_details);
         userStatusTextView = findViewById(R.id.textView_edu_status);
+        regBtn = findViewById(R.id.button_edu_reg);
 
         // Initially set all buttons invisible (may take a second to query DB and update visibility)
         acceptBtn.setVisibility(View.GONE);
         declineBtn.setVisibility(View.GONE);
         unregBtn.setVisibility(View.GONE);
+        regBtn.setVisibility(View.GONE);
 
-        // Register button behavior
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
+            }
+        });
+
+        regBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                joinWaitlist(eventID,()->{fromQR = false;renderAll();});
             }
         });
 
@@ -128,7 +149,13 @@ public class EventDetailUserActivity extends AppCompatActivity {
      */
     private void renderAll(){
         renderEventInfo();
-        dbManager.getUserStatusString(userID,eventID,(status)->{renderBasedOnUserStatus(status.toString());},()->{});
+        if(fromQR){
+            regBtn.setVisibility(View.VISIBLE);
+            userStatusTextView.setText("Unregistered");
+            // TODO - we should check if the user has already registered
+        }else{
+            dbManager.getUserStatusString(userID,eventID,(status)->{renderBasedOnUserStatus(status.toString());},()->{});
+        }
     }
 
     /**
@@ -146,6 +173,7 @@ public class EventDetailUserActivity extends AppCompatActivity {
      */
     private void renderBasedOnUserStatus(String status){
         userStatusTextView.setText(status);
+        regBtn.setVisibility(View.GONE);
 
         Toast.makeText(EventDetailUserActivity.this,status,Toast.LENGTH_SHORT);
 
@@ -162,5 +190,49 @@ public class EventDetailUserActivity extends AppCompatActivity {
             declineBtn.setVisibility(View.GONE);
             unregBtn.setVisibility(View.GONE);
         }
+    }
+
+    /**
+     * Handles joining the waitlist for an event.
+     *
+     * @param eventID The ID of the event.
+     */
+    private void joinWaitlist(String eventID, DBManager.Void2VoidCallback whenDone) {
+        String userID = DeviceManager.getDeviceId();
+        if (userID == null || userID.trim().isEmpty()) {
+            Toast.makeText(this, "User not authenticated.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Prepare data for Events -> eventID -> EventRegistrants -> userID
+        DocumentReference eventRegistrantRef = db.collection("Events")
+                .document(eventID)
+                .collection("EventRegistrants")
+                .document(userID);
+
+        Map<String, Object> eventRegistrantData = new HashMap<>();
+        eventRegistrantData.put("status", "WAITLISTED");
+
+        // Prepare data for Users -> userID -> RegisteredEvents -> eventID
+        DocumentReference userRegisteredEventRef = db.collection("Users")
+                .document(userID)
+                .collection("RegisteredEvents")
+                .document(eventID);
+
+        Map<String, Object> userRegisteredEventData = new HashMap<>();
+        userRegisteredEventData.put("status", "WAITLISTED");
+
+        // Perform both writes atomically
+        db.runTransaction(transaction -> {
+            transaction.set(eventRegistrantRef, eventRegistrantData, SetOptions.merge());
+            transaction.set(userRegisteredEventRef, userRegisteredEventData, SetOptions.merge());
+            return null;
+        }).addOnSuccessListener(aVoid -> {
+            Toast.makeText(this, "Successfully joined the waitlist.", Toast.LENGTH_SHORT).show();
+            whenDone.run();
+        }).addOnFailureListener(e -> {
+            Toast.makeText(this, "Failed to join the waitlist: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        });
     }
 }

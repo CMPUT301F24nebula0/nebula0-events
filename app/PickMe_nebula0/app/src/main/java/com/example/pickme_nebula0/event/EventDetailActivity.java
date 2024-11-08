@@ -32,8 +32,6 @@ public class EventDetailActivity extends AppCompatActivity {
     private ImageView qrCodeImageView;
     private DBManager dbManager;
     private Button participantsButton;
-    private Button joinWaitlistButton;
-    private Button cancelWaitlistButton;
     private Button msgEntrantsButton;
     private Button backButton;
 
@@ -45,8 +43,6 @@ public class EventDetailActivity extends AppCompatActivity {
         // Initialize UI components
         backButton = findViewById(R.id.backButton);
         msgEntrantsButton = findViewById(R.id.button_ed_msgEntrants);
-        joinWaitlistButton = findViewById(R.id.button_JoinWaitlist);
-        cancelWaitlistButton = findViewById(R.id.button_CancelWaitlist);
         participantsButton = findViewById(R.id.participantsButton);
         eventDetailsTextView = findViewById(R.id.event_details_text_view);
         qrCodeImageView = findViewById(R.id.qr_code_image_view);
@@ -61,14 +57,6 @@ public class EventDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "Invalid Event ID.", Toast.LENGTH_SHORT).show();
             finish();
             return;
-        }
-
-        // Handle action extra
-        String action = getIntent().getStringExtra("action");
-        if ("scan".equals(action)) {
-            msgEntrantsButton.setVisibility(View.GONE);
-            joinWaitlistButton.setVisibility(View.VISIBLE);
-            cancelWaitlistButton.setVisibility(View.VISIBLE);
         }
 
         // Set up button listeners
@@ -97,12 +85,6 @@ public class EventDetailActivity extends AppCompatActivity {
         // Participants Button
         participantsButton.setOnClickListener(view -> navigateTo(OrganizerEventParticipantsActivity.class));
 
-        // Join Waitlist Button
-        joinWaitlistButton.setOnClickListener(v -> joinWaitlist(eventID));
-
-        // Cancel Waitlist Button
-        // Modified to simply navigate back without performing any action
-        cancelWaitlistButton.setOnClickListener(v -> onBackPressed());
     }
 
     /**
@@ -145,7 +127,6 @@ public class EventDetailActivity extends AppCompatActivity {
 
                     // Update waitlist button visibility based on user's current status
                     String userID = DeviceManager.getDeviceId();
-                    checkUserWaitlistStatus(eventID, userID);
                 });
             } else {
                 runOnUiThread(() -> {
@@ -186,90 +167,5 @@ public class EventDetailActivity extends AppCompatActivity {
             e.printStackTrace();
             qrCodeImageView.setVisibility(View.GONE);
         }
-    }
-
-    /**
-     * Handles joining the waitlist for an event.
-     *
-     * @param eventID The ID of the event.
-     */
-    private void joinWaitlist(String eventID) {
-        String userID = DeviceManager.getDeviceId();
-        if (userID == null || userID.trim().isEmpty()) {
-            Toast.makeText(this, "User not authenticated.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Prepare data for Events -> eventID -> EventRegistrants -> userID
-        DocumentReference eventRegistrantRef = db.collection("Events")
-                .document(eventID)
-                .collection("EventRegistrants")
-                .document(userID);
-
-        Map<String, Object> eventRegistrantData = new HashMap<>();
-        eventRegistrantData.put("status", "WAITLISTED");
-
-        // Prepare data for Users -> userID -> RegisteredEvents -> eventID
-        DocumentReference userRegisteredEventRef = db.collection("Users")
-                .document(userID)
-                .collection("RegisteredEvents")
-                .document(eventID);
-
-        Map<String, Object> userRegisteredEventData = new HashMap<>();
-        userRegisteredEventData.put("status", "WAITLISTED");
-
-        // Perform both writes atomically
-        db.runTransaction(transaction -> {
-            transaction.set(eventRegistrantRef, eventRegistrantData, SetOptions.merge());
-            transaction.set(userRegisteredEventRef, userRegisteredEventData, SetOptions.merge());
-            return null;
-        }).addOnSuccessListener(aVoid -> {
-            Toast.makeText(this, "Successfully joined the waitlist.", Toast.LENGTH_SHORT).show();
-            joinWaitlistButton.setVisibility(View.GONE);
-            cancelWaitlistButton.setVisibility(View.VISIBLE);
-        }).addOnFailureListener(e -> {
-            Toast.makeText(this, "Failed to join the waitlist: " + e.getMessage(), Toast.LENGTH_LONG).show();
-            e.printStackTrace();
-        });
-    }
-
-    /**
-     * Checks the user's current waitlist status and updates button visibility accordingly.
-     *
-     * @param eventID The ID of the event.
-     * @param userID  The ID of the user.
-     */
-    private void checkUserWaitlistStatus(String eventID, String userID) {
-        if (userID == null || userID.trim().isEmpty()) {
-            // User not authenticated; hide waitlist buttons
-            joinWaitlistButton.setVisibility(View.GONE);
-            cancelWaitlistButton.setVisibility(View.GONE);
-            return;
-        }
-
-        // Reference to Events -> eventID -> EventRegistrants -> userID
-        DocumentReference eventRegistrantRef = db.collection("Events")
-                .document(eventID)
-                .collection("EventRegistrants")
-                .document(userID);
-
-        eventRegistrantRef.get().addOnSuccessListener(documentSnapshot -> {
-            if (documentSnapshot.exists()) {
-                String status = documentSnapshot.getString("status");
-                if ("WAITLISTED".equals(status)) {
-                    joinWaitlistButton.setVisibility(View.GONE);
-                    cancelWaitlistButton.setVisibility(View.VISIBLE);
-                } else {
-                    joinWaitlistButton.setVisibility(View.VISIBLE);
-                    cancelWaitlistButton.setVisibility(View.GONE);
-                }
-            } else {
-                joinWaitlistButton.setVisibility(View.VISIBLE);
-                cancelWaitlistButton.setVisibility(View.GONE);
-            }
-        }).addOnFailureListener(e -> {
-            Toast.makeText(this, "Failed to check waitlist status: " + e.getMessage(), Toast.LENGTH_LONG).show();
-            e.printStackTrace();
-        });
     }
 }
