@@ -14,6 +14,9 @@ import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.user.User;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+/**
+ * Activity for admin or organizer to view details about a user
+ */
 public class UserDetailActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private TextView userDetailsTextView;
