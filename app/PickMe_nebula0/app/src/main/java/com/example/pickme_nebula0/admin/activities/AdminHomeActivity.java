@@ -25,12 +25,19 @@ import com.example.pickme_nebula0.notification.MessageViewActivity;
 import com.example.pickme_nebula0.notification.Notification;
 import com.example.pickme_nebula0.notification.NotificationArrayAdapter;
 import com.example.pickme_nebula0.user.User;
+import com.example.pickme_nebula0.user.UserArrayAdapter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Allows admin to browse and delete items.
+ *
+ * @author Stephine Yearley
+ * @author Sina Shaban
+ */
 public class AdminHomeActivity extends AppCompatActivity {
     private String deviceID;
     private FirebaseFirestore db;
@@ -41,11 +48,9 @@ public class AdminHomeActivity extends AppCompatActivity {
     private EventsArrayAdapter eventAdapter;
 
     // Profiles
-//    private ArrayList<User> users;
-//    private ListView usersList;
-//    private UserArrayAdapter userAdapter;
-
-
+    private ArrayList<User> users;
+    private ListView usersList;
+    private UserArrayAdapter userAdapter;
 
     // UI Elements
     ViewFlipper viewFlipper;
@@ -54,6 +59,7 @@ public class AdminHomeActivity extends AppCompatActivity {
     Button btnManageImages;
     Button btnManageFacilities;
     Button btnManageQR;
+    Button btnBack;
 
     @Override
     protected void onResume() {
@@ -75,12 +81,26 @@ public class AdminHomeActivity extends AppCompatActivity {
         btnManageImages = findViewById(R.id.manage_image);
         btnManageFacilities = findViewById(R.id.manage_facilities);
         btnManageQR = findViewById(R.id.manage_qr_code);
+        btnBack = findViewById(R.id.button_admin_back);
 
         // Set up list view for events
         events = new ArrayList<Event>();
         eventsList = findViewById(R.id.eventListView);
         eventAdapter = new EventsArrayAdapter(AdminHomeActivity.this,R.id.item_event, events);
         eventsList.setAdapter(eventAdapter);
+        // for user profiles
+        users = new ArrayList<User>();
+        usersList = findViewById(R.id.ProfileListView);
+        userAdapter = new UserArrayAdapter(AdminHomeActivity.this,R.id.item_user, users);
+        usersList.setAdapter(userAdapter);
+
+
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         // upon clicking the manage events button, show the manage events layout
         btnManageEvents.setOnClickListener(new View.OnClickListener() {
@@ -111,6 +131,19 @@ public class AdminHomeActivity extends AppCompatActivity {
             //TODO;
             public void onClick(View v) {
                 viewFlipper.setDisplayedChild(1); // Show Manage Profile layout
+
+                // On click, show user details an allow admin to delete
+                usersList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
+//                        Event clickedEvent = (Event) adapterView.getItemAtPosition(pos);
+//
+//                        Intent intent = new Intent(AdminHomeActivity.this, EventDetailAdminActivity.class);
+//                        intent.putExtra("eventID",clickedEvent.getEventID());
+//                        startActivity(intent);
+                    }
+                });
+
                 Toast.makeText(AdminHomeActivity.this, "Switched to Manage Users layout", Toast.LENGTH_SHORT).show();
             }
         });
@@ -168,7 +201,18 @@ public class AdminHomeActivity extends AppCompatActivity {
     }
 
     private void updateProfiles(){
-
+        users.clear();
+        db.collection("Users")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            User u = document.toObject(User.class);
+                            users.add(u);
+                        }
+                        userAdapter.notifyDataSetChanged();
+                    }
+                });
     }
 
     private void updateImages(){

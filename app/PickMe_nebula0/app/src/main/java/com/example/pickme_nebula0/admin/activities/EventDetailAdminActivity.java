@@ -1,9 +1,8 @@
 package com.example.pickme_nebula0.admin.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
+
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -13,13 +12,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.event.Event;
-import com.example.pickme_nebula0.event.EventsArrayAdapter;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import org.w3c.dom.Text;
 
-import java.util.ArrayList;
-
+/**
+ * Activity for displaying details of an event to an admin and to allow them to delete the activity
+ *
+ * @author Stephine
+ */
 public class EventDetailAdminActivity extends AppCompatActivity {
     private TextView eventDetailsTextView;
     private DBManager dbManager;

@@ -139,9 +139,12 @@
                 <ListView
                     android:id="@+id/ProfileListView"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:divider="@android:color/darker_gray"
-                    android:dividerHeight="1dp" />
+                    android:layout_height="537dp"
+                    android:background="#FFFFFF"
+
+                    android:divider="@color/black"
+                    android:dividerHeight="1dp"
+                    android:textColor="#000000" />
 
                 <!-- Search Bar for filtering events -->
                 </LinearLayout>
@@ -164,9 +167,12 @@
                     <ListView
                         android:id="@+id/ImageListView"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:divider="@android:color/darker_gray"
-                        android:dividerHeight="1dp" />
+                        android:layout_height="537dp"
+                        android:background="#FFFFFF"
+
+                        android:divider="@color/black"
+                        android:dividerHeight="1dp"
+                        android:textColor="#000000" />
 
                     <!-- Search Bar for filtering events -->
                 </LinearLayout>
@@ -188,9 +194,12 @@
                     <ListView
                         android:id="@+id/QRcodeListView"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:divider="@android:color/darker_gray"
-                        android:dividerHeight="1dp" />
+                        android:layout_height="537dp"
+                        android:background="#FFFFFF"
+
+                        android:divider="@color/black"
+                        android:dividerHeight="1dp"
+                        android:textColor="#000000" />
 
                     <!-- Search Bar for filtering events -->
                 </LinearLayout>
@@ -212,9 +221,12 @@
                     <ListView
                         android:id="@+id/facilitiesListView"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:divider="@android:color/darker_gray"
-                        android:dividerHeight="1dp" />
+                        android:layout_height="537dp"
+                        android:background="#FFFFFF"
+
+                        android:divider="@color/black"
+                        android:dividerHeight="1dp"
+                        android:textColor="#000000" />
 
                     <!-- Search Bar for filtering events -->
                 </LinearLayout>
