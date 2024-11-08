@@ -2,8 +2,10 @@ package com.example.pickme_nebula0.event;
 
 import android.bluetooth.BluetoothClass;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,13 +29,19 @@ import java.util.Map;
  */
 public class EventDetailUserActivity extends AppCompatActivity {
     private String eventID;
+    private String eventName;
     private final String userID = DeviceManager.getDeviceId();
     private DBManager dbManager;
-    private Button acceptBtn, declineBtn, unregBtn,backBtn,regBtn;
+    private Button unregBtn, backBtn, regBtn;
     private TextView eventDetailsTextView,userStatusTextView;
     private FirebaseFirestore db;
 
     private boolean fromQR;
+
+    // for notification specifically
+    private LinearLayout noteLayout;
+    private TextView noteMessage;
+    private Button noteAcceptBtn, noteDeclineBtn;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,26 +59,50 @@ public class EventDetailUserActivity extends AppCompatActivity {
             finish();
         }
 
+        // Retrieve event Name from intent
+        eventName = getIntent().getStringExtra("eventName");
+        if (eventName == null || eventName.isEmpty()) {
+            Toast.makeText(this, "Invalid Event Name.", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+
 
         // Link components
         backBtn = findViewById(R.id.button_edu_back);
-        acceptBtn = findViewById(R.id.button_edu_accept);
-        declineBtn = findViewById(R.id.button_edu_decline);
         unregBtn = findViewById(R.id.button_edu_unregister);
-        eventDetailsTextView = findViewById(R.id.textView_edu_details);
-        userStatusTextView = findViewById(R.id.textView_edu_status);
         regBtn = findViewById(R.id.button_edu_reg);
+        eventDetailsTextView = findViewById(R.id.textView_event_details);
+        userStatusTextView = findViewById(R.id.textView_user_status);
 
-        // Initially set all buttons invisible (may take a second to query DB and update visibility)
-        acceptBtn.setVisibility(View.GONE);
-        declineBtn.setVisibility(View.GONE);
+        // components from possible notification
+        noteLayout = findViewById(R.id.notification_layout);
+        noteMessage = findViewById(R.id.event_notification_message);
+        noteAcceptBtn = findViewById(R.id.event_notification_accept);
+        noteDeclineBtn = findViewById(R.id.event_notification_decline);
+
+        // notification is visible, but layout may not be
+        noteMessage.setVisibility(View.GONE);
+        noteAcceptBtn.setVisibility(View.GONE);
+        noteDeclineBtn.setVisibility(View.GONE);
+
+        // Initially set main buttons invisible (may take a second to query DB and update visibility)
         unregBtn.setVisibility(View.GONE);
         regBtn.setVisibility(View.GONE);
+
 
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
+            }
+        });
+
+        unregBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO - we can change this later to fully remove them if we don't want a user of leaves of their own volition CANCELED
+                dbManager.setRegistrantStatus(eventID,userID,DBManager.RegistrantStatus.CANCELED);
+                renderUserStatus();
             }
         });
 
@@ -81,7 +113,7 @@ public class EventDetailUserActivity extends AppCompatActivity {
             }
         });
 
-        acceptBtn.setOnClickListener(new View.OnClickListener() {
+        noteAcceptBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dbManager.setRegistrantStatus(eventID,userID,DBManager.RegistrantStatus.CONFIRMED);
@@ -89,16 +121,7 @@ public class EventDetailUserActivity extends AppCompatActivity {
             }
         });
 
-        declineBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO - we can change this later to fully remove them if we don't want a user of leaves of their own volition CANCELED
-                dbManager.setRegistrantStatus(eventID,userID,DBManager.RegistrantStatus.CANCELED);
-                renderUserStatus();
-            }
-        });
-
-        unregBtn.setOnClickListener(new View.OnClickListener() {
+        noteDeclineBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // TODO - we can change this later to fully remove them if we don't want a user of leaves of their own volition CANCELED
@@ -178,16 +201,16 @@ public class EventDetailUserActivity extends AppCompatActivity {
         Toast.makeText(EventDetailUserActivity.this,status,Toast.LENGTH_SHORT);
 
         if (status.equalsIgnoreCase("WAITLISTED") || status.equalsIgnoreCase("CONFIRMED")){
-            acceptBtn.setVisibility(View.GONE);
-            declineBtn.setVisibility(View.GONE);
+            noteAcceptBtn.setVisibility(View.GONE);
+            noteDeclineBtn.setVisibility(View.GONE);
             unregBtn.setVisibility(View.VISIBLE);
         } else if (status.equalsIgnoreCase("SELECTED")) {
-            acceptBtn.setVisibility(View.VISIBLE);
-            declineBtn.setVisibility(View.VISIBLE);
+            noteAcceptBtn.setVisibility(View.VISIBLE);
+            noteDeclineBtn.setVisibility(View.VISIBLE);
             unregBtn.setVisibility(View.GONE);
         } else if (status.equalsIgnoreCase("CANCELED")){
-            acceptBtn.setVisibility(View.GONE);
-            declineBtn.setVisibility(View.GONE);
+            noteAcceptBtn.setVisibility(View.GONE);
+            noteDeclineBtn.setVisibility(View.GONE);
             unregBtn.setVisibility(View.GONE);
         }
     }
