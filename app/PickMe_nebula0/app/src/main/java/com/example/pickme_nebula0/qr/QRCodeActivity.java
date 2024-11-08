@@ -11,15 +11,17 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import com.example.pickme_nebula0.R;
+import com.example.pickme_nebula0.event.EventDetailActivity;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 public class QRCodeActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_CAMERA = 1;
-
+    FirebaseFirestore db;
     Button homebtn;
     boolean active = false;
-    String City;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +37,7 @@ public class QRCodeActivity extends AppCompatActivity {
         } else {
             initQRCodeScanner();
         }
-
+        db = FirebaseFirestore.getInstance();
         homebtn = findViewById(R.id.homebtn);
         homebtn.setOnClickListener(new View.OnClickListener() {
                                        @Override
@@ -75,6 +77,30 @@ public class QRCodeActivity extends AppCompatActivity {
                 Toast.makeText(this, "Scan cancelled", Toast.LENGTH_LONG).show();
             } else {
                 Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
+
+                String eventURI = result.getContents();
+                String eventID = eventURI.substring(eventURI.lastIndexOf("/") + 1);
+
+                db.collection("Events")
+                        .document(eventID)
+                        .get()
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                DocumentSnapshot document = task.getResult();
+
+                                if (document.exists()) {
+                                    Intent intent = new Intent(QRCodeActivity.this, EventDetailActivity.class);
+                                    intent.putExtra("eventID", eventID);
+                                    intent.putExtra("action", "scan");
+                                    startActivity(intent);
+                                } else {
+                                    Toast.makeText(this, "Event not found", Toast.LENGTH_LONG).show();
+                                }
+                            } else {
+                                Toast.makeText(this, "Error fetching event", Toast.LENGTH_LONG).show();
+                            }
+                        });
+
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
