@@ -21,6 +21,8 @@ import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.event.Event;
 import com.example.pickme_nebula0.event.EventDetailUserActivity;
 import com.example.pickme_nebula0.event.EventsArrayAdapter;
+import com.example.pickme_nebula0.facility.Facility;
+import com.example.pickme_nebula0.facility.FacilityArrayAdapter;
 import com.example.pickme_nebula0.notification.MessageViewActivity;
 import com.example.pickme_nebula0.notification.Notification;
 import com.example.pickme_nebula0.notification.NotificationArrayAdapter;
@@ -29,6 +31,8 @@ import com.example.pickme_nebula0.user.UserArrayAdapter;
 import com.example.pickme_nebula0.user.activities.UserDetailActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import org.checkerframework.framework.qual.DefaultQualifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +56,11 @@ public class AdminHomeActivity extends AppCompatActivity {
     private ArrayList<User> users;
     private ListView usersList;
     private UserArrayAdapter userAdapter;
+
+    // Facilities
+    private ArrayList<Facility> facilities;
+    private ListView facilitiesList;
+    private FacilityArrayAdapter facilityAdapter;
 
     // UI Elements
     ViewFlipper viewFlipper;
@@ -94,6 +103,11 @@ public class AdminHomeActivity extends AppCompatActivity {
         usersList = findViewById(R.id.ProfileListView);
         userAdapter = new UserArrayAdapter(AdminHomeActivity.this,R.id.item_user, users);
         usersList.setAdapter(userAdapter);
+        // for facility profiles
+        facilities = new ArrayList<Facility>();
+        facilitiesList = findViewById(R.id.facilitiesListView);
+        facilityAdapter = new FacilityArrayAdapter(AdminHomeActivity.this,R.id.item_facility, facilities);
+        facilitiesList.setAdapter(facilityAdapter);
 
 
         btnBack.setOnClickListener(new View.OnClickListener() {
@@ -177,6 +191,23 @@ public class AdminHomeActivity extends AppCompatActivity {
             //TODO;
             public void onClick(View v) {
                 viewFlipper.setDisplayedChild(4); // Show Manage Facilities layout
+
+                // On click, show user details an allow admin to delete
+                facilitiesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
+                        Facility clickedFacility = (Facility) adapterView.getItemAtPosition(pos);
+
+                        Toast.makeText(AdminHomeActivity.this, clickedFacility.getFacilityID(), Toast.LENGTH_SHORT).show();
+
+//
+//                        Intent intent = new Intent(AdminHomeActivity.this, UserDetailActivity.class);
+//                        intent.putExtra("userID",clickedUser.getUserID());
+//                        intent.putExtra("admin",true);
+//                        startActivity(intent);
+                    }
+                });
+
                 Toast.makeText(AdminHomeActivity.this, "Switched to Manage Facilities layout", Toast.LENGTH_SHORT).show();
             }
         });
@@ -229,6 +260,17 @@ public class AdminHomeActivity extends AppCompatActivity {
     }
 
     private void updateFacilities(){
-
+        facilities.clear();
+        db.collection("Facilities")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            Facility f = document.toObject(Facility.class);
+                            facilities.add(f);
+                        }
+                        facilityAdapter.notifyDataSetChanged();
+                    }
+                });
     }
 }

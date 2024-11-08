@@ -96,8 +96,8 @@ public class FacilityInfoActivity extends AppCompatActivity {
     private void populateFieldsFromDB(Object facility){
         Facility castedFacility = (Facility) facility;
 
-        nameField.setText(castedFacility.getFacilityName());
-        adrField.setText(castedFacility.getFacilityAddress());
+        nameField.setText(castedFacility.getName());
+        adrField.setText(castedFacility.getAddress());
     }
 
     /**

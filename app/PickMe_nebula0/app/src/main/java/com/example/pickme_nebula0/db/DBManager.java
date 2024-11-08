@@ -4,18 +4,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
 import android.util.Log;
-import android.widget.ArrayAdapter;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.event.Event;
 import com.example.pickme_nebula0.facility.Facility;
 import com.example.pickme_nebula0.notification.Notification;
 import com.example.pickme_nebula0.qr.QRCodeManager;
-import com.example.pickme_nebula0.organizer.activities.OrganizerCreateEventActivity;
 import com.example.pickme_nebula0.user.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -28,7 +24,6 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -629,8 +624,8 @@ public class DBManager {
     public void updateOldFacility(Object facilityID,Facility facility){
         // update facilities collection
         DocumentReference docRefFacilities = db.collection(facilitiesCollection).document(facilityID.toString());
-        updateField(docRefFacilities,"name",facility.getFacilityName());
-        updateField(docRefFacilities,"address",facility.getFacilityAddress());
+        updateField(docRefFacilities,"name",facility.getName());
+        updateField(docRefFacilities,"address",facility.getAddress());
       }
 
     /**
@@ -643,8 +638,9 @@ public class DBManager {
         // create new document in facilities collection
         String facilityID = createIDForDocumentIn(facilitiesCollection);
         Map<String, Object> facilityData = new HashMap<>();
-        facilityData.put("name", facility.getFacilityName());
-        facilityData.put("address", facility.getFacilityAddress());
+        facilityData.put("facilityID",facilityID);
+        facilityData.put("name", facility.getName());
+        facilityData.put("address", facility.getAddress());
         facilityData.put("organizerID",facility.getOrganizerID());
         addUpdateDocument(facilitiesCollection,facilityID,facilityData);
 
