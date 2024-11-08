@@ -4,6 +4,11 @@ import com.example.pickme_nebula0.user.activities.UserInfoActivity;
 
 import org.junit.Test;
 
+/**
+ * Tests input validation for UserInfoActivity where users enter/update their profile info
+ * @author Stephine Yearley
+ * @see UserInfoActivity
+ */
 public class UserInfoTest {
 
     @Test

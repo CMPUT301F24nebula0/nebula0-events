@@ -12,7 +12,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.organizer.fragments.OrganizerCancelledFragment;
-import com.example.pickme_nebula0.organizer.fragments.OrganizerEnrolledFragment;
+import com.example.pickme_nebula0.organizer.fragments.OrganizerConfirmedFragment;
 import com.example.pickme_nebula0.organizer.fragments.OrganizerSelectedFragment;
 import com.example.pickme_nebula0.organizer.fragments.OrganizerWaitlistedFragment;
 import com.google.android.material.tabs.TabLayout;
@@ -21,7 +21,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 public class OrganizerEventParticipantsActivity extends AppCompatActivity {
 
     //tabs
-    private final String[] tabTitles = new String[] {"Waitlisted", "Selected", "Enrolled", "Cancelled"};
+    private final String[] tabTitles = new String[] {"Waitlisted", "Selected", "Confirmed", "Cancelled"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +67,7 @@ public class OrganizerEventParticipantsActivity extends AppCompatActivity {
         public Fragment createFragment(int position) {
             if (position == 0) { return new OrganizerWaitlistedFragment(); }
             else if (position == 1) { return new OrganizerSelectedFragment(); }
-            else if (position == 2) { return new OrganizerEnrolledFragment(); }
+            else if (position == 2) { return new OrganizerConfirmedFragment(); }
             else { return new OrganizerCancelledFragment(); }
         }
 
