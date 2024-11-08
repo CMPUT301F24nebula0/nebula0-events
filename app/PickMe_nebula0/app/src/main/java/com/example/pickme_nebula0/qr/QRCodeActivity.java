@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.event.EventDetailActivity;
+import com.example.pickme_nebula0.event.EventDetailUserActivity;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -89,10 +90,11 @@ public class QRCodeActivity extends AppCompatActivity {
                                 DocumentSnapshot document = task.getResult();
 
                                 if (document.exists()) {
-                                    Intent intent = new Intent(QRCodeActivity.this, EventDetailActivity.class);
+                                    Intent intent = new Intent(QRCodeActivity.this, EventDetailUserActivity.class);
                                     intent.putExtra("eventID", eventID);
-                                    intent.putExtra("action", "scan");
+                                    intent.putExtra("fromQR", true);
                                     startActivity(intent);
+                                    finish();
                                 } else {
                                     Toast.makeText(this, "Event not found", Toast.LENGTH_LONG).show();
                                 }
