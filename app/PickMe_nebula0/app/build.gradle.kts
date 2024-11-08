@@ -34,6 +34,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.espresso.intents)
     testImplementation(libs.ext.junit)
     testImplementation(libs.espresso.core)
     testImplementation(libs.espresso.core)
