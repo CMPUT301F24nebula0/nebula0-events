@@ -41,7 +41,7 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         // components on screen
         EditText eventNameField = findViewById(R.id.event_name_field);
         EditText eventDescriptionField = findViewById(R.id.event_description_field);
-        EditText eventDateField = findViewById(R.id.event_date_field);
+        eventDateField = findViewById(R.id.event_date_field);
         Switch geolocationRequirementSwitch = findViewById(R.id.geolocation_requirement_switch);
         EditText geolocationRequirementField = findViewById(R.id.geolocation_requirement_field);
         Switch waitlistCapacityRequiredSwitch = findViewById(R.id.waitlist_capacity_required_switch);
@@ -62,9 +62,9 @@ and the firebase ; Therefore I made a changes for the half way summation that le
 
  */
 
-//        // DatePicker logic
-//        eventDateField.setFocusable(false);
-//        eventDateField.setOnClickListener(v -> showDatePickerDialog());
+        // DatePicker logic
+        eventDateField.setFocusable(false);
+        eventDateField.setOnClickListener(v -> showDatePickerDialog());
 
 
         // Geolocation Requirement Switch Logic
