@@ -235,22 +235,36 @@ public class DBManager {
      *
      * @param userID ID of user to delete
      */
-    public void deleteUser(String userID){
+    public void deleteUser(String userID,Void2VoidCallback onSuccess){
         DocumentReference userDoc = db.collection(usersCollection).document(userID);
 
         // Remove User from all events they signed up for
         CollectionReference registeredEventsCol = userDoc.collection(registeredEventsCollection);
-        iterateOverCollection(registeredEventsCol,(registeredEventQDS)->removeRegistrantFromEvent(registeredEventQDS.getId(), userID));
+        registeredEventsCol.get()
+                        .addOnSuccessListener(querySnapshot-> {
+                            for (DocumentSnapshot doc : querySnapshot.getDocuments()){
+                                // Remove User from all events they signed up for
+                                String eventID = doc.getId();
+                                removeRegistrantFromEvent(eventID,userID);
+                            }
 
-        // Remove any events user created (if an organizer)
-        CollectionReference createdEventsCol = userDoc.collection(organizerEventsCollection);
-        iterateOverCollection(createdEventsCol,(qds)->{deleteEvent(qds.getId());});
+                            // Remove any events user created (if an organizer)
+                            CollectionReference createdEventsCol = userDoc.collection(organizerEventsCollection);
+                            createdEventsCol.get()
+                                    .addOnSuccessListener(querySnapshot2-> {
+                                        for (DocumentSnapshot doc : querySnapshot2.getDocuments()){
+                                            // Remove User from all events they signed up for
+                                            String eventID = doc.getId();
+                                            deleteEvent(eventID);
+                                        }
 
-        // Remove facility associated with that user (if an organizer)
-        performIfFieldPopulated(userDoc,"facilityID",this::deleteFacility,()->{});
+                                        // Remove facility associated with that user (if an organizer)
+                                        performIfFieldPopulated(userDoc,"facilityID",this::deleteFacility,()->{});
 
-        // Remove User from Users
-        removeDocument(userDoc);
+                                        // Remove User from Users
+                                        removeDocument(userDoc);
+                                    });
+                        });
     }
 // -------------------- / Users \ ------------------------------------------------------------------
 
@@ -696,14 +710,38 @@ public class DBManager {
      *
      * @param facilityID facilityID of the facility we want to delete
      */
-    public void deleteFacility(String facilityID){
+    public void deleteFacility(String facilityID,Void2VoidCallback onSuccess){
         DocumentReference facilityDocRef = db.collection(facilitiesCollection).document(facilityID);
 
-        // Delete all the events occurring at this facility e.g. all events for that organizer, and remove the facility from the organize
-        getDocumentAsObject(facilitiesCollection,facilityID,this::facilityConverter,this::removeEventsAtFacilityAndRemoveFromOrganizer,()->{});
 
-        // Remove it from Facilities Collection
-        removeDocument(facilityDocRef);
+
+        facilityDocRef.get()
+                .addOnCompleteListener(task -> {
+                    if(task.isSuccessful()){
+                        String organizerID = task.getResult().getString("organizerID");
+
+                        // delete all events at this facility
+                        db.collection("Users").document(organizerID).collection(organizerEventsCollection).get()
+                                .addOnCompleteListener(task2->{
+                                    if(task2.isSuccessful()){
+                                        for(QueryDocumentSnapshot qds : task2.getResult()){
+                                            deleteEvent(qds.getId());
+                                        }
+                                    }
+                                    // delete facility
+                                    removeDocument(facilityDocRef);
+
+                                    // remove facility ID from organizer
+                                    updateField(db.collection(usersCollection).document(organizerID),"facilityID",null);
+                                    onSuccess.run();
+                                });
+                    }
+                }
+                );
+    }
+
+    public void deleteFacility(String facilityID){
+        deleteFacility(facilityID, ()->{});
     }
 
     /**

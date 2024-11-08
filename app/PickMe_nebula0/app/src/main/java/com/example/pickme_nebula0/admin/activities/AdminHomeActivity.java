@@ -23,6 +23,7 @@ import com.example.pickme_nebula0.event.EventDetailUserActivity;
 import com.example.pickme_nebula0.event.EventsArrayAdapter;
 import com.example.pickme_nebula0.facility.Facility;
 import com.example.pickme_nebula0.facility.FacilityArrayAdapter;
+import com.example.pickme_nebula0.facility.FacilityDetailActivity;
 import com.example.pickme_nebula0.notification.MessageViewActivity;
 import com.example.pickme_nebula0.notification.Notification;
 import com.example.pickme_nebula0.notification.NotificationArrayAdapter;
@@ -123,6 +124,7 @@ public class AdminHomeActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // Show Manage Events layout
                 viewFlipper.setDisplayedChild(0);
+                updateEvents();
 
                 // On click, show event details an allow admin to delete
                 eventsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -146,6 +148,7 @@ public class AdminHomeActivity extends AppCompatActivity {
             //TODO;
             public void onClick(View v) {
                 viewFlipper.setDisplayedChild(1); // Show Manage Profile layout
+                updateProfiles();
 
                 // On click, show user details an allow admin to delete
                 usersList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -191,6 +194,7 @@ public class AdminHomeActivity extends AppCompatActivity {
             //TODO;
             public void onClick(View v) {
                 viewFlipper.setDisplayedChild(4); // Show Manage Facilities layout
+                updateFacilities();
 
                 // On click, show user details an allow admin to delete
                 facilitiesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -198,13 +202,9 @@ public class AdminHomeActivity extends AppCompatActivity {
                     public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
                         Facility clickedFacility = (Facility) adapterView.getItemAtPosition(pos);
 
-                        Toast.makeText(AdminHomeActivity.this, clickedFacility.getFacilityID(), Toast.LENGTH_SHORT).show();
-
-//
-//                        Intent intent = new Intent(AdminHomeActivity.this, UserDetailActivity.class);
-//                        intent.putExtra("userID",clickedUser.getUserID());
-//                        intent.putExtra("admin",true);
-//                        startActivity(intent);
+                        Intent intent = new Intent(AdminHomeActivity.this, FacilityDetailActivity.class);
+                        intent.putExtra("facilityID",clickedFacility.getFacilityID());
+                        startActivity(intent);
                     }
                 });
 
@@ -223,6 +223,7 @@ public class AdminHomeActivity extends AppCompatActivity {
 
     private void updateEvents(){
         events.clear();
+        eventAdapter.notifyDataSetChanged();
         db.collection("Events")
                 .get()
                 .addOnCompleteListener(task -> {
@@ -238,6 +239,7 @@ public class AdminHomeActivity extends AppCompatActivity {
 
     private void updateProfiles(){
         users.clear();
+        userAdapter.notifyDataSetChanged();
         db.collection("Users")
                 .get()
                 .addOnCompleteListener(task -> {
@@ -261,6 +263,7 @@ public class AdminHomeActivity extends AppCompatActivity {
 
     private void updateFacilities(){
         facilities.clear();
+        facilityAdapter.notifyDataSetChanged();
         db.collection("Facilities")
                 .get()
                 .addOnCompleteListener(task -> {
