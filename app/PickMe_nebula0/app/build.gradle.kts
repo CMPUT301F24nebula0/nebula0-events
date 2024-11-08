@@ -35,7 +35,13 @@ android {
 
 dependencies {
     // Import the Firebase BoM
-    testImplementation ("org.robolectric:robolectric:4.7.3") // Use the latest version available
+    testImplementation(libs.ext.junit)
+    testImplementation(libs.espresso.core)
+    testImplementation(libs.espresso.core)
+    testImplementation(libs.junit.jupiter)
+    // Import the Firebase BoM
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
     implementation(platform("com.google.firebase:firebase-bom:32.7.1"))
     implementation("com.google.firebase:firebase-firestore")
