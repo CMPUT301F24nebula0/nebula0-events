@@ -14,6 +14,9 @@ import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.user.User;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+/**
+ * Activity for admin or organizer to view details about a user
+ */
 public class UserDetailActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private TextView userDetailsTextView;
@@ -23,24 +26,35 @@ public class UserDetailActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_detail);
-        final Button backButton = findViewById(R.id.backButton);
-
         dbManager = new DBManager();
 
-        backButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) { getOnBackPressedDispatcher().onBackPressed(); }
-        });
+        final Button backButton = findViewById(R.id.backButton);
+        final Button delButton = findViewById(R.id.button_ud_delete);
 
-        userDetailsTextView = findViewById(R.id.user_details_text_view);
+        if(!getIntent().getBooleanExtra("admin",false)){
+            delButton.setVisibility(View.GONE);
+        }
 
-        // **Correct the key from "eventID" to "userID"**
         String userID = getIntent().getStringExtra("userID");
         if (userID == null || userID.isEmpty()) {
             Toast.makeText(this, "Invalid User ID.", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
+
+        backButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) { getOnBackPressedDispatcher().onBackPressed(); }
+        });
+
+        delButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dbManager.deleteUser(userID,()->{finish();});
+            }
+        });
+
+        userDetailsTextView = findViewById(R.id.user_details_text_view);
 
         fetchUserDetails(userID);
     }

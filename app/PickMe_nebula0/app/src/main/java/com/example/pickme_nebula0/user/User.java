@@ -92,7 +92,7 @@ public class User {
         return this.userID;
     }
 
-    public Boolean notifEnabled(){
+        public Boolean notifEnabled(){
         return notifEnabled;
     }
 
