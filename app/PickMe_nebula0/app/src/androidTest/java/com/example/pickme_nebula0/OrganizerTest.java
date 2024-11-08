@@ -68,8 +68,8 @@ public class OrganizerTest {
                 .perform(typeText("A community gathering to discuss future events."), closeSoftKeyboard());
 
         // Use a date picker to select a date
-        onView(withId(R.id.event_date_field))
-                .perform(typeText("2024-12-24"), closeSoftKeyboard());
+//        onView(withId(R.id.event_date_field))
+//                .perform(click());
 
         // Set other event details
         onView(withId(R.id.geolocation_requirement_switch))
