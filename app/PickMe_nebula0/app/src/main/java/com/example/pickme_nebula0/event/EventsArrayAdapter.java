@@ -41,28 +41,7 @@ public class EventsArrayAdapter extends ArrayAdapter<Event> {
 
         Event event = getItem(position);
         TextView eventName = view.findViewById(R.id.event_name_text_view);
-        TextView eventDescription = view.findViewById(R.id.event_description_text_view);
         eventName.setText(event.getEventName());
-        eventName.setText(event.getEventDescription());
-
-        // Get references to the CardView and the hidden LinearLayout
-        CardView eventCardView = view.findViewById(R.id.event_card_view);
-        LinearLayout expandableLayout = view.findViewById(R.id.event_hidden_view);
-
-        // Set an OnClickListener for each eventCardView
-        eventCardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Toggle the visibility of the expandable content
-                if (expandableLayout.getVisibility() == View.GONE) {
-                    // Show the expandable content
-                    expandableLayout.setVisibility(View.VISIBLE);
-                } else {
-                    // Hide the expandable content
-                    expandableLayout.setVisibility(View.GONE);
-                }
-            }
-        });
 
         return view;
     };
