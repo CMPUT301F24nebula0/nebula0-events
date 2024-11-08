@@ -24,10 +24,16 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Class encompassing database access and modification
@@ -559,6 +565,76 @@ public class DBManager {
 // -------------------- / Events \ -----------------------------------------------------------------
 
     /**
+     * Ensures all users registered in an event are fetched before calling onSuccessCallback.
+     * Passes list of Users to the callback (ArrayList<User> as an Object class.)
+     * Used for sampling users.
+     * @param eventID
+     * @param status
+     * @param onSuccessCallback
+     */
+    public void loadAllUsersRegisteredInEvent(String eventID, RegistrantStatus status, DBManager.Obj2VoidCallback onSuccessCallback) {
+        Query waitlistedUsersQuery = db.collection(eventsCollection)
+                .document(eventID)
+                .collection(eventRegistrantsCollection)
+                .whereEqualTo(eventStatusKey, status);
+
+        ExecutorService executor = Executors.newFixedThreadPool(5);
+        List<Future<User>> futures = new ArrayList<>();
+
+        waitlistedUsersQuery.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                ArrayList<User> waitlistedUsers = new ArrayList<>();
+
+                for (QueryDocumentSnapshot registeredUserDoc : task.getResult()) {
+                    String userID = registeredUserDoc.getId();
+
+                    // submit task to the executor for each event
+                    Future<User> future = executor.submit(() -> {
+                        final CompletableFuture<User> userFuture = new CompletableFuture<>();
+
+                        // fetch actual event asynchronously
+                        getUser(userID, (userFetched) -> {
+                            userFuture.complete((User) userFetched);
+                        }, () -> {
+                            Log.d("Firestore", "Could not get registered user " + userID);
+                            userFuture.completeExceptionally(new Exception("Failed to fetch waitlisted user"));
+                        });
+
+                        return userFuture.get();
+                    });
+
+                    futures.add(future);
+                }
+
+                // wait for all users to be fetched
+                executor.submit(() -> {
+                    try {
+                        for (Future<User> future : futures) {
+                            User user = future.get();  // blocks until user is fetched
+                            waitlistedUsers.add(user);
+                        }
+                    } catch (Exception e) {
+                        Log.d("Firestore", "Error while fetching users: " + e.getMessage());
+                    } finally {
+                        executor.shutdown();
+                        try {
+                            if (!executor.awaitTermination(800, TimeUnit.MILLISECONDS)) {
+                                executor.shutdownNow();
+                            }
+                        } catch (InterruptedException e) {
+                            executor.shutdownNow();
+                        }
+
+                        onSuccessCallback.run(waitlistedUsers);
+                    }
+                });
+            } else {
+                Log.d("Firestore", "Error querying users from EventRegistrants: " + task.getException());
+            }
+        });
+    }
+
+    /**
      * Fetches all registered users of an Event who match the given status.
      * Note that onSuccessCallback is run for every user fetched.
      * This was adapted from Organizer Fragments.
@@ -571,7 +647,14 @@ public class DBManager {
         loadUsersRegisteredInEvent(eventID, status, "Firestore", onSuccessCallback);
     }
 
-    // note that onSuccessCallback is run for every user fetched
+    /**
+     * Runs a callback function on each user loaded for an event's registered user list.
+     * Used for loading users to display in fragment.
+     * @param eventID
+     * @param status
+     * @param loggingTag
+     * @param onSuccessCallback
+     */
     public void loadUsersRegisteredInEvent(String eventID, RegistrantStatus status, String loggingTag, Obj2VoidCallback onSuccessCallback) {
 
         Query registrantsMatchingStatus = db.collection(eventsCollection)
