@@ -3,9 +3,6 @@ package com.example.pickme_nebula0.facility;
 
 import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.db.DBManager;
-import com.example.pickme_nebula0.event.Event;
-
-import java.util.ArrayList;
 
 /**
  * Facility
@@ -13,8 +10,8 @@ import java.util.ArrayList;
 public class Facility {
     private DBManager dbManager;
     private String facilityID;
-    private String facilityName;
-    private String facilityAddress;
+    private String name;
+    private String address;
     private String organizerID;
 
     /**
@@ -24,16 +21,23 @@ public class Facility {
         dbManager = new DBManager();
         organizerID = DeviceManager.getDeviceId();
 
-        this.facilityName = facilityName;
-        this.facilityAddress = facilityAddress;
+        this.name = facilityName;
+        this.address = facilityAddress;
+    }
+
+    /**
+     * Unparameterized constructor for firebase toObject
+     */
+    public Facility(){
+
     }
 
     public Facility(String facilityID,String organizerID,String facilityName, String facilityAddress){
         dbManager = new DBManager();
         this.organizerID = organizerID;
         this.facilityID = facilityID;
-        this.facilityName = facilityName;
-        this.facilityAddress = facilityAddress;
+        this.name = facilityName;
+        this.address = facilityAddress;
     }
 
     /**
@@ -47,11 +51,14 @@ public class Facility {
 
     public String getOrganizerID(){return this.organizerID;}
 
-    public String getFacilityName() {return this.facilityName;}
+    public String getName() {return this.name;}
 
-    public String getFacilityAddress() {return this.facilityAddress;}
+    public String getAddress() {return this.address;}
 
-    public void setFacilityName(String facilityName){this.facilityName = facilityName;}
+    public void setName(String name){this.name = name;}
 
-    public void setFacilityAddress(String facilityAddress){this.facilityAddress = facilityAddress;}
+    public void setAddress(String address){this.address = address;}
+
+    public void setFacilityID(String facilityID){this.facilityID = facilityID;}
+
 }

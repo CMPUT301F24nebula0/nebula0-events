@@ -44,9 +44,6 @@ public class NotificationArrayAdapter extends ArrayAdapter<Notification> {
         notifTitle.setText(notif.getTitle());
         notifBody.setText(notif.getMessage());
 
-        // TODO On click, go to event view if applicable
-
-
         return view;
     };
 
