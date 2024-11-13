@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
-    // Add the Google services Gradle plugin
+    // Google services Gradle plugin for Firebase
     id("com.google.gms.google-services")
 }
 
@@ -34,29 +34,46 @@ android {
 }
 
 dependencies {
-    // Import the Firebase BoM
-    testImplementation(libs.ext.junit)
-    testImplementation(libs.espresso.core)
-    testImplementation(libs.espresso.core)
-    testImplementation(libs.junit.jupiter)
-    // Import the Firebase BoM
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-
+    // Firebase BoM for version management
     implementation(platform("com.google.firebase:firebase-bom:32.7.1"))
-    implementation("com.google.firebase:firebase-firestore")
+
+    // Firebase Firestore, excluding protobuf-lite
+    implementation("com.google.firebase:firebase-firestore") {
+        exclude( "com.google.protobuf",  "protobuf-lite")
+    }
+
+    // ZXing for QR code support, excluding protobuf-lite
+    implementation("com.journeyapps:zxing-android-embedded:4.1.0") {
+        exclude( "com.google.protobuf",  "protobuf-lite")
+    }
+
+    // Espresso contrib for UI testing, excluding protobuf-lite
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.5.1") {
+        exclude( "com.google.protobuf",  "protobuf-lite")
+    }
+
+    // Force protobuf-javalite to be the sole protobuf implementation
+    implementation("com.google.protobuf:protobuf-javalite:3.22.3")
+
+    // UI and other core libraries
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.play.services.tasks)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.ext.junit)
-    androidTestImplementation(libs.espresso.core)
-    implementation("com.journeyapps:zxing-android-embedded:4.1.0")
-    implementation("com.google.zxing:core:3.3.3")
     implementation("com.google.android.material:material:1.4.0")
     implementation("androidx.viewpager2:viewpager2:1.0.0")
     implementation("androidx.core:core-ktx:1.10.0")
 
+    // Testing dependencies
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.ext.junit)
+    androidTestImplementation(libs.espresso.core)
+}
+
+configurations.all {
+    // Force protobuf-javalite to avoid conflicts with protobuf-lite
+    resolutionStrategy {
+        force("com.google.protobuf:protobuf-javalite:3.22.3")
+    }
 }

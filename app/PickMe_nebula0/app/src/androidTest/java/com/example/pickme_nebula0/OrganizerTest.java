@@ -24,12 +24,16 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.allOf;
-
+import androidx.test.espresso.action.ViewActions;
+import androidx.test.espresso.contrib.PickerActions;
+import android.widget.DatePicker;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
 import android.view.View;
+import android.widget.DatePicker;
+
 import org.hamcrest.Matcher;
 import com.example.pickme_nebula0.event.Event;
 import com.example.pickme_nebula0.organizer.activities.OrganizerHomeActivity;
@@ -57,7 +61,7 @@ public class OrganizerTest {
                 .perform(swipeLeft()); // Swipe to ongoing events section
         Thread.sleep(1000);
 
-        // Navigate to the event creation screen
+        // Click on the "Create Event" button
         onView(withId(R.id.createEventButton))
                 .perform(click());
 
@@ -67,9 +71,18 @@ public class OrganizerTest {
         onView(withId(R.id.event_description_field))
                 .perform(typeText("A community gathering to discuss future events."), closeSoftKeyboard());
 
-        // Use a date picker to select a date
-//        onView(withId(R.id.event_date_field))
-//                .perform(click());
+        // Select a date using the date picker
+        onView(withId(R.id.event_date_field))
+                .perform(click());
+        Thread.sleep(1000); // Wait for the date picker to open
+
+        // Interact with the DatePicker dialog to set a specific date
+        // Adjust to match your test date
+        onView(withClassName(Matchers.equalTo(DatePicker.class.getName())))
+                .perform(PickerActions.setDate(2024, 12, 25)); // Example: December 25, 2023
+
+        // Confirm the selected date
+        onView(withText("OK")).perform(click());
 
         // Set other event details
         onView(withId(R.id.geolocation_requirement_switch))
@@ -92,6 +105,11 @@ public class OrganizerTest {
                 .perform(swipeLeft());
         Thread.sleep(3000);
     }
+
+
+
+
+
 
     /**
      * Custom action to click on a child view within a view hierarchy by specifying its ID.
@@ -127,7 +145,7 @@ public class OrganizerTest {
      * It then fills in and sends a message to all entrants.
      */
     @Test
-    public void testNavigateToOngoingEvents() throws InterruptedException {
+    public void testSendMassageToAllEntrants() throws InterruptedException {
         // Swipe to the "Ongoing Events" section
         onView(withId(R.id.view_pager))
                 .perform(ViewActions.swipeLeft());
@@ -165,6 +183,138 @@ public class OrganizerTest {
     }
 
     /**
+     * Test case for navigating to ongoing events.
+     * This test swipes to the ongoing events section, selects the first event, and clicks the "Message to Entrants" button.
+     * It then fills in and sends a message to Waitlisted entrants.
+     */
+    @Test
+    public void testSendMassageToWaitlistEntrants() throws InterruptedException {
+        // Swipe to the "Ongoing Events" section
+        onView(withId(R.id.view_pager))
+                .perform(ViewActions.swipeLeft());
+        Thread.sleep(3000);
+
+        // Find the first item in the RecyclerView and perform a click
+        onView(allOf(withId(R.id.ongoing_events_recycler_view), isDisplayed()))
+                .check(matches(isDisplayed()))
+                .perform(click());
+        Thread.sleep(2000);
+
+        // Click on the "Message to Entrants" button
+        onView(withId(R.id.button_ed_msgEntrants)) // Replace with actual ID of the button
+                .perform(click());
+
+        Thread.sleep(1000); // Wait briefly to ensure the action completes
+
+        // Generate random subject and message content
+        String randomSubject = "Subject: " + UUID.randomUUID().toString();
+        String randomMessage = "Message: " + UUID.randomUUID().toString();
+
+        // Enter the subject line
+        onView(withId(R.id.editText_nc_subjectLine)) // ID of the subject line input field
+                .perform(ViewActions.typeText(randomSubject), ViewActions.closeSoftKeyboard());
+
+        // Enter the message content
+        onView(withId(R.id.editText_nc_message)) // ID of the message input field
+                .perform(ViewActions.typeText(randomMessage), ViewActions.closeSoftKeyboard());
+
+        // Click on the "Send to All Entrants" button
+        onView(withId(R.id.button_nc_notifWaitlist)) // ID for the "Send to All Entrants" button
+                .perform(click());
+
+        System.out.println("Message created and sent to waitlisted entrants successfully.");
+
+    }
+
+    /**
+     * Test case for navigating to ongoing events.
+     * This test swipes to the ongoing events section, selects the first event, and clicks the "Message to Entrants" button.
+     * It then fills in and sends a message to Confirmed entrants.
+     */
+    @Test
+    public void testSendMassageToConfirmedEntrants() throws InterruptedException {
+        // Swipe to the "Ongoing Events" section
+        onView(withId(R.id.view_pager))
+                .perform(ViewActions.swipeLeft());
+        Thread.sleep(3000);
+
+        // Find the first item in the RecyclerView and perform a click
+        onView(allOf(withId(R.id.ongoing_events_recycler_view), isDisplayed()))
+                .check(matches(isDisplayed()))
+                .perform(click());
+        Thread.sleep(2000);
+
+        // Click on the "Message to Entrants" button
+        onView(withId(R.id.button_ed_msgEntrants)) // Replace with actual ID of the button
+                .perform(click());
+
+        Thread.sleep(1000); // Wait briefly to ensure the action completes
+
+        // Generate random subject and message content
+        String randomSubject = "Subject: " + UUID.randomUUID().toString();
+        String randomMessage = "Message: " + UUID.randomUUID().toString();
+
+        // Enter the subject line
+        onView(withId(R.id.editText_nc_subjectLine)) // ID of the subject line input field
+                .perform(ViewActions.typeText(randomSubject), ViewActions.closeSoftKeyboard());
+
+        // Enter the message content
+        onView(withId(R.id.editText_nc_message)) // ID of the message input field
+                .perform(ViewActions.typeText(randomMessage), ViewActions.closeSoftKeyboard());
+
+        // Click on the "Send to Confirmed Entrants" button
+        onView(withId(R.id.button_nc_notifConfirmed)) // ID for the "Send to All Entrants" button
+                .perform(click());
+
+        System.out.println("Message created and sent to all entrants successfully.");
+
+    }
+    /**
+     * Test case for navigating to ongoing events.
+     * This test swipes to the ongoing events section, selects the first event, and clicks the "Message to Entrants" button.
+     * It then fills in and sends a message to Waitlisted entrants.
+     */
+    @Test
+    public void testSendMassageToUnconfirmedEntrants() throws InterruptedException {
+        // Swipe to the "Ongoing Events" section
+        onView(withId(R.id.view_pager))
+                .perform(ViewActions.swipeLeft());
+        Thread.sleep(3000);
+
+        // Find the first item in the RecyclerView and perform a click
+        onView(allOf(withId(R.id.ongoing_events_recycler_view), isDisplayed()))
+                .check(matches(isDisplayed()))
+                .perform(click());
+        Thread.sleep(2000);
+
+        // Click on the "Message to Entrants" button
+        onView(withId(R.id.button_ed_msgEntrants)) // Replace with actual ID of the button
+                .perform(click());
+
+        Thread.sleep(1000); // Wait briefly to ensure the action completes
+
+        // Generate random subject and message content
+        String randomSubject = "Subject: " + UUID.randomUUID().toString();
+        String randomMessage = "Message: " + UUID.randomUUID().toString();
+
+        // Enter the subject line
+        onView(withId(R.id.editText_nc_subjectLine)) // ID of the subject line input field
+                .perform(ViewActions.typeText(randomSubject), ViewActions.closeSoftKeyboard());
+
+        // Enter the message content
+        onView(withId(R.id.editText_nc_message)) // ID of the message input field
+                .perform(ViewActions.typeText(randomMessage), ViewActions.closeSoftKeyboard());
+
+        // Click on the "Send to Unconfirmed Entrants" button
+        onView(withId(R.id.button_nc_notifUnconfirmed)) // ID for the "Send to All Entrants" button
+                .perform(click());
+
+        System.out.println("Message created and sent to all entrants successfully.");
+
+    }
+
+
+    /**
      * Test case for navigating to the past events section and waiting for 3 seconds.
      * This test swipes to the past events section to verify navigation functionality.
      */
@@ -178,55 +328,7 @@ public class OrganizerTest {
         Thread.sleep(3000);
     }
 
-    /**
-     * Test case (commented out) for viewing and navigating event details.
-     * This test navigates to the ongoing events section, selects a specific event ("curling"),
-     * verifies its details, and navigates to the participants screen to view participants by status.
-     */
-//    @Test
-//    public void testViewAndNavigateEventDetails() {
-//        // Navigate to ongoing events
-//        onView(withId(R.id.view_pager))
-//                .perform(swipeLeft()); // Swipe to ongoing events section
-//
-//        // Select an event named "curling" from the ongoing events list
-//        onView(withId(R.id.past_events_recycler_view))
-//                .perform(clone(withText("curling"), click()));
-//
 
 
-//        // Verify that the event details are displayed
-//        onView(withText("Event Name: curling"))
-//                .check(matches(isDisplayed()));
-//        onView(withText("Description: egdhfgudyrrydyrdydry"))
-//                .check(matches(isDisplayed()));
-//        onView(withText("Date: Sat Nov 30 00:00:00 MST 2024"))
-//                .check(matches(isDisplayed()));
-//        onView(withText("Geolocation Required: No"))
-//                .check(matches(isDisplayed()));
-//        onView(withText("Waitlist Capacity Required: Yes"))
-//                .check(matches(isDisplayed()));
-//
-//        // Click on the "Participants" button to view participants
-//        onView(withId(R.id.participantsButton))
-//                .perform(click());
-//
-//        // Verify that the participants screen is displayed with tabs for statuses
-//        onView(withText("Waitlisted"))
-//                .check(matches(isDisplayed()));
-//        onView(withText("Selected"))
-//                .check(matches(isDisplayed()));
-//        onView(withText("Enrolled"))
-//                .check(matches(isDisplayed()));
-//        onView(withText("Cancelled"))
-//                .check(matches(isDisplayed()));
-//
-//        // Navigate back to the event details screen
-//        onView(withId(R.id.backButton))
-//                .perform(click());
-//
-//        // Verify that we are back on the event details screen
-//        onView(withText("Event Name: curling"))
-//                .check(matches(isDisplayed()));
-//    }
+
 }
