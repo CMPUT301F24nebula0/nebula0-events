@@ -152,6 +152,8 @@ public void testAdminNavigationFlow() throws InterruptedException {
         Espresso.onView(ViewMatchers.withText("Back"))
                 .perform(ViewActions.click());
         Thread.sleep(1000); // Wait for 1 second
+
+
     }
 
 }

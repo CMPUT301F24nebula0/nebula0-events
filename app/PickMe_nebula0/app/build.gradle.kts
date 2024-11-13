@@ -46,6 +46,7 @@ dependencies {
     implementation("com.journeyapps:zxing-android-embedded:4.1.0") {
         exclude( "com.google.protobuf",  "protobuf-lite")
     }
+    testImplementation(libs.junit.jupiter)
 
     // Espresso contrib for UI testing, excluding protobuf-lite
     androidTestImplementation("androidx.test.espresso:espresso-contrib:3.5.1") {

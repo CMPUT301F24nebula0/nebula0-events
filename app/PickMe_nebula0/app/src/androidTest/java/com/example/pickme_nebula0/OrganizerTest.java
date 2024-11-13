@@ -61,6 +61,8 @@ public class OrganizerTest {
                 .perform(swipeLeft()); // Swipe to ongoing events section
         Thread.sleep(1000);
 
+
+
         // Click on the "Create Event" button
         onView(withId(R.id.createEventButton))
                 .perform(click());
