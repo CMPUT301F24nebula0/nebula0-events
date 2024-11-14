@@ -1,13 +1,18 @@
 package com.example.pickme_nebula0;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 
-import com.example.pickme_nebula0.db.DBManager;
+import androidx.core.app.NotificationCompat;
+
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.messaging.RemoteMessage;
+
 
 /**
  * @author Stephine Yearley
@@ -16,6 +21,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
  * I have an android app written in java in android studio. I am using firestore as my database. I want to generate an android notification for a specific user everytime a new document is created in a specfic collection of the database. I want the user to receive these notifications even if the application on their phone isn't running (e.g. has been fully killed)
  */
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
+    private static final String CHANNEL_ID = "pickme_cID";
+
     @Override
     public void onNewToken(String token) {
         super.onNewToken(token);
@@ -46,5 +53,42 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
                     saveTokenToFirestore(fcmToken,userID);
                 });
+    }
+
+    @Override
+    public void onMessageReceived(RemoteMessage remoteMessage) {
+        // Check if message contains a notification payload
+        if (remoteMessage.getNotification() != null) {
+            String title = remoteMessage.getNotification().getTitle();
+            String body = remoteMessage.getNotification().getBody();
+
+            // Show notification when app is in the foreground
+            sendNotification(title, body);
+        }
+    }
+
+    // Handle notifications when app is in foreground
+    private void sendNotification(String title, String body) {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // Create notification channel, if the channel already exists, this does nothing
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    CHANNEL_ID,
+                    "PickMeAll",
+                    NotificationManager.IMPORTANCE_HIGH
+            );
+            notificationManager.createNotificationChannel(channel);
+        }
+
+        // Create the notification
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle(title)
+                .setContentText(body)
+                .setSmallIcon(R.drawable.notification_icon)  // Use your app's icon here
+                .setAutoCancel(true);
+
+        // Show the notification
+        notificationManager.notify(0, notificationBuilder.build());
     }
 }
