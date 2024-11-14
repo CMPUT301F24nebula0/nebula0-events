@@ -26,10 +26,6 @@
             </intent-filter>
         </activity>
         <service
-            android:name=".NotificationService"
-            android:exported="false">
-        </service>
-        <service
             android:name=".MyFirebaseMessagingService"
             android:exported="false">
             <intent-filter>
