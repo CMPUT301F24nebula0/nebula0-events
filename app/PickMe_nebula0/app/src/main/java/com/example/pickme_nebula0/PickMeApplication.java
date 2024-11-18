@@ -5,6 +5,8 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
 
+import com.google.firebase.FirebaseApp;
+
 public class PickMeApplication extends Application {
     private static PickMeApplication instance;
 
@@ -13,6 +15,8 @@ public class PickMeApplication extends Application {
         super.onCreate();
         instance = this;
 
+//        FirebaseApp.initializeApp(this);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
                     "pickme_cID", // Channel ID
@@ -20,6 +24,7 @@ public class PickMeApplication extends Application {
                     NotificationManager.IMPORTANCE_HIGH
             );
             channel.setDescription("All notifications for PickMe App");
+
 
             NotificationManager manager = getSystemService(NotificationManager.class);
             if (manager != null) {
