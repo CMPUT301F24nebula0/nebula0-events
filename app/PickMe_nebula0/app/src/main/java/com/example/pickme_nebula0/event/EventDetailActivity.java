@@ -20,24 +20,25 @@ import com.example.pickme_nebula0.notification.NotificationCreationActivity;
 import com.example.pickme_nebula0.organizer.activities.OrganizerEventParticipantsActivity;
 import com.example.pickme_nebula0.DeviceManager;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.SetOptions;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class EventDetailActivity extends AppCompatActivity {
-    private FirebaseFirestore db;
+
+    // Initialize UI components
     private TextView eventDetailsTextView;
     private ImageView qrCodeImageView;
-    private DBManager dbManager;
     private Button participantsButton;
     private Button msgEntrantsButton;
     private Button backButton;
 
+    private String eventID;
+
+    private DBManager dbManager;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Set the content view
         setContentView(R.layout.activity_event_detail);
 
         // Initialize UI components
@@ -47,17 +48,17 @@ public class EventDetailActivity extends AppCompatActivity {
         eventDetailsTextView = findViewById(R.id.event_details_text_view);
         qrCodeImageView = findViewById(R.id.qr_code_image_view);
 
-        db = FirebaseFirestore.getInstance();
         dbManager = new DBManager();
 
         // Retrieve eventID from intent
-        String eventID = getIntent().getStringExtra("eventID");
+        eventID = getIntent().getStringExtra("eventID");
 
         if (eventID == null || eventID.trim().isEmpty()) {
             Toast.makeText(this, "Invalid Event ID.", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
+
 
         // Set up button listeners
         setupButtons(eventID);
@@ -73,7 +74,12 @@ public class EventDetailActivity extends AppCompatActivity {
      */
     private void setupButtons(String eventID) {
         // Back Button
-        backButton.setOnClickListener(v -> onBackPressed());
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getOnBackPressedDispatcher().onBackPressed();
+            }
+        });
 
         // Message Entrants Button
         msgEntrantsButton.setOnClickListener(v -> {
@@ -108,25 +114,9 @@ public class EventDetailActivity extends AppCompatActivity {
             if (eventObj instanceof Event) {
                 Event event = (Event) eventObj;
                 runOnUiThread(() -> {
-                    StringBuilder details = new StringBuilder();
-                    details.append("Event Name: ").append(event.getEventName()).append("\n\n");
-                    details.append("Description: ").append(event.getEventDescription()).append("\n\n");
-                    details.append("Date: ").append(event.getEventDate().toString()).append("\n\n");
-                    details.append("Geolocation Required: ").append(event.getGeolocationRequired() ? "Yes" : "No").append("\n\n");
-                    if (event.getGeolocationRequired()) {
-                        details.append("Geolocation Max Distance: ").append(event.getGeolocationMaxDistance()).append(" km\n");
-                    }
-                    details.append("Waitlist Capacity Required: ").append(event.getWaitlistCapacityRequired() ? "Yes" : "No").append("\n");
-                    if (event.getWaitlistCapacityRequired()) {
-                        details.append("Waitlist Capacity: ").append(event.getWaitlistCapacity()).append("\n");
-                    }
-                    details.append("Number of Attendees: ").append(event.getNumberOfAttendees()).append("\n");
+                    StringBuilder details = generateEventDetails(event);
                     eventDetailsTextView.setText(details.toString());
-
                     displayQRCode(event.getQrCodeData());
-
-                    // Update waitlist button visibility based on user's current status
-                    String userID = DeviceManager.getDeviceId();
                 });
             } else {
                 runOnUiThread(() -> {
@@ -138,6 +128,33 @@ public class EventDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "Failed to retrieve event data.", Toast.LENGTH_SHORT).show();
             finish();
         }));
+    }
+
+    /**
+     * Generates the event details to display.
+     * @param event The event object.
+     * @return The event details.
+     */
+    private StringBuilder generateEventDetails(Event event) {
+        StringBuilder details = new StringBuilder();
+        details.append("Event Name: ").append(event.getEventName()).append("\n\n");
+        details.append("Description: ").append(event.getEventDescription()).append("\n\n");
+        details.append("Date: ").append(event.getEventDate().toString()).append("\n\n");
+        details.append("Geolocation Required: ").append(event.getGeolocationRequired() ? "Yes" : "No").append("\n\n");
+
+        if (event.getGeolocationRequired()) {
+            details.append("Geolocation Max Distance: ").append(event.getGeolocationMaxDistance()).append(" km\n");
+        }
+
+        details.append("Waitlist Capacity Required: ").append(event.getWaitlistCapacityRequired() ? "Yes" : "No").append("\n");
+
+        if (event.getWaitlistCapacityRequired()) {
+            details.append("Waitlist Capacity: ").append(event.getWaitlistCapacity()).append("\n");
+        }
+
+        details.append("Number of Attendees: ").append(event.getNumberOfAttendees()).append("\n");
+
+        return details;
     }
 
     /**
