@@ -23,11 +23,10 @@ public class QRCodeActivity extends AppCompatActivity {
     // QR code scanner
     private static final int PERMISSION_REQUEST_CAMERA = 1;
 
-    //
     FirebaseFirestore db;
     Button homeButton;
 
-    //
+    // check if activity is active
     boolean active = false;
 
     @Override
@@ -44,7 +43,6 @@ public class QRCodeActivity extends AppCompatActivity {
 
         // Firebase Firestore
         db = FirebaseFirestore.getInstance();
-
 
         // check camera permission
         if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -111,32 +109,44 @@ public class QRCodeActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
 
+                // Extract the event URI from the QR code
                 String eventURI = result.getContents();
+                // Extract the event ID from the URI
                 String eventID = eventURI.substring(eventURI.lastIndexOf("/") + 1);
 
-                db.collection("Events")
-                        .document(eventID)
-                        .get()
-                        .addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                DocumentSnapshot document = task.getResult();
-
-                                if (document.exists()) {
-                                    Intent intent = new Intent(QRCodeActivity.this, EventDetailUserActivity.class);
-                                    intent.putExtra("eventID", eventID);
-                                    intent.putExtra("fromQR", true);
-                                    startActivity(intent);
-                                    finish();
-                                } else {
-                                    Toast.makeText(this, "Event not found", Toast.LENGTH_LONG).show();
-                                }
-                            } else {
-                                Toast.makeText(this, "Error fetching event", Toast.LENGTH_LONG).show();
-                            }
-                        });
+                // Navigate to the event details page
+                navigateToEventDetails(eventID);
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    /**
+     * Navigate to the event details page
+     * @param eventID The ID of the event to navigate to
+     */
+    private void navigateToEventDetails(String eventID) {
+        db.collection("Events")
+                .document(eventID)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        // Check if event exists
+                        DocumentSnapshot document = task.getResult();
+                        // If event exists, navigate to the event details page
+                        if (document.exists()) {
+                            Intent intent = new Intent(QRCodeActivity.this, EventDetailUserActivity.class);
+                            intent.putExtra("eventID", eventID);
+                            intent.putExtra("fromQR", true);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Toast.makeText(this, "Event not found", Toast.LENGTH_LONG).show();
+                        }
+                    } else {
+                        Toast.makeText(this, "Error fetching event", Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 }
