@@ -15,6 +15,7 @@ import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.event.Event;
+import com.example.pickme_nebula0.organizer.exceptions.OrganizerExceptions;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -23,130 +24,148 @@ import java.util.Date;
 
 public class OrganizerCreateEventActivity extends AppCompatActivity {
 
+    // Database Manager
     private DBManager dbManager;
 
+    // Screen component variables
     private EditText eventNameField;
     private EditText eventDescriptionField;
     private EditText eventDateField;
     private Switch geolocationRequirementSwitch;
     private EditText geolocationRequirementField;
+    private Switch waitlistCapacityRequiredSwitch;
+    private EditText waitlistCapacityField;
+    private EditText numberOfAttendeesField;
+    private Button eventCreationSubmitButton;
+    private Button eventCreationCancelButton;
+
+    // User input variables
+    String eventName;
+    String eventDescription;
+    String eventDate;
+    boolean geolocationRequired;
+    String geolocationRequirement;
+    boolean waitlistCapacityRequired;
+    String waitlistCapacity;
+    String numberOfAttendees;
+
+    // Variables needed for Backend handling
+    Date eventDateObj;
+    int geolocationMaxDistance;
+    int waitlistMaxCapacity;
+    int maxNumberOfAttendees;
+    boolean eventCreated;
+
+    // Device ID
+    String deviceID;
+
+    // Event object
+    Event event;
+
+    // Exceptions
+    OrganizerExceptions organizerExceptions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        dbManager = new DBManager();
         super.onCreate(savedInstanceState);
+
+        // Initialize database manager
+        dbManager = new DBManager();
 
         // attach to screen component xml
         setContentView(R.layout.activity_organizer_create_event);
 
-        // components on screen
+        // Initialize screen components
         eventNameField = findViewById(R.id.event_name_field);
         eventDescriptionField = findViewById(R.id.event_description_field);
         eventDateField = findViewById(R.id.event_date_field);
         geolocationRequirementSwitch = findViewById(R.id.geolocation_requirement_switch);
         geolocationRequirementField = findViewById(R.id.geolocation_requirement_field);
-        Switch waitlistCapacityRequiredSwitch = findViewById(R.id.waitlist_capacity_required_switch);
-        EditText waitlistCapacityField = findViewById(R.id.waitlist_capacity_field);
-        EditText numberOfAttendeesField = findViewById(R.id.number_of_attendees_field);
-        Button eventCreationSubmitButton = findViewById(R.id.event_creation_submit_button);
-        Button eventCreationCancelButton = findViewById(R.id.event_creation_cancel_button);
+        waitlistCapacityRequiredSwitch = findViewById(R.id.waitlist_capacity_required_switch);
+        waitlistCapacityField = findViewById(R.id.waitlist_capacity_field);
+        numberOfAttendeesField = findViewById(R.id.number_of_attendees_field);
+        eventCreationSubmitButton = findViewById(R.id.event_creation_submit_button);
+        eventCreationCancelButton = findViewById(R.id.event_creation_cancel_button);
 
-        // get deviceID as the foreignKey
-        String deviceID = DeviceManager.getDeviceId();
+        // Get device ID
+        deviceID = DeviceManager.getDeviceId();
 
+        // Initialize exceptions
+        organizerExceptions = new OrganizerExceptions();
 
-/*
-@Author: Sina Shaban
-I just made a bit change in the way that we select the date there was a problem regarding dependency of Espresso picker
-and the firebase ; Therefore I made a changes for the half way summation that lets as write the date in the format
-(YYYY-MM-DD) instead of picking from a calender , I will also put a note so we should modify it for our final submission
-
- */
+        /* TODO:
+        @Author: Sina Shaban
+        I just made a bit change in the way that we select the date there was a problem regarding dependency of Espresso picker
+        and the firebase ; Therefore I made a changes for the half way summation that lets as write the date in the format
+        (YYYY-MM-DD) instead of picking from a calender , I will also put a note so we should modify it for our final submission
+         */
 
         // DatePicker logic
         eventDateField.setFocusable(false);
         eventDateField.setOnClickListener(v -> showDatePickerDialog());
 
-
-        // Geolocation Requirement Switch Logic
+        // Switch logic to enable/disable fields
         geolocationRequirementSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                // the geolocation field can be edited
-                geolocationRequirementField.setEnabled(true);
-            } else {
-                geolocationRequirementField.setEnabled(false);
-                geolocationRequirementField.setText("");
-            }
+            SwitchToggleEditText(geolocationRequirementField, isChecked);
         });
-
-        // Waitlist Capacity Switch Logic
         waitlistCapacityRequiredSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                // the waitlist capacity field can be edited
-                waitlistCapacityField.setEnabled(true);
-            } else {
-                waitlistCapacityField.setEnabled(false);
-                waitlistCapacityField.setText("");
-            }
+            SwitchToggleEditText(waitlistCapacityField, isChecked);
         });
 
-        // Initially disable the geolocation requirement and waitlist capacity fields
-        // since both switches are off initially
+        // Initially disable fields since both switches are off at the beginning
         waitlistCapacityField.setEnabled(false);
         geolocationRequirementField.setEnabled(false);
 
-
         // Submit button logic
         eventCreationSubmitButton.setOnClickListener(v -> {
-            String eventName = eventNameField.getText().toString();
-            String eventDescription = eventDescriptionField.getText().toString();
-            String eventDate = eventDateField.getText().toString();
-            boolean geolocationRequired = geolocationRequirementSwitch.isChecked();
-            String geolocationRequirement = geolocationRequirementField.getText().toString();
-            boolean waitlistCapacityRequired = waitlistCapacityRequiredSwitch.isChecked();
-            String waitlistCapacity = waitlistCapacityField.getText().toString();
-            String numberOfAttendees = numberOfAttendeesField.getText().toString();
+            eventName = eventNameField.getText().toString();
+            eventDescription = eventDescriptionField.getText().toString();
+            eventDate = eventDateField.getText().toString();
+            geolocationRequired = geolocationRequirementSwitch.isChecked();
+            geolocationRequirement = geolocationRequirementField.getText().toString();
+            waitlistCapacityRequired = waitlistCapacityRequiredSwitch.isChecked();
+            waitlistCapacity = waitlistCapacityField.getText().toString();
+            numberOfAttendees = numberOfAttendeesField.getText().toString();
 
             // Validate user input
-            if (!validateEventCreationUserInput(deviceID, eventName, eventDescription, eventDate,
+            if (!organizerExceptions.validateEventCreationUserInput(this, deviceID, eventName, eventDescription, eventDate,
                     geolocationRequired, geolocationRequirement,
                     waitlistCapacityRequired, waitlistCapacity, numberOfAttendees)) {
                 // If user input is invalid, don't add event
                 return;
             }
 
-            Date eventDateObj = parseDate(eventDate);
+            // switch & input logic
+            geolocationMaxDistance = geolocationRequired ? Integer.parseInt(geolocationRequirement) : -1;
+            waitlistMaxCapacity = waitlistCapacityRequired ? Integer.parseInt(waitlistCapacity) : -1;
 
-            // if geolocation requirement switch on
-            int geolocationMaxDistance = -1;
-            if (geolocationRequired) {
-                // save geolocation requirement
-                geolocationMaxDistance = Integer.parseInt(geolocationRequirement);
+            // variables event creation
+            eventDateObj = parseDate(eventDate);
+            maxNumberOfAttendees = Integer.parseInt(numberOfAttendees);
+
+            try {
+                // Try creating event object
+                event = new Event(eventName, eventDescription, eventDateObj,
+                        geolocationRequired, geolocationMaxDistance, waitlistCapacityRequired,
+                        waitlistMaxCapacity, maxNumberOfAttendees);
+                eventCreated = true;
+            } catch (Exception e) {
+                Log.d("OrganizerCreateEventActivity", "Event creation failed with error: " + e.getMessage());
+                Toast.makeText(this, "Event creation failed. Please try again.", Toast.LENGTH_LONG).show();
+                eventCreated = false;
+                return;
             }
 
-            // if waitlist capacity requirement switch on
-            int waitlistMaxCapacity = -1;
-            if (waitlistCapacityRequired) {
-                waitlistMaxCapacity = Integer.parseInt(waitlistCapacity);
-            }
-
-            int maxNumberOfAttendees = Integer.parseInt(numberOfAttendees);
-
-
-            Event event = new Event(eventName, eventDescription, eventDateObj,
-                    geolocationRequired, geolocationMaxDistance, waitlistCapacityRequired,
-                    waitlistMaxCapacity, maxNumberOfAttendees);
-
+            // Add event to database
             dbManager.addEvent(event);
             Toast.makeText(this, "Event created successfully with QR Code!", Toast.LENGTH_LONG).show();
 
             finish();
         });
 
-        // Cancel button logic
+        // Check if any fields are filled before cancelling
         eventCreationCancelButton.setOnClickListener(v -> {
             if (isAnyFieldFilled(eventNameField, eventDescriptionField, eventDateField, geolocationRequirementField, waitlistCapacityField, numberOfAttendeesField)) {
-
                 new AlertDialog.Builder(OrganizerCreateEventActivity.this)
                         .setTitle("Cancel Event Creation")
                         .setMessage("Are you sure you want to cancel? All input will be lost.")
@@ -159,7 +178,7 @@ and the firebase ; Therefore I made a changes for the half way summation that le
         });
     }
 
-    // the Date Picker
+    // the Date Picker Dialog
     private void showDatePickerDialog() {
         final Calendar calendar = Calendar.getInstance();
         DatePickerDialog datePickerDialog = new DatePickerDialog(this,
@@ -173,134 +192,18 @@ and the firebase ; Therefore I made a changes for the half way summation that le
         datePickerDialog.show();
     }
 
-    // validating input
-    // TODO: check and test if there are more conditions needed to check
-    private boolean validateEventCreationUserInput(
-            String deviceID,
-            String eventName,
-            String eventDescription,
-            String eventDate,
-            boolean geolocationRequired,
-            String geolocationRequirement,
-            boolean waitlistCapacityRequired,
-            String waitlistCapacity,
-            String numberOfAttendees
-    ) {
-        StringBuilder warningMessage = new StringBuilder("The event cannot be created for the following reason(s):");
-        boolean valid = true;
-
-        if (deviceID == null || deviceID.isEmpty()) {
-            warningMessage.append("\n- The deviceID could not be retrieved.");
-            valid = false;
-        }
-        if (eventName.isEmpty()) {
-            warningMessage.append("\n- The event name cannot be blank.");
-            valid = false;
-        }
-        if (eventDescription.isEmpty()) {
-            warningMessage.append("\n- The event description cannot be blank.");
-            valid = false;
-        }
-        if (eventDate.isEmpty()) {
-            warningMessage.append("\n- The event date cannot be blank.");
-            valid = false;
+    // switch logic to enable/disable fields
+    private void SwitchToggleEditText(EditText editText, boolean isChecked)
+    {
+        if (isChecked) {
+            editText.setEnabled(true);
         } else {
-            try {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                Date selectedDate = dateFormat.parse(eventDate);
-
-                // Remove time components for comparison
-                Calendar selectedCalendar = Calendar.getInstance();
-                selectedCalendar.setTime(selectedDate);
-                selectedCalendar.set(Calendar.HOUR_OF_DAY, 0);
-                selectedCalendar.set(Calendar.MINUTE, 0);
-                selectedCalendar.set(Calendar.SECOND, 0);
-                selectedCalendar.set(Calendar.MILLISECOND, 0);
-
-                Calendar currentCalendar = Calendar.getInstance();
-                currentCalendar.set(Calendar.HOUR_OF_DAY, 0);
-                currentCalendar.set(Calendar.MINUTE, 0);
-                currentCalendar.set(Calendar.SECOND, 0);
-                currentCalendar.set(Calendar.MILLISECOND, 0);
-
-                if (selectedCalendar.before(currentCalendar)) {
-                    warningMessage.append("\n- The event date must be today or in the future.");
-                    valid = false;
-                }
-            } catch (ParseException e) {
-                warningMessage.append("\n- The event date format is incorrect.");
-                valid = false;
-            }
+            editText.setEnabled(false);
+            editText.setText("");
         }
-
-        if (geolocationRequired) {
-            if (geolocationRequirement.isEmpty()) {
-                warningMessage.append("\n- The geolocation requirement cannot be blank.");
-                valid = false;
-            } else {
-                try {
-                    int radius = Integer.parseInt(geolocationRequirement);
-                    if (radius <= 0) {
-                        warningMessage.append("\n- The geolocation radius must be a positive number.");
-                        valid = false;
-                    }
-                } catch (NumberFormatException e) {
-                    warningMessage.append("\n- The geolocation requirement must be a number (km radius).");
-                    valid = false;
-                }
-            }
-        }
-
-        if (numberOfAttendees.isEmpty()) {
-            warningMessage.append("\n- The number of attendees cannot be blank.");
-            valid = false;
-        } else {
-            try {
-                int attendees = Integer.parseInt(numberOfAttendees);
-                if (attendees <= 0) {
-                    warningMessage.append("\n- The number of attendees must be a positive number.");
-                    valid = false;
-                }
-            } catch (NumberFormatException e) {
-                warningMessage.append("\n- The number of attendees must be a number.");
-                valid = false;
-            }
-        }
-
-        if (waitlistCapacityRequired) {
-            if (waitlistCapacity.isEmpty()) {
-                warningMessage.append("\n- The waitlist capacity cannot be blank.");
-                valid = false;
-            } else {
-                try {
-                    int waitlistCap = Integer.parseInt(waitlistCapacity);
-                    int attendees = Integer.parseInt(numberOfAttendees);
-
-                    if (waitlistCap < attendees) {
-                        warningMessage.append("\n- The waitlist capacity must be equal to or greater than the number of attendees.");
-                        valid = false;
-                    }
-
-                    if (waitlistCap <= 0) {
-                        warningMessage.append("\n- The waitlist capacity must be a positive number.");
-                        valid = false;
-                    }
-
-                } catch (NumberFormatException e) {
-                    warningMessage.append("\n- The waitlist capacity must be a number.");
-                    valid = false;
-                }
-            }
-        }
-
-        if (!valid) {
-            Toast.makeText(this, warningMessage.toString(), Toast.LENGTH_LONG).show();
-        }
-
-        return valid;
     }
 
-    // check if any fields are field (before cancelling)
+    // check if any fields are filled (before cancelling)
     private boolean isAnyFieldFilled(EditText... fields) {
         for (EditText field : fields) {
             if (!field.getText().toString().isEmpty()) {
