@@ -59,7 +59,6 @@ public class EventDetailActivity extends AppCompatActivity {
             return;
         }
 
-
         // Set up button listeners
         setupButtons(eventID);
 
