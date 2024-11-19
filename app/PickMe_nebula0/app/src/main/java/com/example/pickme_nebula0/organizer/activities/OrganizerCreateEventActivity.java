@@ -22,6 +22,12 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+/**
+ * Class for OrganizerCreateEventActivity
+ * This class is used to create an event as an organizer.
+ *
+ * @author Taekwan Yoon
+ */
 public class OrganizerCreateEventActivity extends AppCompatActivity {
 
     // Database Manager
@@ -178,7 +184,10 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         });
     }
 
-    // the Date Picker Dialog
+    /**
+     * Show date picker dialog
+     * This method is used to show the date picker dialog when the user clicks on the date field.
+     */
     private void showDatePickerDialog() {
         final Calendar calendar = Calendar.getInstance();
         DatePickerDialog datePickerDialog = new DatePickerDialog(this,
@@ -192,7 +201,12 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         datePickerDialog.show();
     }
 
-    // switch logic to enable/disable fields
+    /**
+     * Check if switch is on/off and enable/disable EditText accordingly
+     *
+     * @param editText EditText to enable/disable
+     * @param isChecked boolean value of switch
+     */
     private void SwitchToggleEditText(EditText editText, boolean isChecked)
     {
         if (isChecked) {
@@ -203,7 +217,12 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         }
     }
 
-    // check if any fields are filled (before cancelling)
+    /**
+     * Check if any of the fields are filled
+     *
+     * @param fields EditText fields to check
+     * @return boolean value of whether any of the fields are filled
+     */
     private boolean isAnyFieldFilled(EditText... fields) {
         for (EditText field : fields) {
             if (!field.getText().toString().isEmpty()) {
@@ -213,6 +232,12 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         return false;
     }
 
+    /**
+     * Parse date string to Date object
+     *
+     * @param dateString date string to parse
+     * @return Date object
+     */
     private static Date parseDate(String dateString) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         try {
