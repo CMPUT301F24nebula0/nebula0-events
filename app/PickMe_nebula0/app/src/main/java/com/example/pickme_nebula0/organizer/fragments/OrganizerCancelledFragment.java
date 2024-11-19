@@ -1,5 +1,6 @@
 package com.example.pickme_nebula0.organizer.fragments;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,15 +15,12 @@ import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.organizer.adapters.CancelledAdapter;
 import com.example.pickme_nebula0.user.User;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class OrganizerCancelledFragment extends Fragment {
-    private FirebaseFirestore db;
-    private DBManager dbManager = new DBManager();
+    private final DBManager dbManager = new DBManager();
     ArrayList<User> cancelledUsers = new ArrayList<User>();
     private CancelledAdapter adapter;
     String eventID;
@@ -39,7 +37,7 @@ public class OrganizerCancelledFragment extends Fragment {
         adapter = new CancelledAdapter(getContext(), cancelledUsers);
         recyclerView.setAdapter(adapter);
         eventID = getActivity().getIntent().getStringExtra("eventID");
-        db = FirebaseFirestore.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         return view;
     }
@@ -50,6 +48,7 @@ public class OrganizerCancelledFragment extends Fragment {
         loadCancelledUsers();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void loadCancelledUsers() {
         cancelledUsers.clear();
         dbManager.loadUsersRegisteredInEvent(eventID, DBManager.RegistrantStatus.CANCELED, "OrganizerCancelledFragment",
