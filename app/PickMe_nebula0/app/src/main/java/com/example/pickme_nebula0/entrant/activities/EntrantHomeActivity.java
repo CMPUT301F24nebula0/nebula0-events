@@ -7,6 +7,7 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -21,26 +22,40 @@ import com.google.android.material.tabs.TabLayoutMediator;
  */
 public class EntrantHomeActivity extends AppCompatActivity {
 
-    // tabs
+    // tabs: Waitlist, Selected, Confirmed, Canceled
     private final String[] tabTitles = new String[]{"Waitlist", "Selected", "Confirmed","Canceled"};
+
+    private ViewPager2 viewPager;
+    private TabLayout tabLayout;
+    private FragmentStateAdapter pagerAdapter;
+
+    // buttons
+    private Button scanQRButton, backButton;
+
+    // fragments for each tab
     EntrantEventsFragment waitlistFrag, selectedFrag, confirmedFrag, canceledFrag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // set layout
+        setContentView(R.layout.activity_entrant_home);
+
+        // initialize fragments
         waitlistFrag = new EntrantEventsFragment("WAITLISTED");
         selectedFrag = new EntrantEventsFragment("SELECTED");
         confirmedFrag = new EntrantEventsFragment("CONFIRMED");
         canceledFrag = new EntrantEventsFragment("CANCELED");
 
-        setContentView(R.layout.activity_entrant_home);
+        // Initialize ViewPager2 and TabLayout
+        viewPager = findViewById(R.id.view_pager);
+        tabLayout = findViewById(R.id.tab_layout);
+        pagerAdapter = new ScreenSlidePagerAdapter(this);
 
-        ViewPager2 viewPager = findViewById(R.id.view_pager);
-        TabLayout tabLayout = findViewById(R.id.tab_layout);
-        FragmentStateAdapter pagerAdapter = new ScreenSlidePagerAdapter(this);
-        final Button scanQRButton = findViewById(R.id.ScanQRButton);
-        final Button backButton = findViewById(R.id.backButton);
+        // Initialize buttons
+        scanQRButton = findViewById(R.id.ScanQRButton);
+        backButton = findViewById(R.id.backButton);
 
         viewPager.setAdapter(pagerAdapter);
 
@@ -89,7 +104,7 @@ public class EntrantHomeActivity extends AppCompatActivity {
     @Override
     public void onResume(){
         super.onResume();
-        // TODO - tidy this by making a list of fragments and iterate
+
         if (waitlistFrag.isAdded()) {
             waitlistFrag.loadEvents();
         }
@@ -103,7 +118,4 @@ public class EntrantHomeActivity extends AppCompatActivity {
             canceledFrag.loadEvents();
         }
     }
-
-
-
 }
