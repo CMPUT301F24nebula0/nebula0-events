@@ -40,7 +40,8 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-messaging")
-    implementation ("com.google.firebase:firebase-storage:20.0.0")
+    implementation ("com.google.firebase:firebase-storage:20.2.1")
+    implementation ("com.squareup.picasso:picasso:2.8")// For loading images
 
     implementation(libs.rules)
     testImplementation(libs.ext.junit)
