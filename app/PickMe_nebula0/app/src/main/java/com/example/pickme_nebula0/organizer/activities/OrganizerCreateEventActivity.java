@@ -15,20 +15,21 @@ import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.event.Event;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.type.DateTime;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 public class OrganizerCreateEventActivity extends AppCompatActivity {
 
     private DBManager dbManager;
+
+    private EditText eventNameField;
+    private EditText eventDescriptionField;
     private EditText eventDateField;
+    private Switch geolocationRequirementSwitch;
+    private EditText geolocationRequirementField;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,11 +40,11 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         setContentView(R.layout.activity_organizer_create_event);
 
         // components on screen
-        EditText eventNameField = findViewById(R.id.event_name_field);
-        EditText eventDescriptionField = findViewById(R.id.event_description_field);
+        eventNameField = findViewById(R.id.event_name_field);
+        eventDescriptionField = findViewById(R.id.event_description_field);
         eventDateField = findViewById(R.id.event_date_field);
-        Switch geolocationRequirementSwitch = findViewById(R.id.geolocation_requirement_switch);
-        EditText geolocationRequirementField = findViewById(R.id.geolocation_requirement_field);
+        geolocationRequirementSwitch = findViewById(R.id.geolocation_requirement_switch);
+        geolocationRequirementField = findViewById(R.id.geolocation_requirement_field);
         Switch waitlistCapacityRequiredSwitch = findViewById(R.id.waitlist_capacity_required_switch);
         EditText waitlistCapacityField = findViewById(R.id.waitlist_capacity_field);
         EditText numberOfAttendeesField = findViewById(R.id.number_of_attendees_field);
