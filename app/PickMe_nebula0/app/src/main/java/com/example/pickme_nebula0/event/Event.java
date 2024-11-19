@@ -85,6 +85,7 @@ public class Event {
     public String getEventID() {
         return this.eventID;
     }
+
     public String getEventName() { return this.eventName; }
     public String getEventDescription() { return this.eventDescription; }
     public Date getEventDate() { return this.eventDate; }

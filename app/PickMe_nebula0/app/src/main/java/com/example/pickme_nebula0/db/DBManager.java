@@ -568,9 +568,9 @@ public class DBManager {
      * Ensures all users registered in an event are fetched before calling onSuccessCallback.
      * Passes list of Users to the callback (ArrayList<User> as an Object class.)
      * Used for sampling users.
-     * @param eventID
-     * @param status
-     * @param onSuccessCallback
+     * @param eventID eventID
+     * @param status status
+     * @param onSuccessCallback onSuccessCallback
      */
     public void loadAllUsersRegisteredInEvent(String eventID, RegistrantStatus status, DBManager.Obj2VoidCallback onSuccessCallback) {
         Query waitlistedUsersQuery = db.collection(eventsCollection)
