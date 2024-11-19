@@ -29,7 +29,6 @@ import java.util.Map;
  */
 public class EventDetailUserActivity extends AppCompatActivity {
     private String eventID;
-    private String eventName;
     private final String userID = DeviceManager.getDeviceId();
     private DBManager dbManager;
     private Button unregBtn, backBtn, regBtn;
@@ -58,14 +57,6 @@ public class EventDetailUserActivity extends AppCompatActivity {
             Toast.makeText(this, "Invalid Event ID.", Toast.LENGTH_SHORT).show();
             finish();
         }
-
-        // Retrieve event Name from intent
-        eventName = getIntent().getStringExtra("eventName");
-        if (eventName == null || eventName.isEmpty()) {
-            Toast.makeText(this, "Invalid Event Name.", Toast.LENGTH_SHORT).show();
-            finish();
-        }
-
 
         // Link components
         backBtn = findViewById(R.id.button_edu_back);

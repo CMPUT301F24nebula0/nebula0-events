@@ -66,7 +66,6 @@ public class EntrantEventsFragment extends Fragment {
 
                 Intent intent = new Intent(getActivity(), EventDetailUserActivity.class);
                 intent.putExtra("eventID",clickedEvent.getEventID());
-                intent.putExtra("eventName",clickedEvent.getEventName());
                 startActivity(intent);
             }
         });
