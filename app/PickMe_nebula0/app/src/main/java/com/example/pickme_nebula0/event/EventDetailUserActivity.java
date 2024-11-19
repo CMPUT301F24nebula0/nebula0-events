@@ -13,6 +13,7 @@ import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.db.DBManager;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
@@ -77,9 +78,47 @@ public class EventDetailUserActivity extends AppCompatActivity {
         regBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                joinWaitlist(eventID,()->{fromQR = false;renderAll();});
+                // Check if the event requires geolocation
+                db.collection("Events")
+                        .document(eventID)
+                        .get()
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                // Ensure document exists and fetch the "geolocationRequired" field
+                                DocumentSnapshot document = task.getResult();
+                                if (document != null && document.exists()) {
+                                    Boolean requiresGeolocation = document.getBoolean("geolocationRequired");
+
+                                    // Handle geolocation requirement
+                                    if (requiresGeolocation != null && requiresGeolocation) {
+                                        // Geolocation required: Show dialog to notify the user
+                                        showGeolocationRequiredDialog(() -> {
+                                            // User agrees: Join waitlist
+                                            joinWaitlist(eventID, () -> {
+                                                fromQR = false;
+                                                renderAll();
+                                            });
+                                        });
+                                    } else {
+                                        // Geolocation not required: Proceed with joining the waitlist
+                                        joinWaitlist(eventID, () -> {
+                                            fromQR = false;
+                                            renderAll();
+                                        });
+                                    }
+                                } else {
+                                    // Document does not exist
+                                    Toast.makeText(EventDetailUserActivity.this, "Event not found.", Toast.LENGTH_LONG).show();
+                                }
+                            } else {
+                                // Firestore query failed
+                                Exception e = task.getException();
+                                Toast.makeText(EventDetailUserActivity.this, "Failed to fetch event details: " + (e != null ? e.getMessage() : "Unknown error"), Toast.LENGTH_LONG).show();
+                            }
+                        });
             }
         });
+
 
         acceptBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -234,5 +273,26 @@ public class EventDetailUserActivity extends AppCompatActivity {
             Toast.makeText(this, "Failed to join the waitlist: " + e.getMessage(), Toast.LENGTH_LONG).show();
             e.printStackTrace();
         });
+    }
+
+    /**
+     * Shows a dialog to notify the user that the event requires geolocation.
+     *
+     * @param onConfirm Callback to execute if the user agrees to continue.
+     */
+    private void showGeolocationRequiredDialog(Runnable onConfirm) {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Geolocation Required")
+                .setMessage("This event requires geolocation information to join the waitlist. Do you want to proceed?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    // User agrees to proceed
+                    onConfirm.run();
+                })
+                .setNegativeButton("No", (dialog, which) -> {
+                    // User cancels
+                    dialog.dismiss();
+                })
+                .setCancelable(true)
+                .show();
     }
 }
