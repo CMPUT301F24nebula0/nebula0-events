@@ -142,8 +142,18 @@ public class User {
     public void setPhone(String phone) {
         this.phone = phone;
     }
+
+    /**
+     * correct version
+     * @return
+     */
     public String getProfilePic() {
         return this.profilePic;
+    }
+    public void genProfilePic(){
+        char Firstletter=this.getName().charAt(0);
+        
+
     }
     public void setProfilePic(String profilePic) {
         this.profilePic = profilePic;
@@ -222,7 +232,7 @@ public class User {
 
     /**
      * Returns the profile picture of the user
-     *
+     * outdated to be finished
      * @return  profilePicture  the profile picture of the user
      */
     public String getProfilePicture() {
