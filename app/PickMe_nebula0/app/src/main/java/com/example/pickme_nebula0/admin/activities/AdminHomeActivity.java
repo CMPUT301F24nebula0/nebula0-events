@@ -262,25 +262,25 @@ public class AdminHomeActivity extends AppCompatActivity {
     private void updateImages(){
 
     }
-
+/*
+there is no reason to separate the QR codes from their respective event
+as a QR code doesn't exist on its own  aslo a change made to the QR code
+ */
     private void updateQRCodes(){
-        QRcodes.clear();
 
-
-        facilityAdapter.notifyDataSetChanged();
-        db.collection("Facilities")
+        events.clear();
+        QRAdapter.notifyDataSetChanged();
+        db.collection("Events")
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         for (QueryDocumentSnapshot document : task.getResult()) {
-                            Facility f = document.toObject(Facility.class);
-                            facilities.add(f);
+                               Event e = document.toObject(Event.class);
+                                events.add(e);
                         }
-                        facilityAdapter.notifyDataSetChanged();
+                        QRAdapter.notifyDataSetChanged();
                     }
                 });
-
-
     }
 
     private void updateFacilities(){
