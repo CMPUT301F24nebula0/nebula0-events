@@ -3,6 +3,7 @@ package com.example.pickme_nebula0.event;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,9 +30,14 @@ public class EventDetailUserActivity extends AppCompatActivity {
     private final String userID = DeviceManager.getDeviceId();
     private DBManager dbManager;
 
-    // UI components
-    private Button acceptButton, declineButton, unregisterButton, backButton, registerButton;
+    // main UI components
+    private Button unregisterButton, backButton, registerButton;
     private TextView eventDetailsTextView, userStatusTextView;
+
+    // notification UI components
+    private Button acceptButton, declineButton;
+    private TextView notificationMessage;
+    private LinearLayout notificationLayout;
 
     private FirebaseFirestore db;
 
@@ -58,21 +64,30 @@ public class EventDetailUserActivity extends AppCompatActivity {
             finish();
         }
 
-        // Link components
+        // link main components
         backButton = findViewById(R.id.button_edu_back);
-        acceptButton = findViewById(R.id.button_edu_accept);
-        declineButton = findViewById(R.id.button_edu_decline);
         unregisterButton = findViewById(R.id.button_edu_unregister);
         eventDetailsTextView = findViewById(R.id.textView_edu_details);
         userStatusTextView = findViewById(R.id.textView_edu_status);
         registerButton = findViewById(R.id.button_edu_reg);
 
-        // Initially set all buttons invisible (may take a second to query DB and update visibility)
-        acceptButton.setVisibility(View.GONE);
-        declineButton.setVisibility(View.GONE);
+        // link notification components
+        notificationLayout = findViewById(R.id.notification_layout);
+        acceptButton = findViewById(R.id.entrant_event_notification_accept);
+        declineButton = findViewById(R.id.entrant_event_notification_decline);
+        notificationMessage = findViewById(R.id.entrant_event_notification_message);
+
+        // Initially set main buttons invisible (may take a second to query DB and update visibility)
         unregisterButton.setVisibility(View.GONE);
         registerButton.setVisibility(View.GONE);
 
+        // initially set notification invisible, but components to visible
+        notificationLayout.setVisibility(View.GONE);
+        acceptButton.setVisibility(View.VISIBLE);
+        declineButton.setVisibility(View.VISIBLE);
+        notificationMessage.setVisibility(View.VISIBLE);
+
+        // when back button clicked, finish activity
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -80,6 +95,7 @@ public class EventDetailUserActivity extends AppCompatActivity {
             }
         });
 
+        // when register button clicked, user joins waitlist
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -87,6 +103,17 @@ public class EventDetailUserActivity extends AppCompatActivity {
             }
         });
 
+        // when unregister button clicked, user status set to canceled
+        unregisterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO - we can change this later to fully remove them if we don't want a user of leaves of their own volition CANCELED
+                dbManager.setRegistrantStatus(eventID,userID,DBManager.RegistrantStatus.CANCELED);
+                renderUserStatus();
+            }
+        });
+
+        // when accept button clicked, user status set to confirmed
         acceptButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -95,6 +122,7 @@ public class EventDetailUserActivity extends AppCompatActivity {
             }
         });
 
+        // when decline button clicked, user status set to canceled
         declineButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -183,24 +211,45 @@ public class EventDetailUserActivity extends AppCompatActivity {
      * @see DBManager
      */
     private void renderBasedOnUserStatus(String status){
+        // show status
         userStatusTextView.setText(status);
+
+        // user cannot register (assumption: they have already registered)
         registerButton.setVisibility(View.GONE);
 
+        // Toast to show user this is running?
         Toast.makeText(EventDetailUserActivity.this,status,Toast.LENGTH_SHORT);
 
+        // user is waitlisted or confirmed:
+        // - no notification sent to them
+        // - can unregister from event
         if (status.equalsIgnoreCase("WAITLISTED") || status.equalsIgnoreCase("CONFIRMED")){
-            acceptButton.setVisibility(View.GONE);
-            declineButton.setVisibility(View.GONE);
+            notificationLayout.setVisibility(View.GONE);
             unregisterButton.setVisibility(View.VISIBLE);
+
+        // user is selected:
+        // - notification sent to them: accept or decline
         } else if (status.equalsIgnoreCase("SELECTED")) {
-            acceptButton.setVisibility(View.VISIBLE);
-            declineButton.setVisibility(View.VISIBLE);
+            showNotificationChoice();
             unregisterButton.setVisibility(View.GONE);
+
+        // user is canceled:
+        // - canceled their registration in the event
         } else if (status.equalsIgnoreCase("CANCELLED")){
-            acceptButton.setVisibility(View.GONE);
-            declineButton.setVisibility(View.GONE);
+            notificationLayout.setVisibility(View.GONE);
             unregisterButton.setVisibility(View.GONE);
         }
+    }
+
+    /**
+     * Shows a notification allowing user to accept or decline
+     */
+    private void showNotificationChoice() {
+        // set text to say user is accepted
+        String message = "You have been accepted!";
+        notificationMessage.setText(message);
+        // show notification layout
+        notificationLayout.setVisibility(View.VISIBLE);
     }
 
     /**
