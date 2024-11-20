@@ -1,9 +1,15 @@
 package com.example.pickme_nebula0.user;
 
+import android.graphics.Color;
+
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.awt.*;
+
+
+
 
 
 /**
@@ -117,7 +123,7 @@ public class User {
     /**
      * Sets the first name of the user
      *
-     * @param  firstName  the first name of the user
+     * @param  name  the first name of the user
      */
     public void setName(String name) {
         this.name = name;
@@ -152,6 +158,11 @@ public class User {
     }
     public void genProfilePic(){
         char Firstletter=this.getName().charAt(0);
+        BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+        g = image.createGraphics();  // not sure on this line, but this seems more right
+        g.setColor(Color.white);
+        g.fillRect(0, 0, 100, 100); // give the whole image a white background
+        g.setColor(Color.blue);
         
 
     }
