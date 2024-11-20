@@ -191,7 +191,6 @@ public class UserInfoActivity extends AppCompatActivity {
      * @return a blank string if all is valid, else returns a warning string containing information of invalidities
      */
     public static String validateUserInfo(String name, String email, String phone){
-        // TODO: data valildation should probably be done within the User Class, but this will work for now
         String warning = "";
         // verify name is non-numeric
         if (name.matches(".*\\d.*")){
@@ -230,7 +229,13 @@ public class UserInfoActivity extends AppCompatActivity {
 
     public void renderProfilePicture(Uri uri){
         try {
-            Picasso.get().load(uri).into(profilePicImageView);
+            Picasso.get()
+                    .load(uri)
+                    .fit()
+                    .centerInside()
+                    .placeholder(R.drawable.ic_profile_placeholder)
+                    .error(R.drawable.ic_profile_placeholder)
+                    .into(profilePicImageView);
         } catch(Exception e){
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
@@ -244,7 +249,7 @@ public class UserInfoActivity extends AppCompatActivity {
     }
 
     private void setAutoProfilePic(){
-        Toast.makeText(this,"Replacing image with auto",Toast.LENGTH_LONG);
+        Toast.makeText(this,"Replacing image with auto",Toast.LENGTH_LONG).show();
 
         // TODO - tie this in with auto gen profile pics
 //        Uri generatedImageUri;
