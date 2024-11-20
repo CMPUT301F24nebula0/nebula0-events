@@ -1,5 +1,9 @@
 package com.example.pickme_nebula0.organizer.fragments;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -7,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -36,9 +41,9 @@ public class OrganizerSelectedFragment extends Fragment {
         RecyclerView recyclerView = view.findViewById(R.id.selected_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        adapter = new SelectedAdapter(getContext(), selectedUsers);
-        recyclerView.setAdapter(adapter);
         eventID = getActivity().getIntent().getStringExtra("eventID");
+        adapter = new SelectedAdapter(getContext(), selectedUsers, eventID);
+        recyclerView.setAdapter(adapter);
 
         db = FirebaseFirestore.getInstance();
 
