@@ -1,10 +1,12 @@
 package com.example.pickme_nebula0.user.activities;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -13,6 +15,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.PickVisualMediaRequest;
+
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -48,15 +56,29 @@ public class UserInfoActivity extends AppCompatActivity {
     ImageView profilePicImageView;
     Button changeProfilePicButton;
     Button removeProfilePicButton;
+    ActivityResultLauncher<PickVisualMediaRequest> pickMedia;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_info);
-
-        boolean newUser = getIntent().getBooleanExtra("newUser",false);
-        deviceID = DeviceManager.getDeviceId();
         dbManager = new DBManager();
+
+        deviceID = DeviceManager.getDeviceId();
+        boolean newUser = getIntent().getBooleanExtra("newUser",false);
+
+        // Registers a photo picker activity launcher in single-select mode.
+        pickMedia =
+                registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
+                    // Callback is invoked after the user selects a media item or closes the
+                    // photo picker.
+                    if (uri != null) {
+                        FBStorageManager.uploadProfilePic(uri,deviceID,this);
+                        renderProfilePicture(uri);
+                    } else {
+                        setAutoProfilePic();
+                    }
+                });
 
         headerTextView = findViewById(R.id.textViewUserInfoHeader);
         nameField = findViewById(R.id.editTextUserInfoName);
@@ -111,14 +133,14 @@ public class UserInfoActivity extends AppCompatActivity {
         changeProfilePicButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO
+                openImagePicker();
             }
         });
 
         removeProfilePicButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO
+                setAutoProfilePic();
             }
         });
 
@@ -150,7 +172,7 @@ public class UserInfoActivity extends AppCompatActivity {
             phoneField.setText(castedUser.getPhone());
         }
         enableNotifBox.setChecked(castedUser.getNotificationsEnabled());
-//        FBStorageManager.retrieveProfilePicUri(deviceID,this::renderProfilePicture,this::generateAndSetProfilePicture);
+        FBStorageManager.retrieveProfilePicUri(deviceID,this::renderProfilePicture,this::setAutoProfilePic);
     }
 
     /**
@@ -205,34 +227,31 @@ public class UserInfoActivity extends AppCompatActivity {
         return warning;
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == 100) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, you can notify the user in the background
-                Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show();
-
-            } else {
-                // Permission denied, handle accordingly
-                Toast.makeText(this, "Permission denied, can't show notifications", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
 
     public void renderProfilePicture(Uri uri){
         try {
             Picasso.get().load(uri).into(profilePicImageView);
         } catch(Exception e){
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-
         }
     }
 
-    public void generateAndSetProfilePicture(){
-        // TODO
+
+    private void openImagePicker() {
+        pickMedia.launch(new PickVisualMediaRequest.Builder()
+                .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                .build());
     }
+
+    private void setAutoProfilePic(){
+        Toast.makeText(this,"Replacing image with auto",Toast.LENGTH_LONG);
+
+        // TODO - tie this in with auto gen profile pics
+//        Uri generatedImageUri;
+//        FBStorageManager.uploadProfilePic(generatedImageUri,deviceID,this);
+//        renderProfilePicture(generatedImageUri);
+    }
+
 
 
 }
