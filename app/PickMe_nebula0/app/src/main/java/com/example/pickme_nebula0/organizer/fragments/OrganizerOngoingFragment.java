@@ -1,7 +1,7 @@
 package com.example.pickme_nebula0.organizer.fragments;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,6 +49,7 @@ public class OrganizerOngoingFragment extends Fragment {
         loadOngoingEvents();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void loadOngoingEvents() {
         ongoingEvents.clear();
         db.collection("Events")

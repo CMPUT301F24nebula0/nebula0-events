@@ -1,5 +1,6 @@
 package com.example.pickme_nebula0;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.provider.Settings;
@@ -20,6 +21,7 @@ public class DeviceManager {
      *
      * @return string containing hardware id provided by Andriod
      */
+    @SuppressLint("HardwareIds")
     public static String getDeviceId() {
         return Settings.Secure.getString(PickMeApplication.getInstance().getContentResolver(), Settings.Secure.ANDROID_ID);
     }

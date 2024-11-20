@@ -17,8 +17,8 @@ import com.example.pickme_nebula0.user.activities.UserDetailActivity;
 import java.util.ArrayList;
 
 public class SelectedAdapter extends RecyclerView.Adapter<SelectedAdapter.SelectedViewHolder> {
-    private ArrayList<User> selectedUsers;
-    private Context context;
+    private final ArrayList<User> selectedUsers;
+    private final Context context;
 
     public SelectedAdapter(Context context, ArrayList<User> selectedUsers) {
         this.context = context;

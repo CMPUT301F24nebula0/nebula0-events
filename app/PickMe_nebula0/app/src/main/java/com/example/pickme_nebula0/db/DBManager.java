@@ -11,7 +11,7 @@ import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.event.Event;
 import com.example.pickme_nebula0.facility.Facility;
 import com.example.pickme_nebula0.notification.Notification;
-import com.example.pickme_nebula0.qr.QRCodeManager;
+import com.example.pickme_nebula0.qr.QRCodeGenerator;
 import com.example.pickme_nebula0.user.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -59,7 +59,7 @@ public class DBManager {
 
     public String notificationCollection = "Notifications";
 
-    private QRCodeManager qrCodeManager;
+    private QRCodeGenerator qrCodeManager;
 
 
     /**
@@ -82,7 +82,7 @@ public class DBManager {
     public DBManager() {
 
         db = FirebaseFirestore.getInstance();
-        qrCodeManager = new QRCodeManager();
+        qrCodeManager = new QRCodeGenerator();
     }
 
 // ------------- \ Function Interfaces / -----------------------------------------------------------
@@ -188,7 +188,20 @@ public class DBManager {
      * @param onFailureCallback action performed if user not found in database
      */
     public void getUser(String deviceID, Obj2VoidCallback onSuccessCallback,Void2VoidCallback onFailureCallback) {
-        getDocumentAsObject(usersCollection,deviceID,this::userConverter,onSuccessCallback,onFailureCallback);
+//        getDocumentAsObject(usersCollection,deviceID,this::userConverter,onSuccessCallback,onFailureCallback);
+        DocumentReference userDocRef = db.collection(usersCollection).document(deviceID);
+        userDocRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                     User user = document.toObject(User.class);
+                     onSuccessCallback.run(user);
+                }
+            }
+            else{
+                onFailureCallback.run();
+            }
+        });
     }
 
     /**
@@ -568,9 +581,9 @@ public class DBManager {
      * Ensures all users registered in an event are fetched before calling onSuccessCallback.
      * Passes list of Users to the callback (ArrayList<User> as an Object class.)
      * Used for sampling users.
-     * @param eventID
-     * @param status
-     * @param onSuccessCallback
+     * @param eventID eventID
+     * @param status status
+     * @param onSuccessCallback onSuccessCallback
      */
     public void loadAllUsersRegisteredInEvent(String eventID, RegistrantStatus status, DBManager.Obj2VoidCallback onSuccessCallback) {
         Query waitlistedUsersQuery = db.collection(eventsCollection)
@@ -1102,7 +1115,7 @@ public class DBManager {
      * @param fieldName name of field which we want to update
      * @param newVal value which we want to set this field to
      */
-    private void updateField(DocumentReference doc,String fieldName, Object newVal){
+    public void updateField(DocumentReference doc,String fieldName, Object newVal){
         String operationDescription = String.format("updateField [C-%s,D-%s, F-%s]",doc.getParent().getId(),doc.getId(),fieldName);
         doc.update(fieldName,newVal).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
