@@ -19,42 +19,53 @@ import com.google.android.material.tabs.TabLayoutMediator;
 
 public class OrganizerHomeActivity extends AppCompatActivity {
 
-    // tabs
+    // tabs: "Past" and "Ongoing"
     private final String[] tabTitles = new String[]{"Past", "Ongoing"};
+
+    // back button and create event button
+    private Button backButton;
+    private Button createEventButton;
+
+    // display tabs: "past" and "ongoing"
+    private ViewPager2 viewPager;
+    // displays corresponding fragment when tab is selected
+    private TabLayout tabLayout;
+    // Adapter for ViewPager2 (to provide fragments)
+    private FragmentStateAdapter pagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // attach screen layout xml file
+        // attach components to layout
         setContentView(R.layout.activity_organizer_home);
+        viewPager = findViewById(R.id.view_pager);
+        tabLayout = findViewById(R.id.tab_layout);
 
-        // binding elements
-        ViewPager2 viewPager = findViewById(R.id.view_pager);
-        TabLayout tabLayout = findViewById(R.id.tab_layout);
-        FragmentStateAdapter pagerAdapter = new ScreensSlidePagerAdapter(this);
-        final Button backButton = findViewById(R.id.backButton);
-        final Button createEventButton = findViewById(R.id.createEventButton);
-
+        pagerAdapter = new ScreensSlidePagerAdapter(this);
         viewPager.setAdapter(pagerAdapter);
 
-        // Initialize TabLayout and link it with ViewPager2
+        backButton = findViewById(R.id.backButton);
+        createEventButton = findViewById(R.id.createEventButton);
+
+
+        // Sync tabLayout with viewPager
         new TabLayoutMediator(tabLayout, viewPager,
                 (tab, position) -> tab.setText(tabTitles[position])
         ).attach();
 
-        // back button
+
+        // back button and create event button
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getOnBackPressedDispatcher().onBackPressed();
             }
         });
-
-        // once create event button pressed
         createEventButton.setOnClickListener(view -> navigateTo(OrganizerCreateEventActivity.class));
 
-        // to keep track of which tab is selected
+
+        // toggles the visibility of the createEventButton depending on selected tab
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
@@ -73,7 +84,7 @@ public class OrganizerHomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    // Adapter for ViewPager2
+    // Supplies the fragments for the ViewPager2
     private class ScreensSlidePagerAdapter extends FragmentStateAdapter {
         public ScreensSlidePagerAdapter(AppCompatActivity fa) {
             super(fa);

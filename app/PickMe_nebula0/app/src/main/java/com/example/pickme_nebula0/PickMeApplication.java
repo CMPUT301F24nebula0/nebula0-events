@@ -37,6 +37,7 @@ public class PickMeApplication extends Application {
                 manager.createNotificationChannel(channel);
             }
         }
+
     }
 
     public static PickMeApplication getInstance(){

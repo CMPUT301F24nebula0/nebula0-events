@@ -33,15 +33,23 @@ public class LaunchActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         EdgeToEdge.enable(this);
+
+        // set layout
         setContentView(R.layout.activity_launch);
+
+        // set padding for system bars
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
+        // get device ID
         deviceID = DeviceManager.getDeviceId();
+
+        // check if user is registered
         dbManager = new DBManager();
         dbManager.checkUserRegistration(deviceID,this::registeredCallback,this::unregisteredCallback);
     }
@@ -56,7 +64,8 @@ public class LaunchActivity extends AppCompatActivity {
     }
 
     /**
-     * Action to take if the user is not yet in the database
+     * Action to take if the user is not in the database
+     * Sends user to user info screen
      */
     private void unregisteredCallback(){
         Intent intent = new Intent(LaunchActivity.this, UserInfoActivity.class);
@@ -66,7 +75,8 @@ public class LaunchActivity extends AppCompatActivity {
     }
 
     /**
-     * Action to take if the user is already in the database
+     * Action to take if the user is in the database
+     * Sends user to home screen
      */
     private void registeredCallback(){
         MyFirebaseMessagingService.registerFCMToken(deviceID);

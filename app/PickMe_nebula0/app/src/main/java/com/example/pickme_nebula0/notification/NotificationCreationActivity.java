@@ -45,7 +45,6 @@ public class NotificationCreationActivity extends AppCompatActivity {
             finish();
         }
 
-
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) { finish(); }
@@ -105,7 +104,7 @@ public class NotificationCreationActivity extends AppCompatActivity {
      * If valid, attempts to send message and returns true. If invalid,
      * shows invalid data alert and returns false.
      *
-     * @param status
+     * @param status status of entrants to send message to, null if all entrants
      * @return True if we attempted to send message, False if fields were invalid
      */
     private boolean getFieldsAndAttemptNotification(DBManager.RegistrantStatus status){

@@ -18,35 +18,44 @@ import com.example.pickme_nebula0.organizer.fragments.OrganizerWaitlistedFragmen
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
+/**
+ * Class for the Organizer Event Participants Activity
+ *
+ * @Author: Taekwan Yoon
+ */
 public class OrganizerEventParticipantsActivity extends AppCompatActivity {
 
-    //tabs
+    // tabs: Waitlisted, Selected, Confirmed, Cancelled
     private final String[] tabTitles = new String[] {"Waitlisted", "Selected", "Confirmed", "Cancelled"};
+
+    // UI components
+    ViewPager2 viewPager;
+    TabLayout tabLayout;
+    FragmentStateAdapter pagerAdapter;
+    Button backButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // set the layout
         setContentView(R.layout.activity_organizer_participants);
 
-        ViewPager2 viewPager = findViewById(R.id.view_pager);
-        TabLayout tabLayout = findViewById(R.id.tab_layout);
-        FragmentStateAdapter pagerAdapter = new ScreensSlidePagerAdapter(this);
-        final Button backButton = findViewById(R.id.backButton);
+        // initialize UI components
+        viewPager = findViewById(R.id.view_pager);
+        tabLayout = findViewById(R.id.tab_layout);
+        pagerAdapter = new ScreensSlidePagerAdapter(this);
+        backButton = findViewById(R.id.backButton);
 
+        // Set the adapter for ViewPager2
         viewPager.setAdapter(pagerAdapter);
 
-        // Initialize TabLayout and link it with ViewPager2
+        // Sync TabLayout with ViewPager2
         new TabLayoutMediator(tabLayout, viewPager,
                 (tab, position) -> tab.setText(tabTitles[position])
         ).attach();
 
-        // back button
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) { getOnBackPressedDispatcher().onBackPressed(); }
-        });
-
+        // Set the current item to the selected tab
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
@@ -54,9 +63,18 @@ public class OrganizerEventParticipantsActivity extends AppCompatActivity {
             }
         });
 
-
+        // back button
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) { getOnBackPressedDispatcher().onBackPressed(); }
+        });
     }
 
+    /**
+     * Class for the Screens Slide Pager Adapter
+     *
+     * @author Taekwan Yoon
+     */
     private class ScreensSlidePagerAdapter extends FragmentStateAdapter {
         public ScreensSlidePagerAdapter(AppCompatActivity fa) {
             super(fa);
@@ -65,10 +83,15 @@ public class OrganizerEventParticipantsActivity extends AppCompatActivity {
         @NonNull
         @Override
         public Fragment createFragment(int position) {
-            if (position == 0) { return new OrganizerWaitlistedFragment(); }
-            else if (position == 1) { return new OrganizerSelectedFragment(); }
-            else if (position == 2) { return new OrganizerConfirmedFragment(); }
-            else { return new OrganizerCancelledFragment(); }
+            switch (position) {
+                // Waitlisted, Selected, Confirmed, Cancelled
+                case 0: return new OrganizerWaitlistedFragment();
+                case 1: return new OrganizerSelectedFragment();
+                case 2: return new OrganizerConfirmedFragment();
+                case 3: return new OrganizerCancelledFragment();
+            }
+            // default to Waitlisted
+            return new OrganizerWaitlistedFragment();
         }
 
         @Override

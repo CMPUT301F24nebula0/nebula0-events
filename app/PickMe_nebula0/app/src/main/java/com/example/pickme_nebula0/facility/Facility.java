@@ -18,9 +18,8 @@ public class Facility {
      * Constructor
      */
     public Facility(String facilityName, String facilityAddress) {
-        dbManager = new DBManager();
-        organizerID = DeviceManager.getDeviceId();
-
+        this.dbManager = new DBManager();
+        this.organizerID = DeviceManager.getDeviceId();
         this.name = facilityName;
         this.address = facilityAddress;
     }
@@ -32,7 +31,7 @@ public class Facility {
 
     }
 
-    public Facility(String facilityID,String organizerID,String facilityName, String facilityAddress){
+    public Facility(String facilityID, String organizerID, String facilityName, String facilityAddress){
         dbManager = new DBManager();
         this.organizerID = organizerID;
         this.facilityID = facilityID;
