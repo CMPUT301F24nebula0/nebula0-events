@@ -22,7 +22,6 @@ public class PickMeApplication extends Application {
         instance = this;
         Intent serviceIntent = new Intent(this, NotificationService.class);
         startService(serviceIntent);
-
     }
 
     public static PickMeApplication getInstance(){

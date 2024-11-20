@@ -11,7 +11,7 @@ import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.event.Event;
 import com.example.pickme_nebula0.facility.Facility;
 import com.example.pickme_nebula0.notification.Notification;
-import com.example.pickme_nebula0.qr.QRCodeManager;
+import com.example.pickme_nebula0.qr.QRCodeGenerator;
 import com.example.pickme_nebula0.user.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -59,7 +59,7 @@ public class DBManager {
 
     public String notificationCollection = "Notifications";
 
-    private QRCodeManager qrCodeManager;
+    private QRCodeGenerator qrCodeManager;
 
 
     /**
@@ -82,7 +82,7 @@ public class DBManager {
     public DBManager() {
 
         db = FirebaseFirestore.getInstance();
-        qrCodeManager = new QRCodeManager();
+        qrCodeManager = new QRCodeGenerator();
     }
 
 // ------------- \ Function Interfaces / -----------------------------------------------------------
@@ -568,9 +568,9 @@ public class DBManager {
      * Ensures all users registered in an event are fetched before calling onSuccessCallback.
      * Passes list of Users to the callback (ArrayList<User> as an Object class.)
      * Used for sampling users.
-     * @param eventID
-     * @param status
-     * @param onSuccessCallback
+     * @param eventID eventID
+     * @param status status
+     * @param onSuccessCallback onSuccessCallback
      */
     public void loadAllUsersRegisteredInEvent(String eventID, RegistrantStatus status, DBManager.Obj2VoidCallback onSuccessCallback) {
         Query waitlistedUsersQuery = db.collection(eventsCollection)
