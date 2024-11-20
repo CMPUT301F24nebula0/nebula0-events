@@ -60,6 +60,7 @@ public class EventDetailAdminActivity extends AppCompatActivity {
         fetchEventDetails(eventID);
 
 
+
     }
 
     private void fetchEventDetails(String eventID) {
