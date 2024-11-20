@@ -3,11 +3,13 @@ package com.example.pickme_nebula0.user.activities;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,7 +20,9 @@ import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.SharedDialogue;
+import com.example.pickme_nebula0.db.FBStorageManager;
 import com.example.pickme_nebula0.user.User;
+import com.squareup.picasso.Picasso;
 
 // TODO: add profile image LATER
 
@@ -41,6 +45,9 @@ public class UserInfoActivity extends AppCompatActivity {
     Button confirmButton;
     Button cancelButton;
     Button facilityButton;
+    ImageView profilePicImageView;
+    Button changeProfilePicButton;
+    Button removeProfilePicButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +66,9 @@ public class UserInfoActivity extends AppCompatActivity {
         confirmButton= findViewById(R.id.buttonUserInfoConfirm);
         cancelButton = findViewById(R.id.buttonUserInfoCancel);
         facilityButton = findViewById(R.id.buttonUserInfoManageFacility);
+        profilePicImageView = findViewById(R.id.imageViewProfilePic);
+        changeProfilePicButton = findViewById(R.id.buttonChangePicture);
+        removeProfilePicButton = findViewById(R.id.buttonRemovePicture);
 
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,12 +108,28 @@ public class UserInfoActivity extends AppCompatActivity {
             }
         });
 
+        changeProfilePicButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO
+            }
+        });
+
+        removeProfilePicButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO
+            }
+        });
 
         if (newUser){ // new user's require a slightly different screen layout
             headerTextView.setText(R.string.user_info_header_first_time);
             cancelButton.setVisibility(View.GONE);
             facilityButton.setVisibility(View.GONE);
             enableNotifBox.setChecked(true);
+            profilePicImageView.setVisibility(View.GONE);
+            changeProfilePicButton.setVisibility(View.GONE);
+            removeProfilePicButton.setVisibility(View.GONE);
         } else{ // returning users need to see their stored info, read it from DB
             headerTextView.setText(R.string.user_info_header_returning);
             dbManager.getUser(deviceID,this::populateFieldsFromDB,this::failedToPopulateFieldsFromDB);
@@ -124,6 +150,7 @@ public class UserInfoActivity extends AppCompatActivity {
             phoneField.setText(castedUser.getPhone());
         }
         enableNotifBox.setChecked(castedUser.getNotificationsEnabled());
+//        FBStorageManager.retrieveProfilePicUri(deviceID,this::renderProfilePicture,this::generateAndSetProfilePicture);
     }
 
     /**
@@ -192,6 +219,19 @@ public class UserInfoActivity extends AppCompatActivity {
                 Toast.makeText(this, "Permission denied, can't show notifications", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    public void renderProfilePicture(Uri uri){
+        try {
+            Picasso.get().load(uri).into(profilePicImageView);
+        } catch(Exception e){
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+
+        }
+    }
+
+    public void generateAndSetProfilePicture(){
+        // TODO
     }
 
 
