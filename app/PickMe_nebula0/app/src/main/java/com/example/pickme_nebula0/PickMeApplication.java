@@ -1,17 +1,17 @@
 package com.example.pickme_nebula0;
 
-import static androidx.activity.result.ActivityResultCallerKt.registerForActivityResult;
-
-import android.app.Application;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.Manifest;
+import android.app.Activity;
+import android.app.Application;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.pm.PackageManager;
 import android.os.Build;
-import android.util.Log;
 
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import com.google.firebase.FirebaseApp;
 
 public class PickMeApplication extends Application {
     private static PickMeApplication instance;
@@ -20,8 +20,23 @@ public class PickMeApplication extends Application {
     public void onCreate(){
         super.onCreate();
         instance = this;
-        Intent serviceIntent = new Intent(this, NotificationService.class);
-        startService(serviceIntent);
+
+        FirebaseApp.initializeApp(this);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    "pickme_cID", // Channel ID
+                    "PickMeAll", // Channel Name
+                    NotificationManager.IMPORTANCE_HIGH
+            );
+            channel.setDescription("All notifications for PickMe App");
+
+
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            if (manager != null) {
+                manager.createNotificationChannel(channel);
+            }
+        }
 
     }
 
@@ -29,20 +44,4 @@ public class PickMeApplication extends Application {
         return instance;
     }
 
-//    private void setUpNotifs(){
-//        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
-//        ) {
-//            Log.d("NOTIF","permission granted");
-//            // Permission is granted
-//            // Proceed forward to create a notification
-//        } else {
-//            Log.d("NOTIF","permission denied");
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//                if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-//                        != PackageManager.PERMISSION_GRANTED) {
-//                    ActivityCompat.requestPermissions(this.getApplicationContext(), new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1);
-//                }
-//            }
-//        }
-//    }
 }

@@ -1,13 +1,13 @@
 package com.example.pickme_nebula0.start.activities;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import android.Manifest;
@@ -22,8 +22,24 @@ import com.example.pickme_nebula0.notification.MessageViewActivity;
 import com.example.pickme_nebula0.organizer.activities.OrganizerHomeActivity;
 import com.example.pickme_nebula0.user.activities.UserInfoActivity;
 
+/**
+ * Home page activity for the app
+ * Allows user to navigate to different parts of the app
+ * such as profile, admin, entrant, organizer, and messages
+ * Also checks for notification permission
+ *
+ * @Author Taekwan Yoon
+ */
 public class HomePageActivity extends AppCompatActivity {
+    // Request code for permission
     private static final int REQUEST_CODE_PERMISSION = 100;
+
+    // UI components
+    Button profileButton;
+    Button adminButton;
+    Button entrantButton;
+    Button organizerButton;
+    Button messagesButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,11 +49,11 @@ public class HomePageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home_page);
 
         // buttons on screen
-        final Button profileButton = findViewById(R.id.profile_button);
-        final Button adminButton = findViewById(R.id.adminButton);
-        final Button entrantButton = findViewById(R.id.entrantButton);
-        final Button organizerButton = findViewById(R.id.organizerButton);
-        final Button messagesButton = findViewById(R.id.button_messages);
+        profileButton = findViewById(R.id.profile_button);
+        adminButton = findViewById(R.id.adminButton);
+        entrantButton = findViewById(R.id.entrantButton);
+        organizerButton = findViewById(R.id.organizerButton);
+        messagesButton = findViewById(R.id.button_messages);
 
         // actions once buttons are pressed
         profileButton.setOnClickListener(view -> navigateTo(UserInfoActivity.class));
@@ -55,24 +71,40 @@ public class HomePageActivity extends AppCompatActivity {
                         new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQUEST_CODE_PERMISSION);
             }
         }
+
+        // Check if media access permission is granted
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_MEDIA_IMAGES}, 100);
+        }
     }
 
-    // function for switching screens through intent
+    /**
+     * Navigate to the target activity
+     * @param targetActivity
+     */
     private void navigateTo(Class<?> targetActivity ) {
         Intent intent = new Intent(HomePageActivity.this, targetActivity);
         startActivity(intent);
     }
 
-    // function to generate toast notif to let user know the effect of their permission selection
+    /**
+     * Generate a toast notification to let the user know the effect of their permission selection
+     *
+     * @param requestCode The request code passed in requestPermissions
+     * @param permissions The requested permissions. Never null.
+     * @param grantResults The grant results for the corresponding permissions
+     *     which is either {@link android.content.pm.PackageManager#PERMISSION_GRANTED}
+     *     or {@link android.content.pm.PackageManager#PERMISSION_DENIED}. Never null.
+     *
+     */
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == REQUEST_CODE_PERMISSION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission granted, you can notify the user in the background
                 Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show();
-
             } else {
                 // Permission denied, handle accordingly
                 Toast.makeText(this, "Permission denied, can't show notifications", Toast.LENGTH_SHORT).show();
