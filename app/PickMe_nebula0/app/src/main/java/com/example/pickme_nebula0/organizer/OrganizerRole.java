@@ -3,7 +3,6 @@ package com.example.pickme_nebula0.organizer;
 import android.util.Log;
 
 import com.example.pickme_nebula0.db.DBManager;
-import com.example.pickme_nebula0.db.DBManagerStatic;
 import com.example.pickme_nebula0.entrant.EntrantRole;
 import com.example.pickme_nebula0.event.Event;
 import com.example.pickme_nebula0.user.User;
@@ -28,6 +27,7 @@ public class OrganizerRole extends User {
     private static String usersSelectedKey = "selected";
     private static String usersNotSelectedKey = "not selected";
     private static String organizer_tag = "OrganizerRole";
+    private static DBManager dbm = new DBManager();
 
     /**
      * Constructor
@@ -299,8 +299,8 @@ public class OrganizerRole extends User {
     // US 02.07.02 As an organizer I want to send notifications to all selected entrants
     // US 02.07.03 As an organizer I want to send a notification to all canceled entrants
 
-    public boolean notifyEntrantsByStatus(String eventID, String title, String message, DBManagerStatic.RegistrantStatus status) {
-        DBManagerStatic.notifyEntrantsOfStatus(title, message, eventID, status);
+    public boolean notifyEntrantsByStatus(String eventID, String title, String message, DBManager.RegistrantStatus status) {
+        dbm.notifyEntrantsOfStatus(title, message, eventID, status);
         return true;
     }
 
@@ -313,7 +313,7 @@ public class OrganizerRole extends User {
         if (!user.getNotificationsEnabled()) {return false;}
         String title = "Selected For Event";
         String message = "You have been selected to join the following event: " + event.getEventName();
-        DBManagerStatic.createNotification(title, message, user.getUserID(), event.getEventID());
+        dbm.createNotification(title, message, user.getUserID(), event.getEventID());
         return true;
     }
 
@@ -321,7 +321,7 @@ public class OrganizerRole extends User {
         if (!user.getNotificationsEnabled()) {return false;}
         String title = "Selected For Event";
         String message = "You have been selected to join the following event, since some have declined their invite: " + event.getEventName();
-        DBManagerStatic.createNotification(title, message, user.getUserID(), event.getEventID());
+        dbm.createNotification(title, message, user.getUserID(), event.getEventID());
         return true;
     }
 
@@ -329,7 +329,7 @@ public class OrganizerRole extends User {
         if (!user.getNotificationsEnabled()) {return false;}
         String title = "Not Selected For Event";
         String message = "You have not been sampled for the following event, but you will remain waitlisted in case a spot opens up: " + event.getEventName();
-        DBManagerStatic.createNotification(title, message, user.getUserID(), event.getEventID());
+        dbm.createNotification(title, message, user.getUserID(), event.getEventID());
         return true;
     }
 
@@ -337,13 +337,13 @@ public class OrganizerRole extends User {
         if (!user.getNotificationsEnabled()) {return false;}
         String title = "Cancelled Event Invite";
         String message = "Your invitation to join the following event has been cancelled: " + event.getEventName();
-        DBManagerStatic.createNotification(title, message, user.getUserID(), event.getEventID());
+        dbm.createNotification(title, message, user.getUserID(), event.getEventID());
         return true;
     }
 
     // -------------- UTILITY FUNCTIONS
-    public static void sampledEntrantsExist(String eventID, DBManagerStatic.Void2VoidCallback entrantsExistCallback, DBManagerStatic.Void2VoidCallback entrantsNotExistCallback) {
-        DBManager dbm = new DBManager();
+    public static void sampledEntrantsExist(String eventID, DBManager.Void2VoidCallback entrantsExistCallback, DBManager.Void2VoidCallback entrantsNotExistCallback) {
+//        DBManager dbm = new DBManager();
         CollectionReference eventRegistrantsRef = dbm.db.collection(dbm.eventsCollection)
                 .document(eventID)
                 .collection(dbm.eventRegistrantsCollection);
@@ -365,8 +365,8 @@ public class OrganizerRole extends User {
     }
 
     // for resampling users
-    private static void countConfirmedAndSelected(String eventID, DBManagerStatic.Obj2VoidCallback onSuccessCallback) {
-        DBManager dbm = new DBManager();
+    private static void countConfirmedAndSelected(String eventID, DBManager.Obj2VoidCallback onSuccessCallback) {
+//        DBManager dbm = new DBManager();
         // reference to EventRegistrants subcollection
         CollectionReference eventRegistrantsRef = dbm.db.collection(dbm.eventsCollection)
                 .document(eventID)
