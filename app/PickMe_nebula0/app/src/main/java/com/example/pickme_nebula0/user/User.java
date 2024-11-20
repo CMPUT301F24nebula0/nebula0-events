@@ -114,11 +114,6 @@ public class User {
         return this.name;
     }
 
-    /**
-     * Sets the first name of the user
-     *
-     * @param  firstName  the first name of the user
-     */
     public void setName(String name) {
         this.name = name;
     }
@@ -220,6 +215,7 @@ public class User {
         }
     }
 
+    // TODO get rid of these
     /**
      * Returns the profile picture of the user
      *

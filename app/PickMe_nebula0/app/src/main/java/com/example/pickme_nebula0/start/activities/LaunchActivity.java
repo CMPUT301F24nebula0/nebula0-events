@@ -10,6 +10,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.pickme_nebula0.MyFirebaseMessagingService;
 import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
@@ -78,9 +79,11 @@ public class LaunchActivity extends AppCompatActivity {
      * Sends user to home screen
      */
     private void registeredCallback(){
+        MyFirebaseMessagingService.registerFCMToken(deviceID);
         Intent intent = new Intent(LaunchActivity.this, HomePageActivity.class);
         startActivity(intent);
         returning = true;
     }
+
 
 }
