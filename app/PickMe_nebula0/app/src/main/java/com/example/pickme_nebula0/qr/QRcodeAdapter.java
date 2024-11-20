@@ -4,20 +4,22 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.pickme_nebula0.R;
+import com.example.pickme_nebula0.event.Event;
 import com.example.pickme_nebula0.user.User;
 
 import java.util.ArrayList;
 
-public class QRcodeAdapter {
+public class QRcodeAdapter extends ArrayAdapter<Event> {
 
-    public UserArrayAdapter(Context context, int textViewResourceId, ArrayList<String> QRcodes){
-        super(context,textViewResourceId,QRcodes);
+    public QRcodeAdapter(Context context, int textViewResourceId, ArrayList<Event> events){
+        super(context,textViewResourceId, events);
 
     }
     // convert each User into a View
@@ -27,15 +29,15 @@ public class QRcodeAdapter {
         View view;
 
         if (convertView == null) {
-            view = LayoutInflater.from(getContext()).inflate(R.layout.item_QRcode, parent, false);
+            view = LayoutInflater.from(getContext()).inflate(R.layout.item_qrcode, parent, false);
         }
         else {
             view = convertView;
         }
 
-        User user = getItem(position);
-        TextView userName = view.findViewById(R.id.QRcode_image);
-        userName.setText(user.getName());
+        Event event= getItem(position);
+        TextView QRcode = view.findViewById(R.id.qrcodehash_text_view);
+        QRcode.setText(event.getQrCodeData());
 
         return view;
     };

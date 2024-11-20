@@ -57,7 +57,6 @@ public class AdminHomeActivity extends AppCompatActivity {
     // Profiles
     private ArrayList<User> users;
     private ListView usersList;
-    private ArrayList<String> QRcodes;
     private ListView QRcodesList;
     private QRcodeAdapter QRAdapter;
 
