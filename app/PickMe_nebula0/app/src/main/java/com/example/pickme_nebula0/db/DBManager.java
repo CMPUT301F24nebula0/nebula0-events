@@ -330,7 +330,7 @@ public class DBManager {
      * @param userID deviceID of user we are sending the notification to
      * @param eventID ID of event associated with notification
      */
-    private void createNotification(String title, String message, String userID, String eventID){
+    public void createNotification(String title, String message, String userID, String eventID){
         CollectionReference userNotifCollection = db.collection(notificationCollection).document(userID).collection("userNotifs");
         String notifID = createIDForDocumentIn(userNotifCollection);
         Timestamp timestamp = new Timestamp(new Date());
