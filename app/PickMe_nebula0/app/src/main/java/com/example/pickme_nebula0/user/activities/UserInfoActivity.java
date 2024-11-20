@@ -145,13 +145,11 @@ public class UserInfoActivity extends AppCompatActivity {
         });
 
         if (newUser){ // new user's require a slightly different screen layout
+            setAutoProfilePic();
             headerTextView.setText(R.string.user_info_header_first_time);
             cancelButton.setVisibility(View.GONE);
             facilityButton.setVisibility(View.GONE);
             enableNotifBox.setChecked(true);
-            profilePicImageView.setVisibility(View.GONE);
-            changeProfilePicButton.setVisibility(View.GONE);
-            removeProfilePicButton.setVisibility(View.GONE);
         } else{ // returning users need to see their stored info, read it from DB
             headerTextView.setText(R.string.user_info_header_returning);
             dbManager.getUser(deviceID,this::populateFieldsFromDB,this::failedToPopulateFieldsFromDB);
