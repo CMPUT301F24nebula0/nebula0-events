@@ -27,6 +27,7 @@ import com.example.pickme_nebula0.facility.FacilityDetailActivity;
 import com.example.pickme_nebula0.notification.MessageViewActivity;
 import com.example.pickme_nebula0.notification.Notification;
 import com.example.pickme_nebula0.notification.NotificationArrayAdapter;
+import com.example.pickme_nebula0.qr.QRcodeAdapter;
 import com.example.pickme_nebula0.user.User;
 import com.example.pickme_nebula0.user.UserArrayAdapter;
 import com.example.pickme_nebula0.user.activities.UserDetailActivity;
@@ -56,11 +57,17 @@ public class AdminHomeActivity extends AppCompatActivity {
     // Profiles
     private ArrayList<User> users;
     private ListView usersList;
+    private ArrayList<String> QRcodes;
+    private ListView QRcodesList;
+    private QRcodeAdapter QRAdapter;
+
+
     private UserArrayAdapter userAdapter;
 
     // Facilities
     private ArrayList<Facility> facilities;
     private ListView facilitiesList;
+
     private FacilityArrayAdapter facilityAdapter;
 
     // UI Elements
@@ -258,6 +265,22 @@ public class AdminHomeActivity extends AppCompatActivity {
     }
 
     private void updateQRCodes(){
+        QRcodes.clear();
+
+
+        facilityAdapter.notifyDataSetChanged();
+        db.collection("Facilities")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            Facility f = document.toObject(Facility.class);
+                            facilities.add(f);
+                        }
+                        facilityAdapter.notifyDataSetChanged();
+                    }
+                });
+
 
     }
 
