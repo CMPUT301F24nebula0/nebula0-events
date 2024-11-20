@@ -192,6 +192,19 @@ public class AdminHomeActivity extends AppCompatActivity {
             public void onClick(View v) {
                 viewFlipper.setDisplayedChild(3); // Show Manage QR Code layout
                 Toast.makeText(AdminHomeActivity.this, "Switched to Manage QR Code layout", Toast.LENGTH_SHORT).show();
+                // On click, show event details an allow admin to delete
+                QRcodesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
+                        Event clickedEvent = (Event) adapterView.getItemAtPosition(pos);
+
+                        Intent intent = new Intent(AdminHomeActivity.this, EventDetailAdminActivity.class);
+                        intent.putExtra("eventID",clickedEvent.getEventID());
+                        startActivity(intent);
+                    }
+                });
+                // Confirmation message for debugging and UI verification
+                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Events layout", Toast.LENGTH_SHORT).show();
             }
         });
 
