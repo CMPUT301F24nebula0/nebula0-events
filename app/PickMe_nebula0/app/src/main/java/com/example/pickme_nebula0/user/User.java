@@ -13,17 +13,16 @@ public class User {
     protected String userID;
     protected String name;
     protected String email;
-    protected String phoneNumber;
+    protected String phone;
+    boolean notificationsEnabled = true;
+    protected String profilePic;
+
+    // todo - start as entrant only then add organizer, admin role conditionally
     protected String role;
-    protected String profilePicture;
-    protected Boolean notifEnabled;
     private final ArrayList<String> roles = new ArrayList<String>(Arrays.asList("admin", "entrant", "organizer"));
     protected String status;
     boolean admin;
-    boolean notificationsEnabled;
-    protected String phone;
-    protected String profilePic;
-    // todo - start as entrant only then add organizer, admin role conditionally
+
 
     public User(){
 
@@ -44,7 +43,6 @@ public class User {
         this.userID = deviceID;
         this.name = name;
         this.email = email;
-        this.notifEnabled = true;
     }
 
     public User(Boolean admin, String email, String nam, boolean notificationsEnabled, String phone, String profilePic)
@@ -70,16 +68,16 @@ public class User {
         this.userID = deviceID;
         this.name = name;
         this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.notifEnabled = notifEnabled;
+        this.phone = phoneNumber;
+        this.notificationsEnabled = notifEnabled;
     }
 
     public User(String deviceID, String name, String email, String phoneNumber ,String profilePicture) {
         this.userID = deviceID;
         this.name = name;
         this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.profilePicture = profilePicture;
+        this.phone = phoneNumber;
+        this.profilePic = profilePicture;
     }
 
 
@@ -90,10 +88,6 @@ public class User {
      */
     public String getUserID() {
         return this.userID;
-    }
-
-        public Boolean notifEnabled(){
-        return notifEnabled;
     }
 
     /**
@@ -164,23 +158,6 @@ public class User {
         this.email = email;
     }
 
-    /**
-     * Returns the phone number of the user
-     *
-     * @return  phoneNumber  the phone number of the user
-     */
-    public String getPhoneNumber() {
-        return this.phoneNumber;
-    }
-
-    /**
-     * Sets the phone number of the user
-     *
-     * @param  phoneNumber  the phone number of the user
-     */
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
 
     public String getStatus() { return this.status; }
     public void setStatus(String status) { this.status = status;}
@@ -215,34 +192,6 @@ public class User {
         }
     }
 
-    // TODO get rid of these
-    /**
-     * Returns the profile picture of the user
-     *
-     * @return  profilePicture  the profile picture of the user
-     */
-    public String getProfilePicture() {
-        return this.profilePicture;
-    }
-
-    /**
-     * Sets the profile picture of the user
-     *
-     * @param  profilePicture  the profile picture of the user
-     */
-    // US 01.03.01 As an entrant I want to upload a profile picture for a more personalized experience
-    public void setProfilePicture(String profilePicture) {
-        this.profilePicture = profilePicture;
-    }
-
-    /**
-     * Removes the profile picture of the user
-     */
-    // US 01.03.02 As an entrant I want remove profile picture if need be
-    public void removeProfilePicture() {
-        this.profilePicture = null;
-    }
-
     @NonNull
     @Override
     public String toString() {
@@ -250,10 +199,10 @@ public class User {
                 "userID='" + userID + '\'' +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
+                ", phoneNumber='" + phone + '\'' +
                 ", role='" + role + '\'' +
-                ", profilePicture='" + profilePicture + '\'' +
-                ", notifEnabled=" + notifEnabled +
+                ", profilePicture='" + profilePic+ '\'' +
+                ", notificationsEnabled=" + notificationsEnabled +
                 ", status='" + status + '\'' +
                 '}';
     }
