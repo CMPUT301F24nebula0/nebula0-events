@@ -36,7 +36,7 @@ public class NotificationCreationActivity extends AppCompatActivity {
         Button msgWaitlistedBtn = findViewById(R.id.button_nc_notifWaitlist);
         Button msgConfirmedBtn = findViewById(R.id.button_nc_notifConfirmed);
         Button msgUnconfirmedBtn = findViewById(R.id.button_nc_notifUnconfirmed);
-        Button msgCanceledBtn = findViewById(R.id.button_nc_notfiCanceled);
+        Button msgCancelledBtn = findViewById(R.id.button_nc_notfiCancelled);
         Button cancelBtn = findViewById(R.id.button_nc_cancel);
 
         eventID = getIntent().getStringExtra("eventID");
@@ -78,10 +78,10 @@ public class NotificationCreationActivity extends AppCompatActivity {
             }
         });
 
-        msgCanceledBtn.setOnClickListener(new View.OnClickListener() {
+        msgCancelledBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(getFieldsAndAttemptNotification(DBManager.RegistrantStatus.CANCELED)){
+                if(getFieldsAndAttemptNotification(DBManager.RegistrantStatus.CANCELLED)){
                     finish();
 
                 }

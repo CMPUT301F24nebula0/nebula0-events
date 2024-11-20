@@ -58,16 +58,14 @@ public class UserDetailActivity extends AppCompatActivity {
                 // cancelling an entrant from organizer's end
                 db.collection("Events").document(eventID)
                         .collection("EventRegistrants")
-                        .document(userID).update("status", "CANCELED");
+                        .document(userID).update("status", "CANCELLED");
 
                 db.collection("Users").document(userID)
                         .collection("RegisteredEvents")
-                        .document(eventID).update("status", "CANCELED");
-                //TODO: Add a notification logic here for the canceled entrant
+                        .document(eventID).update("status", "CANCELLED");
+                //TODO: Add a notification logic here for the cancelled entrant
 
                 finish();
-
-                // reload the fragment
             });
         }
 

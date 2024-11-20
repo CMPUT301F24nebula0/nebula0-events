@@ -56,6 +56,8 @@ public class OrganizerSelectedFragment extends Fragment {
         loadSelectedUsers();
     }
 
+
+
     private void loadSelectedUsers() {
         selectedUsers.clear();
         dbManager.loadUsersRegisteredInEvent(eventID, DBManager.RegistrantStatus.SELECTED, "OrganizerSelectedFragment",
@@ -64,5 +66,6 @@ public class OrganizerSelectedFragment extends Fragment {
                     selectedUsers.add(user);
                     adapter.notifyDataSetChanged();
                 });
+        adapter.notifyDataSetChanged();
     }
 }
