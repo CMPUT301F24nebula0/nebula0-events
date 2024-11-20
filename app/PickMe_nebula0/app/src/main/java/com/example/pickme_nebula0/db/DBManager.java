@@ -158,9 +158,9 @@ public class DBManager {
         userData.put("userID",user.getUserID());
         userData.put("name", user.getName());
         userData.put("email", user.getEmail());
-        userData.put("phone", user.getPhoneNumber());
-        userData.put("profilePic", user.getProfilePicture());
-        userData.put("notificationsEnabled", user.notifEnabled());
+        userData.put("phone", user.getPhone());
+        userData.put("profilePic", user.getProfilePic());
+        userData.put("notificationsEnabled", user.getNotificationsEnabled());
         userData.put("admin", false);
 
         addUpdateDocument(usersCollection,user.getUserID(),userData);
@@ -175,9 +175,9 @@ public class DBManager {
         DocumentReference docRef = db.collection(usersCollection).document(user.getUserID());
         updateField(docRef,"name",user.getName());
         updateField(docRef,"email",user.getEmail());
-        updateField(docRef,"phone",user.getPhoneNumber());
-        updateField(docRef,"profilePic",user.getProfilePicture());
-        updateField(docRef,"notificationsEnabled",user.notifEnabled());
+        updateField(docRef,"phone",user.getPhone());
+        updateField(docRef,"profilePic",user.getProfilePic());
+        updateField(docRef,"notificationsEnabled",user.getNotificationsEnabled());
     }
 
     /**

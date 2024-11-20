@@ -103,6 +103,7 @@ public class UserInfoActivity extends AppCompatActivity {
             headerTextView.setText(R.string.user_info_header_first_time);
             cancelButton.setVisibility(View.GONE);
             facilityButton.setVisibility(View.GONE);
+            enableNotifBox.setChecked(true);
         } else{ // returning users need to see their stored info, read it from DB
             headerTextView.setText(R.string.user_info_header_returning);
             dbManager.getUser(deviceID,this::populateFieldsFromDB,this::failedToPopulateFieldsFromDB);
@@ -119,8 +120,10 @@ public class UserInfoActivity extends AppCompatActivity {
         User castedUser = (User) user;
         nameField.setText(castedUser.getName());
         emailField.setText(castedUser.getEmail());
-        phoneField.setText(castedUser.getPhoneNumber());
-        enableNotifBox.setChecked(castedUser.notifEnabled());
+        if(castedUser.getPhone() != null){
+            phoneField.setText(castedUser.getPhone());
+        }
+        enableNotifBox.setChecked(castedUser.getNotificationsEnabled());
     }
 
     /**
