@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
-    // Add the Google services Gradle plugin
+    // Google services Gradle plugin for Firebase
     id("com.google.gms.google-services")
 }
 
@@ -34,37 +34,55 @@ android {
 }
 
 dependencies {
-    // Firebase BoM
+    // Firebase BoM for version management
     implementation(platform("com.google.firebase:firebase-bom:32.7.1"))
-    // Firebase libs
+
+    // Firebase dependencies
     implementation("com.google.firebase:firebase-auth")
-    implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-firestore") {
+        exclude("com.google.protobuf", "protobuf-lite")
+    }
     implementation("com.google.firebase:firebase-messaging")
-    implementation ("com.google.firebase:firebase-storage:20.2.1")
-    implementation ("com.squareup.picasso:picasso:2.8")// For loading images
-    implementation ("androidx.activity:activity-compose:1.9.3") // or the latest version
+    implementation("com.google.firebase:firebase-storage:20.2.1")
 
+    // Image loading
+    implementation("com.squareup.picasso:picasso:2.8")
 
-    implementation(libs.rules)
-    testImplementation(libs.ext.junit)
-    testImplementation(libs.espresso.core)
-    testImplementation(libs.espresso.core)
-    testImplementation(libs.junit.jupiter)
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    // QR code support with ZXing
+    implementation("com.journeyapps:zxing-android-embedded:4.1.0") {
+        exclude("com.google.protobuf", "protobuf-lite")
+    }
 
-    implementation(libs.appcompat)
-    implementation(libs.material)
-    implementation(libs.activity)
-    implementation(libs.constraintlayout)
-    implementation(libs.play.services.tasks)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.ext.junit)
-    androidTestImplementation(libs.espresso.core)
-    implementation("com.journeyapps:zxing-android-embedded:4.1.0")
-    implementation("com.google.zxing:core:3.3.3")
+    // UI and Compose dependencies
+    implementation("androidx.activity:activity-compose:1.9.3")
     implementation("com.google.android.material:material:1.4.0")
     implementation("androidx.viewpager2:viewpager2:1.0.0")
     implementation("androidx.core:core-ktx:1.10.0")
+    implementation(libs.appcompat)
+    implementation(libs.material)
+    implementation(libs.constraintlayout)
 
+    // Testing dependencies
+    testImplementation(libs.junit)
+    testImplementation(libs.junit.jupiter)
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:3.5.1") {
+        exclude("com.google.protobuf", "protobuf-lite")
+    }
+
+    // Force protobuf-javalite to avoid conflicts with protobuf-lite
+    implementation("com.google.protobuf:protobuf-javalite:3.22.3")
+
+    // Additional tools
+    implementation(libs.rules)
+    testImplementation(libs.ext.junit)
+    testImplementation(libs.espresso.core)
+}
+
+configurations.all {
+    // Force protobuf-javalite to avoid conflicts with protobuf-lite
+    resolutionStrategy {
+        force("com.google.protobuf:protobuf-javalite:3.22.3")
+    }
 }
