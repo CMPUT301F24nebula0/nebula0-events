@@ -22,8 +22,8 @@ import com.google.android.material.tabs.TabLayoutMediator;
  */
 public class EntrantHomeActivity extends AppCompatActivity {
 
-    // tabs: Waitlist, Selected, Confirmed, Canceled
-    private final String[] tabTitles = new String[]{"Waitlist", "Selected", "Confirmed","Canceled"};
+    // tabs: Waitlist, Selected, Confirmed, Cancelled
+    private final String[] tabTitles = new String[]{"Waitlist", "Selected", "Confirmed","Cancelled"};
 
     private ViewPager2 viewPager;
     private TabLayout tabLayout;
@@ -33,7 +33,7 @@ public class EntrantHomeActivity extends AppCompatActivity {
     private Button scanQRButton, backButton;
 
     // fragments for each tab
-    EntrantEventsFragment waitlistFrag, selectedFrag, confirmedFrag, canceledFrag;
+    EntrantEventsFragment waitlistFrag, selectedFrag, confirmedFrag, cancelledFrag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +46,7 @@ public class EntrantHomeActivity extends AppCompatActivity {
         waitlistFrag = new EntrantEventsFragment("WAITLISTED");
         selectedFrag = new EntrantEventsFragment("SELECTED");
         confirmedFrag = new EntrantEventsFragment("CONFIRMED");
-        canceledFrag = new EntrantEventsFragment("CANCELED");
+        cancelledFrag = new EntrantEventsFragment("CANCELLED");
 
         // Initialize ViewPager2 and TabLayout
         viewPager = findViewById(R.id.view_pager);
@@ -91,7 +91,7 @@ public class EntrantHomeActivity extends AppCompatActivity {
                 case 2:
                     return confirmedFrag;
                 default:
-                    return canceledFrag;
+                    return cancelledFrag;
             }
         }
 
@@ -114,8 +114,8 @@ public class EntrantHomeActivity extends AppCompatActivity {
         if (selectedFrag.isAdded()) {
             selectedFrag.loadEvents();
         }
-        if (canceledFrag.isAdded()) {
-            canceledFrag.loadEvents();
+        if (cancelledFrag.isAdded()) {
+            cancelledFrag.loadEvents();
         }
     }
 }

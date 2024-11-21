@@ -98,8 +98,8 @@ public class EventDetailUserActivity extends AppCompatActivity {
         declineButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO - we can change this later to fully remove them if we don't want a user of leaves of their own volition CANCELED
-                dbManager.setRegistrantStatus(eventID,userID,DBManager.RegistrantStatus.CANCELED);
+                // TODO - we can change this later to fully remove them if we don't want a user of leaves of their own volition CANCELLED
+                dbManager.setRegistrantStatus(eventID,userID,DBManager.RegistrantStatus.CANCELLED);
                 renderUserStatus();
             }
         });
@@ -107,8 +107,8 @@ public class EventDetailUserActivity extends AppCompatActivity {
         unregisterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO - we can change this later to fully remove them if we don't want a user of leaves of their own volition CANCELED
-                dbManager.setRegistrantStatus(eventID,userID,DBManager.RegistrantStatus.CANCELED);
+                // TODO - we can change this later to fully remove them if we don't want a user of leaves of their own volition CANCELLED
+                dbManager.setRegistrantStatus(eventID,userID,DBManager.RegistrantStatus.CANCELLED);
                 renderUserStatus();
             }
         });
@@ -196,7 +196,7 @@ public class EventDetailUserActivity extends AppCompatActivity {
             acceptButton.setVisibility(View.VISIBLE);
             declineButton.setVisibility(View.VISIBLE);
             unregisterButton.setVisibility(View.GONE);
-        } else if (status.equalsIgnoreCase("CANCELED")){
+        } else if (status.equalsIgnoreCase("CANCELLED")){
             acceptButton.setVisibility(View.GONE);
             declineButton.setVisibility(View.GONE);
             unregisterButton.setVisibility(View.GONE);

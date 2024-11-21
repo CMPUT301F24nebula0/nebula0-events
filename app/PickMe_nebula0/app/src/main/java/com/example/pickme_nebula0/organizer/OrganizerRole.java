@@ -216,7 +216,7 @@ public class OrganizerRole extends User {
         return notifyEntrants(event, event.getEntrantsChosen(), message);
     }
 
-    // US 02.07.03 As an organizer I want to send a notification to all canceled entrants
+    // US 02.07.03 As an organizer I want to send a notification to all cancelled entrants
     public boolean notifyCancelledEntrants(Event event, String message) {
         return notifyEntrants(event, event.getEntrantsCancelled(), message);
     }

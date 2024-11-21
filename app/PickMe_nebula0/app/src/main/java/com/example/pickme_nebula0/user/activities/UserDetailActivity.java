@@ -1,5 +1,6 @@
 package com.example.pickme_nebula0.user.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -8,10 +9,13 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.db.DBManager;
+import com.example.pickme_nebula0.organizer.fragments.OrganizerSelectedFragment;
 import com.example.pickme_nebula0.user.User;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
@@ -28,8 +32,11 @@ public class UserDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_detail);
         dbManager = new DBManager();
 
+        db = FirebaseFirestore.getInstance();
+
         final Button backButton = findViewById(R.id.backButton);
         final Button delButton = findViewById(R.id.button_ud_delete);
+        final Button cancelEntrantButton = findViewById(R.id.button_cancel_selected_entrant);
 
         if(!getIntent().getBooleanExtra("admin",false)){
             delButton.setVisibility(View.GONE);
@@ -40,6 +47,26 @@ public class UserDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "Invalid User ID.", Toast.LENGTH_SHORT).show();
             finish();
             return;
+        }
+
+        String eventID = getIntent().getStringExtra("eventID");
+        if (eventID == null || eventID.isEmpty()) {
+            cancelEntrantButton.setVisibility(View.GONE);
+        } else {
+            cancelEntrantButton.setVisibility(View.VISIBLE);
+            cancelEntrantButton.setOnClickListener(v -> {
+                // cancelling an entrant from organizer's end
+                db.collection("Events").document(eventID)
+                        .collection("EventRegistrants")
+                        .document(userID).update("status", "CANCELLED");
+
+                db.collection("Users").document(userID)
+                        .collection("RegisteredEvents")
+                        .document(eventID).update("status", "CANCELLED");
+                //TODO: Add a notification logic here for the cancelled entrant
+
+                finish();
+            });
         }
 
         backButton.setOnClickListener(new View.OnClickListener(){

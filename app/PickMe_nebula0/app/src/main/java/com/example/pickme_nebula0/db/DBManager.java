@@ -67,11 +67,11 @@ public class DBManager {
      * Waitlisted = user is registered but has not "won the lottery"
      * Selected = user has "won the lottery" but has not accepted the invite
      * Confirmed = user has "won the lottery" and has accepted the invite
-     * Canceled = user "won the lottery" but took too long to accept, got canceled by organizer
+     * Cancelled = user "won the lottery" but took too long to accept, got cancelled by organizer
      */
 
     public enum RegistrantStatus{
-        WAITLISTED, SELECTED, CONFIRMED, CANCELED;
+        WAITLISTED, SELECTED, CONFIRMED, CANCELLED;
     }
 
     public final FirebaseFirestore db;
