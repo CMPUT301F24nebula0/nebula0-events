@@ -21,6 +21,7 @@ import com.example.pickme_nebula0.event.Event;
  */
 public class EventDetailAdminActivity extends AppCompatActivity {
     private TextView eventDetailsTextView;
+    private TextView QRcodeHashTextVeiw;
     private DBManager dbManager;
 
     @Override
@@ -44,7 +45,7 @@ public class EventDetailAdminActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 dbManager.deleteEvent(eventID);
-                Toast.makeText(EventDetailAdminActivity.this,"Event Deleted",Toast.LENGTH_SHORT);
+                Toast.makeText(EventDetailAdminActivity.this, "Event Deleted", Toast.LENGTH_SHORT);
                 finish();
             }
         });
@@ -58,9 +59,57 @@ public class EventDetailAdminActivity extends AppCompatActivity {
         });
 
         fetchEventDetails(eventID);
+        fetchQRcodehash(eventID);
+        QRcodeHashTextVeiw = findViewById(R.id.eventqrcodehash);
 
+        QRcodeHashTextVeiw.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DeleteQRcode(eventID);
+            }
+        });
+    }
+
+    public void DeleteQRcode(String eventID){
+        dbManager.getEvent(eventID, eventObj -> {
+            if (eventObj instanceof Event) {
+                Event event = (Event) eventObj;
+                runOnUiThread(() -> {
+                    event.setQrCodeData("null");
+                });
+            } else {
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "Event not found.", Toast.LENGTH_SHORT).show();
+                    finish();
+                });
+            }
+        }, () -> runOnUiThread(() -> {
+            Toast.makeText(this, "Failed to retrieve event data.", Toast.LENGTH_SHORT).show();
+            finish();
+        }));
 
     }
+    private void fetchQRcodehash(String eventID) {
+        dbManager.getEvent(eventID, eventObj -> {
+            if (eventObj instanceof Event) {
+                Event event = (Event) eventObj;
+                runOnUiThread(() -> {
+                    StringBuilder details = new StringBuilder();
+                    details.append("QRcodeHash: ").append(event.getQrCodeData()).append("\n\n");
+                    QRcodeHashTextVeiw.setText(details.toString());
+                });
+            } else {
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "Event not found.", Toast.LENGTH_SHORT).show();
+                    finish();
+                });
+            }
+        }, () -> runOnUiThread(() -> {
+            Toast.makeText(this, "Failed to retrieve event data.", Toast.LENGTH_SHORT).show();
+            finish();
+        }));
+    }
+
 
     private void fetchEventDetails(String eventID) {
         // TODO this code is duplicated we should refactor to avoid this later
@@ -95,5 +144,4 @@ public class EventDetailAdminActivity extends AppCompatActivity {
             finish();
         }));
     }
-
 }

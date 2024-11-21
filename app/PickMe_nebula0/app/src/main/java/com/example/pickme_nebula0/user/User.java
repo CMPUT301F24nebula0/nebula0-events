@@ -131,8 +131,18 @@ public class User {
     public void setPhone(String phone) {
         this.phone = phone;
     }
+
+    /**
+     * correct version
+     * @return
+     */
     public String getProfilePic() {
         return this.profilePic;
+    }
+    public void genProfilePic(){
+        char Firstletter=this.getName().charAt(0);
+        
+
     }
     public void setProfilePic(String profilePic) {
         this.profilePic = profilePic;

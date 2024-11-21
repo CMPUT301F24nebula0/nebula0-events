@@ -27,6 +27,7 @@ import com.example.pickme_nebula0.facility.FacilityDetailActivity;
 import com.example.pickme_nebula0.notification.MessageViewActivity;
 import com.example.pickme_nebula0.notification.Notification;
 import com.example.pickme_nebula0.notification.NotificationArrayAdapter;
+import com.example.pickme_nebula0.qr.QRcodeAdapter;
 import com.example.pickme_nebula0.user.User;
 import com.example.pickme_nebula0.user.UserArrayAdapter;
 import com.example.pickme_nebula0.user.activities.UserDetailActivity;
@@ -56,11 +57,16 @@ public class AdminHomeActivity extends AppCompatActivity {
     // Profiles
     private ArrayList<User> users;
     private ListView usersList;
+    private ListView QRcodesList;
+    private QRcodeAdapter QRAdapter;
+
+
     private UserArrayAdapter userAdapter;
 
     // Facilities
     private ArrayList<Facility> facilities;
     private ListView facilitiesList;
+
     private FacilityArrayAdapter facilityAdapter;
 
     // UI Elements
@@ -186,6 +192,19 @@ public class AdminHomeActivity extends AppCompatActivity {
             public void onClick(View v) {
                 viewFlipper.setDisplayedChild(3); // Show Manage QR Code layout
                 Toast.makeText(AdminHomeActivity.this, "Switched to Manage QR Code layout", Toast.LENGTH_SHORT).show();
+                // On click, show event details an allow admin to delete
+                QRcodesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
+                        Event clickedEvent = (Event) adapterView.getItemAtPosition(pos);
+
+                        Intent intent = new Intent(AdminHomeActivity.this, EventDetailAdminActivity.class);
+                        intent.putExtra("eventID",clickedEvent.getEventID());
+                        startActivity(intent);
+                    }
+                });
+                // Confirmation message for debugging and UI verification
+                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Events layout", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -256,9 +275,25 @@ public class AdminHomeActivity extends AppCompatActivity {
     private void updateImages(){
 
     }
-
+/*
+there is no reason to separate the QR codes from their respective event
+as a QR code doesn't exist on its own  aslo a change made to the QR code
+ */
     private void updateQRCodes(){
 
+        events.clear();
+        QRAdapter.notifyDataSetChanged();
+        db.collection("Events")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                               Event e = document.toObject(Event.class);
+                                events.add(e);
+                        }
+                        QRAdapter.notifyDataSetChanged();
+                    }
+                });
     }
 
     private void updateFacilities(){
