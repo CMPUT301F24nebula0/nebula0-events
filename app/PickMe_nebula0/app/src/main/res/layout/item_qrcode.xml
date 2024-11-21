@@ -11,5 +11,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Qrcodehash"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:maxLines="1"
+        android:maxLength="30"
+        android:ellipsize="end"
+        />
 </LinearLayout>

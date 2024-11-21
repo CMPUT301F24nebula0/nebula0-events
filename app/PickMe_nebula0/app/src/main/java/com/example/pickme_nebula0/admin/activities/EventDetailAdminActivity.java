@@ -66,6 +66,7 @@ public class EventDetailAdminActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 DeleteQRcode(eventID);
+                QRcodeHashTextVeiw.setText("QRcodeHash: Null");
             }
         });
     }
@@ -76,6 +77,7 @@ public class EventDetailAdminActivity extends AppCompatActivity {
                 Event event = (Event) eventObj;
                 runOnUiThread(() -> {
                     event.setQrCodeData("null");
+                    dbManager.updateEvent(event);
                 });
             } else {
                 runOnUiThread(() -> {
@@ -86,8 +88,8 @@ public class EventDetailAdminActivity extends AppCompatActivity {
         }, () -> runOnUiThread(() -> {
             Toast.makeText(this, "Failed to retrieve event data.", Toast.LENGTH_SHORT).show();
             finish();
-        }));
 
+        }));
     }
     private void fetchQRcodehash(String eventID) {
         dbManager.getEvent(eventID, eventObj -> {
@@ -97,12 +99,11 @@ public class EventDetailAdminActivity extends AppCompatActivity {
                     StringBuilder details = new StringBuilder();
                     details.append("QRcodeHash: ");
                     if (event.getQrCodeData()==null){
-                        details.append("0").append("\n\n");
+                        details.append("null").append("\n\n");
                     }
                     else{
-                        //details.append(event.getQrCodeData()).append("\n\n");
+                        details.append(event.getQrCodeData()).append("\n\n");
                         //issue need to learn where the QR code data is held within events
-                        details.append("1").append("\n\n");
                     }
                     QRcodeHashTextVeiw.setText(details.toString());
                 });
@@ -115,8 +116,6 @@ public class EventDetailAdminActivity extends AppCompatActivity {
         }, () -> runOnUiThread(() -> {
             Toast.makeText(this, "Failed to retrieve event data.", Toast.LENGTH_SHORT).show();
             finish();
-
-
         }));
     }
 
