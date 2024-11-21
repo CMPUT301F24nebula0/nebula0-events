@@ -2,8 +2,6 @@ package com.example.pickme_nebula0.db;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Base64;
 import android.util.Log;
 
@@ -27,7 +25,6 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -70,11 +67,11 @@ public class DBManager {
      * Waitlisted = user is registered but has not "won the lottery"
      * Selected = user has "won the lottery" but has not accepted the invite
      * Confirmed = user has "won the lottery" and has accepted the invite
-     * Canceled = user "won the lottery" but took too long to accept, got canceled by organizer
+     * Cancelled = user "won the lottery" but took too long to accept, got cancelled by organizer
      */
 
     public enum RegistrantStatus{
-        WAITLISTED, SELECTED, CONFIRMED, CANCELED;
+        WAITLISTED, SELECTED, CONFIRMED, CANCELLED;
     }
 
     public final FirebaseFirestore db;
@@ -330,7 +327,7 @@ public class DBManager {
      * @param userID deviceID of user we are sending the notification to
      * @param eventID ID of event associated with notification
      */
-    public void createNotification(String title, String message, String userID, String eventID){
+    private void createNotification(String title, String message, String userID, String eventID){
         CollectionReference userNotifCollection = db.collection(notificationCollection).document(userID).collection("userNotifs");
         String notifID = createIDForDocumentIn(userNotifCollection);
         Timestamp timestamp = new Timestamp(new Date());
@@ -599,7 +596,7 @@ public class DBManager {
 
         waitlistedUsersQuery.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                List<User> waitlistedUsers = Collections.synchronizedList(new ArrayList<>());
+                ArrayList<User> waitlistedUsers = new ArrayList<>();
 
                 for (QueryDocumentSnapshot registeredUserDoc : task.getResult()) {
                     String userID = registeredUserDoc.getId();
@@ -609,10 +606,13 @@ public class DBManager {
                         final CompletableFuture<User> userFuture = new CompletableFuture<>();
 
                         // fetch actual event asynchronously
-                        getUser(userID, (userFetched) -> { userFuture.complete((User) userFetched);}, () -> {
+                        getUser(userID, (userFetched) -> {
+                            userFuture.complete((User) userFetched);
+                        }, () -> {
                             Log.d("Firestore", "Could not get registered user " + userID);
                             userFuture.completeExceptionally(new Exception("Failed to fetch waitlisted user"));
                         });
+
                         return userFuture.get();
                     });
 
@@ -629,12 +629,6 @@ public class DBManager {
                     } catch (Exception e) {
                         Log.d("Firestore", "Error while fetching users: " + e.getMessage());
                     } finally {
-                        synchronized (waitlistedUsers) {
-                            new Handler(Looper.getMainLooper()).post(() -> {
-                                onSuccessCallback.run((List<User>) waitlistedUsers);
-                                Log.d("Firestore", "waitlisted users callback was invoked with size: " + waitlistedUsers.size());
-                            });
-                        }
                         executor.shutdown();
                         try {
                             if (!executor.awaitTermination(800, TimeUnit.MILLISECONDS)) {
@@ -643,6 +637,8 @@ public class DBManager {
                         } catch (InterruptedException e) {
                             executor.shutdownNow();
                         }
+
+                        onSuccessCallback.run(waitlistedUsers);
                     }
                 });
             } else {

@@ -78,7 +78,7 @@
         android:text="Cancel"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_nc_notfiCanceled" />
+        app:layout_constraintTop_toBottomOf="@+id/button_nc_notfiCancelled" />
 
     <Button
         android:id="@+id/button_nc_notifWaitlist"
@@ -111,11 +111,11 @@
         app:layout_constraintTop_toBottomOf="@+id/button_nc_notifConfirmed" />
 
     <Button
-        android:id="@+id/button_nc_notfiCanceled"
+        android:id="@+id/button_nc_notfiCancelled"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Send to Canceled Entrants"
+        android:text="Send to Cancelled Entrants"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button_nc_notifUnconfirmed" />

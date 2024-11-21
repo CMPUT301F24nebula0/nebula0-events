@@ -1,6 +1,5 @@
 package com.example.pickme_nebula0.start.activities;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -31,8 +30,8 @@ import com.example.pickme_nebula0.user.activities.UserInfoActivity;
  * @Author Taekwan Yoon
  */
 public class HomePageActivity extends AppCompatActivity {
-    // Request code for permission
-    private static final int REQUEST_CODE_PERMISSION = 100;
+    private static final int REQUEST_CODE_NOTIF_PERMISSION = 100;
+    private static final int REQUEST_CODE_MEDIA_PERMISSION = 101;
 
     // UI components
     Button profileButton;
@@ -68,13 +67,13 @@ public class HomePageActivity extends AppCompatActivity {
                     != PackageManager.PERMISSION_GRANTED) {
                 // Request permission, users can disable notifications in UserInfoActivity, but we want to have permission
                 ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQUEST_CODE_PERMISSION);
+                        new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQUEST_CODE_NOTIF_PERMISSION);
             }
         }
 
         // Check if media access permission is granted
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_MEDIA_IMAGES}, 100);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_MEDIA_IMAGES}, REQUEST_CODE_MEDIA_PERMISSION);
         }
     }
 
@@ -101,13 +100,23 @@ public class HomePageActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (requestCode == REQUEST_CODE_PERMISSION) {
+        if (requestCode == REQUEST_CODE_NOTIF_PERMISSION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission granted, you can notify the user in the background
-                Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Notif Permission Granted", Toast.LENGTH_SHORT).show();
             } else {
                 // Permission denied, handle accordingly
-                Toast.makeText(this, "Permission denied, can't show notifications", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Notif Permission Denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        if (requestCode == REQUEST_CODE_MEDIA_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, you can notify the user in the background
+                Toast.makeText(this, "Media Permission Granted", Toast.LENGTH_SHORT).show();
+            } else {
+                // Permission denied, handle accordingly
+                Toast.makeText(this, "Media Permission Denied", Toast.LENGTH_SHORT).show();
             }
         }
     }

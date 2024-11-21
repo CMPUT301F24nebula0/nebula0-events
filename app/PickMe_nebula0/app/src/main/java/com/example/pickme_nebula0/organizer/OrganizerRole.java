@@ -6,16 +6,10 @@ import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.entrant.EntrantRole;
 import com.example.pickme_nebula0.event.Event;
 import com.example.pickme_nebula0.user.User;
-import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Date;
-import java.util.List;
 
 /**
  * OrganizerRole
@@ -23,11 +17,6 @@ import java.util.List;
 public class OrganizerRole extends User {
     private String organizerID;
     private ArrayList<Event> events = new ArrayList<Event>();
-
-    private static String usersSelectedKey = "selected";
-    private static String usersNotSelectedKey = "not selected";
-    private static String organizer_tag = "OrganizerRole";
-    private static DBManager dbm = new DBManager();
 
     /**
      * Constructor
@@ -52,39 +41,34 @@ public class OrganizerRole extends User {
         this.organizerID = organizerID;
     }
 
-    // US 02.01.01 As a an organizer I want to create a new event and generate a unique promotional QR code that links to the event description and event poster in the app
-    // already implemented
     public boolean createEvent() {
 //        boolean eventCreated = false;
 //        // Create event
 //        Event event = new Event();
 //        events.add(event);
 //        //
-        return false;
+//        return false;
+        throw new RuntimeException("NOT IMPLEMENTED");
     }
 
-    // US 02.01.01 As a an organizer I want to create a new event and generate a unique promotional QR code that links to the event description and event poster in the app
     public boolean generateQRCode() {
         boolean QRCodeGenerated = false;
         // Generate QR code
         return false;
     }
 
-    // US 02.01.04 As an organizer I want to store hash data of the generated QR code in my database
     public boolean storeHashDataQRCode() {
         boolean hashDataStored = false;
         // Store hash data
         return false;
     }
 
-    // US 02.01.04 As an organizer I want to store hash data of the generated QR code in my database
     public boolean deleteHashDataQRCode() {
         boolean hashDataDeleted = false;
         // Delete hash data
         return false;
     }
 
-    // US 02.02.01 As an organizer I want to view the list of entrants who joined my event waiting list
     public ArrayList<EntrantRole> viewWaitlist(Event event) {
         ArrayList<EntrantRole> entrantsInWaitlist = new ArrayList<EntrantRole>();
 
@@ -92,154 +76,69 @@ public class OrganizerRole extends User {
         return entrantsInWaitlist;
     }
 
-    // US 02.02.02 As an organizer I want to see on a map where entrants joined my event waiting list from.
     public void viewMapOfWaitlist(Event event) {
         // in future, show the map of entrants who joined the event waiting list
     }
 
-    // US 02.03.01 As an organizer I want to OPTIONALLY limit the number of entrants who can join my waiting list
     public int getWaitlistCapacity(Event event) {
         return event.getWaitlistCapacity();
     }
 
-    // US 02.03.01 As an organizer I want to OPTIONALLY limit the number of entrants who can join my waiting list
     public void setWaitlistCapacity(Event event, int capacity) {
         event.setWaitlistCapacity(capacity);
     }
 
-    // US 02.04.01 As an organizer I want to upload an event poster to provide visual information to entrants 
     public String getEventPoster(Event event) {
         return event.getEventPoster();
     }
 
-    // US 02.04.01 As an organizer I want to upload an event poster to provide visual information to entrants 
     public void setEventPoster(Event event, String eventPoster) {
         event.setEventPoster(eventPoster);
     }
 
 
     /**
-     * US 02.05.02
-     * As an organizer I want to set the system to sample a specified number of attendees to register for the event
-     *
      * Samples all users in the waitlist, based on the event capacity of the given event,
      * or samples all if event capacity is none.
      * Sets their status to SELECTED and updates the corresponding EventRegistrants status.
      * Passes the list of selected users to onSuccessCallback (as an Object.)
-     * @param eventID
-     * @param onSuccessCallback
+     * @param eventID eventID
+     * @param onSuccessCallback onSuccessCallback
      */
     public static void sampleAndSelectUsers(String eventID, DBManager.Obj2VoidCallback onSuccessCallback) {
         DBManager dbManager = new DBManager();
-
         // get waitlist capacity first via event
         dbManager.getEvent(eventID, (eventObj) -> {
             Event event = (Event) eventObj;
             int eventCapacity = event.getEventCapacity();
 
-            // get random sample of users
-            sampleUsers(eventID, eventCapacity, (sampleResultsObj) -> {
-                HashMap<String, ArrayList<User>> sampleResults = (HashMap<String, ArrayList<User>>) sampleResultsObj;
+            // get random sample of users and add them to selected list
+            sampleUsers(eventID, eventCapacity, (userListObj) -> {
+                ArrayList<User> usersSelected = (ArrayList<User>) userListObj;
+                Log.d("TEST", String.format("Sampled %s users from event capacity %s", usersSelected.size(), eventCapacity));
 
-                ArrayList<User> usersSelected = sampleResults.get(usersSelectedKey);
-                ArrayList<User> usersNotSelected = sampleResults.get(usersNotSelectedKey);
-
-                Log.d(organizer_tag, java.lang.String.format("Sampled %s users from event capacity %s", usersSelected.size(), eventCapacity));
-
-                // update status of selected entrants and notify
                 for (User user : usersSelected) {
-                    Log.d(organizer_tag, java.lang.String.format("Sampled user %s for initial event selection", user.getName()));
+                    Log.d("TEST", String.format("Sampled user %s for initial event selection", user.getName()));
                     dbManager.setRegistrantStatus(eventID, user.getUserID(), DBManager.RegistrantStatus.SELECTED);
-                    notifyEntrantChosen(event, user);
-                }
 
-                // notify entrants not sampled
-                for (User user : usersNotSelected) {
-//                    Log.d(organizer_tag, java.lang.String.format("Did not sample user %s for initial event selection", user.getName()));
-                    notifyEntrantNotChosen(event, user);
+                    // possible race condition
+                    // consider calling from onSuccessCallback instead
+                    dbManager.notifyEntrantsOfStatus("Not Selected For Event",
+                            "You will remain waitlisted in case a spot opens up",
+                            eventID, DBManager.RegistrantStatus.WAITLISTED);
                 }
                 onSuccessCallback.run(usersSelected);
             });
 
-        }, () -> {Log.d(organizer_tag, "Could not fetch event to check event capacity.");});
+        }, () -> {Log.d("Firestore", "Could not fetch event to check event capacity.");});
     }
-
-    /**
-     * US 02.05.03
-     * As an organizer I want to be able to draw a replacement applicant from the pooling system
-     * when a previously selected applicant cancels or rejects the invitation.
-     *
-     * Resample users whose status remains waitlisted by the number of free spots,
-     * which is the difference between the event capacity and number of selected users (if any.)
-     * Sets their status to SELECTED.
-     * Passes the list of resampled users to onSuccessCallback (as an Object.)
-     * @param eventID
-     * @param onSuccessCallback
-     */
-    public static void resampleAndSelectUsers(String eventID, DBManager.Obj2VoidCallback onSuccessCallback) {
-        // assumes that event capacity is defined, otherwise there would be no one to resample
-        // get event capacity and (number of entrants who were selected + confirmed entrants)
-        // the difference is the number of free spots to be filled by resampling
-        DBManager dbManager = new DBManager();
-
-        // get event capacity
-        dbManager.getEvent(eventID, (eventObj) -> {
-            Event event = (Event) eventObj;
-            int eventCapacity = event.getEventCapacity();
-//            assert(eventCapacity != -1);
-            if (eventCapacity == -1) {return;}
-
-            // get number of entrants who are selected and confirmed
-            countConfirmedAndSelected(eventID, (countObj) -> {
-                int count = (int) countObj;
-                int free_spots = eventCapacity - count;
-                Log.d(organizer_tag, String.format("Free spots %d = %d-%d", free_spots, eventCapacity, count));
-                if (free_spots > 0) {
-                    // resample by number of free spots
-                    sampleUsers(eventID, free_spots, (sampleResultsObj) -> {
-                        HashMap<String, ArrayList<User>> sampleResults = (HashMap<String, ArrayList<User>>) sampleResultsObj;
-
-                        ArrayList<User> usersResampled = sampleResults.get(usersSelectedKey);
-                        for (User user : usersResampled) {
-                            // set new status and notify
-                            dbManager.setRegistrantStatus(eventID, user.getUserID(), DBManager.RegistrantStatus.SELECTED);
-                            notifyEntrantResampled(event, user);
-                        }
-                        onSuccessCallback.run(usersResampled);
-                    });
-                } else { Log.d(organizer_tag, "No entrants to resample"); }
-            });
-            }, () -> {Log.d(organizer_tag, "failed to fetch event for resampling"); return;});
-    }
-
-    // cancel all users who are selected and did not accept their invite
-    public static void cancelUsers(String eventID, DBManager.Obj2VoidCallback onSuccessCallback) {
-        DBManager dbManager = new DBManager();
-
-        dbManager.getEvent(eventID, (eventObj) -> {
-            // load users registered in event
-            dbManager.loadUsersRegisteredInEvent(eventID, DBManager.RegistrantStatus.SELECTED, (selectedUsersObj) -> {
-                ArrayList<User> users = (ArrayList<User>) selectedUsersObj;
-                for (User user:users) {
-                    dbManager.setRegistrantStatus(eventID, user.getUserID(), DBManager.RegistrantStatus.CANCELED);
-                    notifyEntrantCancelled((Event) eventObj, user);
-                }
-            });
-
-        }, () -> {Log.d(organizer_tag, "Could not fetch event for cancelling users");});
-    }
-
 
     /**
      * Utility function that randomly samples users registered for an event
-     * and passes sampled and not sampled users to the onSuccessCallback
-     * as a Hashmap typecasted to as an Object.
-     * The hashmap has the following keys:
-     *  usersSelectedKey
-     *  usersNotSelectedKey
-     * @param eventID
-     * @param sampleNum
-     * @param onSuccessCallback
+     * and passes this list to the onSuccessCallback (as an Object.)
+     * @param eventID eventID
+     * @param sampleNum sampleNum
+     * @param onSuccessCallback onSuccessCallback
      */
     public static void sampleUsers(String eventID, int sampleNum, DBManager.Obj2VoidCallback onSuccessCallback) {
         DBManager dbManager = new DBManager();
@@ -248,31 +147,44 @@ public class OrganizerRole extends User {
         // then shuffle and sample
         dbManager.loadAllUsersRegisteredInEvent(eventID, DBManager.RegistrantStatus.WAITLISTED,
                 (userListObj) -> {
-                    ArrayList<User> users = new ArrayList<>((List<User>) userListObj);
-                    ArrayList<User> usersSelected = new ArrayList<>();
-                    ArrayList<User> usersNotSelected = new ArrayList<>();
+                    ArrayList<User> users = (ArrayList<User>) userListObj;
+                    ArrayList<User> usersToSelect = new ArrayList<>();
 
                     if (sampleNum == -1 || users.size() <= sampleNum) {
-                        usersSelected.addAll(users);
+                        usersToSelect.addAll(users);
                     } else {
                         ArrayList<User> randomUsers = new ArrayList<>(users);
                         Collections.shuffle(randomUsers);
-                        usersSelected = new ArrayList<>(randomUsers.subList(0, sampleNum));
-                        usersNotSelected = new ArrayList<>(randomUsers.subList(sampleNum, randomUsers.size()));
+                        usersToSelect = new ArrayList<>(randomUsers.subList(0, sampleNum));
                     }
 
-                    HashMap<String, ArrayList<User>> samplingResult = new HashMap<>();
-                    samplingResult.put(usersSelectedKey, usersSelected);
-                    samplingResult.put(usersNotSelectedKey, usersNotSelected);
-
-                    onSuccessCallback.run(samplingResult);
+                    onSuccessCallback.run(usersToSelect);
 
                 });
     }
 
+    /**
+     * Resample users whose status remains waitlisted.
+     * Sets their status to SELECTED and updates the corresponding EventRegistrants status.
+     * Passes the list of resampled users to onSuccessCallback (as an Object.)
+     * @param eventID eventID
+     * @param resampleNum number of users to resample
+     * @param onSuccessCallback onSuccessCallback
+     */
+    public static void resampleAndSelectUsers(String eventID, int resampleNum, DBManager.Obj2VoidCallback onSuccessCallback) {
+        // assumes all entrants in waitlist elected to be resampled
+        DBManager dbManager = new DBManager();
+        sampleUsers(eventID, resampleNum, (userListObj) -> {
+            ArrayList<User> usersResampled = (ArrayList<User>) userListObj;
+            for (User user : usersResampled) {
+                dbManager.setRegistrantStatus(eventID, user.getUserID(), DBManager.RegistrantStatus.SELECTED);
+            }
+
+            onSuccessCallback.run(usersResampled);
+        });
+    }
 
 
-    // US 02.06.01 As an organizer I want to view a list of all chosen entrants who are invited to apply
     public ArrayList<EntrantRole> getInvitedEntrants(Event event) {
         return event.getEntrantsChosen();
     }
@@ -294,96 +206,46 @@ public class OrganizerRole extends User {
     }
 
     //---------- NOTIFICATIONS
-    // the following user stories are covered by notifyEntrantsByStatus in DBManager:
     // US 02.07.01 As an organizer I want to send notifications to all entrants on the waiting list
-    // US 02.07.02 As an organizer I want to send notifications to all selected entrants
-    // US 02.07.03 As an organizer I want to send a notification to all canceled entrants
+    public boolean notifyEntrantsInWaitlist(Event event, String message) {
+        return notifyEntrants(event, event.getEntrantsInWaitlist(), message);
+    }
 
-    public boolean notifyEntrantsByStatus(String eventID, String title, String message, DBManager.RegistrantStatus status) {
-        dbm.notifyEntrantsOfStatus(title, message, eventID, status);
-        return true;
+    // US 02.07.02 As an organizer I want to send notifications to all selected entrants
+    public boolean notifySelectedEntrants(Event event, String message) {
+        return notifyEntrants(event, event.getEntrantsChosen(), message);
+    }
+
+    // US 02.07.03 As an organizer I want to send a notification to all cancelled entrants
+    public boolean notifyCancelledEntrants(Event event, String message) {
+        return notifyEntrants(event, event.getEntrantsCancelled(), message);
     }
 
     // US 02.05.01 As an organizer I want to send a notification to chosen entrants to sign up for events
-    // called for each selected entrant (sampled or resampled)
-    // defines title, message, and updates Notification documents
-    // function is for individual entrants because functions that list
-    // all users are callback functions and this makes the most sense
-    public static boolean notifyEntrantChosen(Event event, User user) {
-        if (!user.getNotificationsEnabled()) {return false;}
-        String title = "Selected For Event";
-        String message = "You have been selected to join the following event: " + event.getEventName();
-        dbm.createNotification(title, message, user.getUserID(), event.getEventID());
-        return true;
+    public boolean notifyEntrantsChosen(Event event) {
+        String message = "You have been selected for "+event.getEventName()+". Sign up now.";
+        return notifyEntrants(event, event.getEntrantsChosen(), message);
     }
 
-    public static boolean notifyEntrantResampled(Event event, User user) {
-        if (!user.getNotificationsEnabled()) {return false;}
-        String title = "Selected For Event";
-        String message = "You have been selected to join the following event, since some have declined their invite: " + event.getEventName();
-        dbm.createNotification(title, message, user.getUserID(), event.getEventID());
-        return true;
-    }
+    public boolean notifyEntrants(Event event, ArrayList<EntrantRole> entrants, String message) {
+        boolean notificationSent = false;
 
-    public static boolean notifyEntrantNotChosen(Event event, User user) {
-        if (!user.getNotificationsEnabled()) {return false;}
-        String title = "Not Selected For Event";
-        String message = "You have not been sampled for the following event, but you will remain waitlisted in case a spot opens up: " + event.getEventName();
-        dbm.createNotification(title, message, user.getUserID(), event.getEventID());
-        return true;
-    }
+        // notification attributes
+        Date timestamp = new Date();
+        String eventID = event.getEventID();
 
-    public static boolean notifyEntrantCancelled(Event event, User user) {
-        if (!user.getNotificationsEnabled()) {return false;}
-        String title = "Cancelled Event Invite";
-        String message = "Your invitation to join the following event has been cancelled: " + event.getEventName();
-        dbm.createNotification(title, message, user.getUserID(), event.getEventID());
-        return true;
-    }
+        for (int i=0; i<entrants.size(); i++) {
+            EntrantRole current_entrant = entrants.get(i);
 
-    // -------------- UTILITY FUNCTIONS
-    public static void sampledEntrantsExist(String eventID, DBManager.Void2VoidCallback entrantsExistCallback, DBManager.Void2VoidCallback entrantsNotExistCallback) {
-//        DBManager dbm = new DBManager();
-        CollectionReference eventRegistrantsRef = dbm.db.collection(dbm.eventsCollection)
-                .document(eventID)
-                .collection(dbm.eventRegistrantsCollection);
-        Task<QuerySnapshot> selectedQuery = eventRegistrantsRef.whereEqualTo(dbm.eventStatusKey, DBManager.RegistrantStatus.SELECTED).get();
-        selectedQuery.addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                QuerySnapshot querySnapshot = task.getResult();
-                int numSelected = querySnapshot.size();
+            if (current_entrant.canRecieveNotifs()) {
+                String entrantID = current_entrant.getUserID(); // replace with device ID
 
-                if (numSelected > 0) {
-                    entrantsExistCallback.run();
-                } else {
-                    entrantsNotExistCallback.run();
-                }
-            } else {
-                Log.d(organizer_tag, "Error getting selected entrants: " + task.getException());
+                // NOTIFICATION GOES HERE
+                // how to send notification?
+
             }
-        });
-    }
+        }
 
-    // for resampling users
-    private static void countConfirmedAndSelected(String eventID, DBManager.Obj2VoidCallback onSuccessCallback) {
-//        DBManager dbm = new DBManager();
-        // reference to EventRegistrants subcollection
-        CollectionReference eventRegistrantsRef = dbm.db.collection(dbm.eventsCollection)
-                .document(eventID)
-                .collection(dbm.eventRegistrantsCollection);
-
-        Task<QuerySnapshot> selectedQuery = eventRegistrantsRef.whereEqualTo(dbm.eventStatusKey, DBManager.RegistrantStatus.SELECTED).get();
-        Task<QuerySnapshot> confirmedQuery = eventRegistrantsRef.whereEqualTo(dbm.eventStatusKey, DBManager.RegistrantStatus.CONFIRMED).get();
-
-        // combine results
-        Tasks.whenAllComplete(selectedQuery, confirmedQuery).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                int selectedCount = selectedQuery.getResult().size();
-                int confirmedCount = confirmedQuery.getResult().size();
-                onSuccessCallback.run(selectedCount + confirmedCount);
-            } else {
-                Log.e("Firestore", "Error counting selected and confirmed: ", task.getException());
-            }
-        });
+        return notificationSent;
     }
 }
