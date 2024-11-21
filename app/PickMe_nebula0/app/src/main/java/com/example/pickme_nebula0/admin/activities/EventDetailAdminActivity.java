@@ -93,9 +93,17 @@ public class EventDetailAdminActivity extends AppCompatActivity {
         dbManager.getEvent(eventID, eventObj -> {
             if (eventObj instanceof Event) {
                 Event event = (Event) eventObj;
-                runOnUiThread(() -> {
+               runOnUiThread(() -> {
                     StringBuilder details = new StringBuilder();
-                    details.append("QRcodeHash: ").append(event.getQrCodeData()).append("\n\n");
+                    details.append("QRcodeHash: ");
+                    if (event.getQrCodeData()==null){
+                        details.append("0").append("\n\n");
+                    }
+                    else{
+                        //details.append(event.getQrCodeData()).append("\n\n");
+                        //issue need to learn where the QR code data is held within events
+                        details.append("1").append("\n\n");
+                    }
                     QRcodeHashTextVeiw.setText(details.toString());
                 });
             } else {
@@ -107,6 +115,8 @@ public class EventDetailAdminActivity extends AppCompatActivity {
         }, () -> runOnUiThread(() -> {
             Toast.makeText(this, "Failed to retrieve event data.", Toast.LENGTH_SHORT).show();
             finish();
+
+
         }));
     }
 

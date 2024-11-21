@@ -103,6 +103,10 @@ public class AdminHomeActivity extends AppCompatActivity {
         // Set up list view for events
         events = new ArrayList<Event>();
         eventsList = findViewById(R.id.eventListView);
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
         eventAdapter = new EventsArrayAdapter(AdminHomeActivity.this,R.id.item_event, events);
         eventsList.setAdapter(eventAdapter);
         // for user profiles
@@ -115,6 +119,10 @@ public class AdminHomeActivity extends AppCompatActivity {
         facilitiesList = findViewById(R.id.facilitiesListView);
         facilityAdapter = new FacilityArrayAdapter(AdminHomeActivity.this,R.id.item_facility, facilities);
         facilitiesList.setAdapter(facilityAdapter);
+
+       // for QR codes
+        QRcodesList=findViewById(R.id.QRcodeListView);
+        QRAdapter=new QRcodeAdapter(AdminHomeActivity.this,R.id.item_qrcode, events);
 
 
         btnBack.setOnClickListener(new View.OnClickListener() {
@@ -152,9 +160,15 @@ public class AdminHomeActivity extends AppCompatActivity {
         btnManageUsers.setOnClickListener(new View.OnClickListener() {
             @Override
             //TODO;
+<<<<<<< Updated upstream
             public void onClick(View v) {
                 viewFlipper.setDisplayedChild(1); // Show Manage Profile layout
                 updateProfiles();
+=======
+            public void onClick(View v) { // Show Manage Events layout
+                viewFlipper.setDisplayedChild(1);
+                updateEvents();
+>>>>>>> Stashed changes
 
                 // On click, show user details an allow admin to delete
                 usersList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -171,7 +185,11 @@ public class AdminHomeActivity extends AppCompatActivity {
                         startActivity(intent);
                     }
                 });
+<<<<<<< Updated upstream
 
+=======
+                // Confirmation message for debugging and UI verification
+>>>>>>> Stashed changes
                 Toast.makeText(AdminHomeActivity.this, "Switched to Manage Users layout", Toast.LENGTH_SHORT).show();
             }
         });
@@ -191,6 +209,7 @@ public class AdminHomeActivity extends AppCompatActivity {
             //TODO;
             public void onClick(View v) {
                 viewFlipper.setDisplayedChild(3); // Show Manage QR Code layout
+                updateQRCodes();
                 Toast.makeText(AdminHomeActivity.this, "Switched to Manage QR Code layout", Toast.LENGTH_SHORT).show();
                 // On click, show event details an allow admin to delete
                 QRcodesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -203,8 +222,11 @@ public class AdminHomeActivity extends AppCompatActivity {
                         startActivity(intent);
                     }
                 });
+<<<<<<< Updated upstream
                 // Confirmation message for debugging and UI verification
                 Toast.makeText(AdminHomeActivity.this, "Switched to Manage Events layout", Toast.LENGTH_SHORT).show();
+=======
+>>>>>>> Stashed changes
             }
         });
 
@@ -280,8 +302,11 @@ there is no reason to separate the QR codes from their respective event
 as a QR code doesn't exist on its own  aslo a change made to the QR code
  */
     private void updateQRCodes(){
+<<<<<<< Updated upstream
 
         events.clear();
+=======
+>>>>>>> Stashed changes
         QRAdapter.notifyDataSetChanged();
         db.collection("Events")
                 .get()

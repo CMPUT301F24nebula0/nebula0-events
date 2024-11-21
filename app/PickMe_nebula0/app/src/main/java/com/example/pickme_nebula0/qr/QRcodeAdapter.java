@@ -27,14 +27,12 @@ public class QRcodeAdapter extends ArrayAdapter<Event> {
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         View view;
-
         if (convertView == null) {
             view = LayoutInflater.from(getContext()).inflate(R.layout.item_qrcode, parent, false);
         }
         else {
             view = convertView;
         }
-
         Event event= getItem(position);
         String hashcode=event.getQrCodeData();
         TextView QRcode = view.findViewById(R.id.qrcodehash_text_view);
@@ -42,7 +40,7 @@ public class QRcodeAdapter extends ArrayAdapter<Event> {
             QRcode.setText("0");
         }
         else {
-            QRcode.setText(hashcode);
+            QRcode.setText("1");
         }
         return view;
     };
