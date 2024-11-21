@@ -65,25 +65,30 @@ public class EventDetailAdminActivity extends AppCompatActivity {
         QRcodeHashTextVeiw.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dbManager.getEvent(eventID, eventObj -> {
-                    if (eventObj instanceof Event) {
-                        Event event = (Event) eventObj;
-                        runOnUiThread(() -> {
-                                    event.setQrCodeData("null");
-
-                        });
-                    } else {
-                        runOnUiThread(() -> {
-                            Toast.makeText(this, "Event not found.", Toast.LENGTH_SHORT).show();
-                            finish();
-                        });
-
-
-
+                DeleteQRcode(eventID);
             }
         });
     }
 
+    public void DeleteQRcode(String eventID){
+        dbManager.getEvent(eventID, eventObj -> {
+            if (eventObj instanceof Event) {
+                Event event = (Event) eventObj;
+                runOnUiThread(() -> {
+                    event.setQrCodeData("null");
+                });
+            } else {
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "Event not found.", Toast.LENGTH_SHORT).show();
+                    finish();
+                });
+            }
+        }, () -> runOnUiThread(() -> {
+            Toast.makeText(this, "Failed to retrieve event data.", Toast.LENGTH_SHORT).show();
+            finish();
+        }));
+
+    }
     private void fetchQRcodehash(String eventID) {
         dbManager.getEvent(eventID, eventObj -> {
             if (eventObj instanceof Event) {
