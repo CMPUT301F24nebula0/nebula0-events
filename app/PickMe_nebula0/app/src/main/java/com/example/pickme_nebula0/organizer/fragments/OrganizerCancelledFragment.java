@@ -51,7 +51,7 @@ public class OrganizerCancelledFragment extends Fragment {
     @SuppressLint("NotifyDataSetChanged")
     private void loadCancelledUsers() {
         cancelledUsers.clear();
-        dbManager.loadUsersRegisteredInEvent(eventID, DBManager.RegistrantStatus.CANCELED, "OrganizerCancelledFragment",
+        dbManager.loadUsersRegisteredInEvent(eventID, DBManager.RegistrantStatus.CANCELLED, "OrganizerCancelledFragment",
                 (userObj) -> {
                     User user = (User) userObj;
                     cancelledUsers.add(user);
