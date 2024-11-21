@@ -2,6 +2,8 @@ package com.example.pickme_nebula0.db;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Base64;
 import android.util.Log;
 
@@ -25,6 +27,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -158,9 +161,9 @@ public class DBManager {
         userData.put("userID",user.getUserID());
         userData.put("name", user.getName());
         userData.put("email", user.getEmail());
-        userData.put("phone", user.getPhoneNumber());
-        userData.put("profilePic", user.getProfilePicture());
-        userData.put("notificationsEnabled", user.notifEnabled());
+        userData.put("phone", user.getPhone());
+        userData.put("profilePic", user.getProfilePic());
+        userData.put("notificationsEnabled", user.getNotificationsEnabled());
         userData.put("admin", false);
 
         addUpdateDocument(usersCollection,user.getUserID(),userData);
@@ -175,9 +178,9 @@ public class DBManager {
         DocumentReference docRef = db.collection(usersCollection).document(user.getUserID());
         updateField(docRef,"name",user.getName());
         updateField(docRef,"email",user.getEmail());
-        updateField(docRef,"phone",user.getPhoneNumber());
-        updateField(docRef,"profilePic",user.getProfilePicture());
-        updateField(docRef,"notificationsEnabled",user.notifEnabled());
+        updateField(docRef,"phone",user.getPhone());
+        updateField(docRef,"profilePic",user.getProfilePic());
+        updateField(docRef,"notificationsEnabled",user.getNotificationsEnabled());
     }
 
     /**
@@ -327,7 +330,7 @@ public class DBManager {
      * @param userID deviceID of user we are sending the notification to
      * @param eventID ID of event associated with notification
      */
-    private void createNotification(String title, String message, String userID, String eventID){
+    public void createNotification(String title, String message, String userID, String eventID){
         CollectionReference userNotifCollection = db.collection(notificationCollection).document(userID).collection("userNotifs");
         String notifID = createIDForDocumentIn(userNotifCollection);
         Timestamp timestamp = new Timestamp(new Date());
@@ -596,7 +599,7 @@ public class DBManager {
 
         waitlistedUsersQuery.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                ArrayList<User> waitlistedUsers = new ArrayList<>();
+                List<User> waitlistedUsers = Collections.synchronizedList(new ArrayList<>());
 
                 for (QueryDocumentSnapshot registeredUserDoc : task.getResult()) {
                     String userID = registeredUserDoc.getId();
@@ -606,13 +609,10 @@ public class DBManager {
                         final CompletableFuture<User> userFuture = new CompletableFuture<>();
 
                         // fetch actual event asynchronously
-                        getUser(userID, (userFetched) -> {
-                            userFuture.complete((User) userFetched);
-                        }, () -> {
+                        getUser(userID, (userFetched) -> { userFuture.complete((User) userFetched);}, () -> {
                             Log.d("Firestore", "Could not get registered user " + userID);
                             userFuture.completeExceptionally(new Exception("Failed to fetch waitlisted user"));
                         });
-
                         return userFuture.get();
                     });
 
@@ -629,6 +629,12 @@ public class DBManager {
                     } catch (Exception e) {
                         Log.d("Firestore", "Error while fetching users: " + e.getMessage());
                     } finally {
+                        synchronized (waitlistedUsers) {
+                            new Handler(Looper.getMainLooper()).post(() -> {
+                                onSuccessCallback.run((List<User>) waitlistedUsers);
+                                Log.d("Firestore", "waitlisted users callback was invoked with size: " + waitlistedUsers.size());
+                            });
+                        }
                         executor.shutdown();
                         try {
                             if (!executor.awaitTermination(800, TimeUnit.MILLISECONDS)) {
@@ -637,8 +643,6 @@ public class DBManager {
                         } catch (InterruptedException e) {
                             executor.shutdownNow();
                         }
-
-                        onSuccessCallback.run(waitlistedUsers);
                     }
                 });
             } else {

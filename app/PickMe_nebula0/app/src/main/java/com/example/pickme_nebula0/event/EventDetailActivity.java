@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -17,9 +18,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.notification.NotificationCreationActivity;
+import com.example.pickme_nebula0.organizer.OrganizerRole;
 import com.example.pickme_nebula0.organizer.activities.OrganizerEventParticipantsActivity;
 import com.example.pickme_nebula0.DeviceManager;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.example.pickme_nebula0.user.User;
+
+import java.util.ArrayList;
+
+
+// NOTE: Assumes that if there is at least one selected entrant present,
+// first sampling has already occurred.
 
 public class EventDetailActivity extends AppCompatActivity {
 
@@ -28,10 +37,10 @@ public class EventDetailActivity extends AppCompatActivity {
     private ImageView qrCodeImageView;
     private Button participantsButton;
     private Button msgEntrantsButton;
+    private Button sampleEntrantsButton;
     private Button backButton;
 
     private String eventID;
-
     private DBManager dbManager;
 
     @Override
@@ -44,6 +53,7 @@ public class EventDetailActivity extends AppCompatActivity {
         // Initialize UI components
         backButton = findViewById(R.id.backButton);
         msgEntrantsButton = findViewById(R.id.button_ed_msgEntrants);
+        sampleEntrantsButton = findViewById(R.id.button_sample_entrants);
         participantsButton = findViewById(R.id.participantsButton);
         eventDetailsTextView = findViewById(R.id.event_details_text_view);
         qrCodeImageView = findViewById(R.id.qr_code_image_view);
@@ -51,7 +61,7 @@ public class EventDetailActivity extends AppCompatActivity {
         dbManager = new DBManager();
 
         // Retrieve eventID from intent
-        eventID = getIntent().getStringExtra("eventID");
+        String eventID = getIntent().getStringExtra("eventID");
 
         if (eventID == null || eventID.trim().isEmpty()) {
             Toast.makeText(this, "Invalid Event ID.", Toast.LENGTH_SHORT).show();
@@ -64,6 +74,12 @@ public class EventDetailActivity extends AppCompatActivity {
 
         // Fetch and display event details
         fetchEventDetails(eventID);
+
+        // Check if event has already sampled entrants
+        OrganizerRole.sampledEntrantsExist(eventID, () -> {
+            // rename text to resample entrants
+            sampleEntrantsButton.setText("Resample Entrants");
+        }, () -> {});
     }
 
     /**
@@ -85,6 +101,27 @@ public class EventDetailActivity extends AppCompatActivity {
             Intent intent = new Intent(EventDetailActivity.this, NotificationCreationActivity.class);
             intent.putExtra("eventID", eventID);
             startActivity(intent);
+        });
+
+        // Sample Entrants Button
+        sampleEntrantsButton.setOnClickListener(v -> {
+            OrganizerRole.sampledEntrantsExist(eventID, () -> {
+                Log.d("EventDetailActivity", "RESAMPLING USERS");
+                // sampled entrants exist
+                // do resampling instead
+                OrganizerRole.resampleAndSelectUsers(eventID, (resampledUsersObj) -> {
+                    for (User user : ((ArrayList<User>) resampledUsersObj)) {
+                        Log.d("EventDetailActivity", "resampled user "+user.getUserID());
+                    }});
+            }, () -> {
+                Log.d("EventDetailActivity", "SAMPLING USERS");
+                // do first sampling
+                OrganizerRole.sampleAndSelectUsers(eventID, (selectedUsersObj) -> {
+                    for (User user : ((ArrayList<User>) selectedUsersObj)) {
+                        Log.d("EventDetailActivity", "sampled user "+user.getUserID());
+                    }
+                });
+            });
         });
 
         // Participants Button
