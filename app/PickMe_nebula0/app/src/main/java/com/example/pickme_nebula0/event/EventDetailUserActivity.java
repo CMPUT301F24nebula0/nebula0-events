@@ -1,6 +1,5 @@
 package com.example.pickme_nebula0.event;
 
-import android.bluetooth.BluetoothClass;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -29,80 +28,87 @@ public class EventDetailUserActivity extends AppCompatActivity {
     private String eventID;
     private final String userID = DeviceManager.getDeviceId();
     private DBManager dbManager;
-    private Button acceptBtn, declineBtn, unregBtn,backBtn,regBtn;
-    private TextView eventDetailsTextView,userStatusTextView;
+
+    // UI components
+    private Button acceptButton, declineButton, unregisterButton, backButton, registerButton;
+    private TextView eventDetailsTextView, userStatusTextView;
+
     private FirebaseFirestore db;
 
     private boolean fromQR;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Set the content view
         setContentView(R.layout.activity_event_detail_user);
 
         db = FirebaseFirestore.getInstance();
         dbManager = new DBManager();
 
-        fromQR =getIntent().getBooleanExtra("fromQR",false);
+        // Check if user is coming from QR code
+        fromQR = getIntent().getBooleanExtra("fromQR",false);
 
         // Retrieve eventID from intent, go back if we fail to get valid eventID
         eventID = getIntent().getStringExtra("eventID");
+
+
         if (eventID == null || eventID.isEmpty()) {
             Toast.makeText(this, "Invalid Event ID.", Toast.LENGTH_SHORT).show();
             finish();
         }
 
-
         // Link components
-        backBtn = findViewById(R.id.button_edu_back);
-        acceptBtn = findViewById(R.id.button_edu_accept);
-        declineBtn = findViewById(R.id.button_edu_decline);
-        unregBtn = findViewById(R.id.button_edu_unregister);
+        backButton = findViewById(R.id.button_edu_back);
+        acceptButton = findViewById(R.id.button_edu_accept);
+        declineButton = findViewById(R.id.button_edu_decline);
+        unregisterButton = findViewById(R.id.button_edu_unregister);
         eventDetailsTextView = findViewById(R.id.textView_edu_details);
         userStatusTextView = findViewById(R.id.textView_edu_status);
-        regBtn = findViewById(R.id.button_edu_reg);
+        registerButton = findViewById(R.id.button_edu_reg);
 
         // Initially set all buttons invisible (may take a second to query DB and update visibility)
-        acceptBtn.setVisibility(View.GONE);
-        declineBtn.setVisibility(View.GONE);
-        unregBtn.setVisibility(View.GONE);
-        regBtn.setVisibility(View.GONE);
+        acceptButton.setVisibility(View.GONE);
+        declineButton.setVisibility(View.GONE);
+        unregisterButton.setVisibility(View.GONE);
+        registerButton.setVisibility(View.GONE);
 
-        backBtn.setOnClickListener(new View.OnClickListener() {
+        backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
             }
         });
 
-        regBtn.setOnClickListener(new View.OnClickListener() {
+        registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                joinWaitlist(eventID,()->{fromQR = false;renderAll();});
+                joinWaitlist(eventID, () -> { fromQR = false; renderAll(); });
             }
         });
 
-        acceptBtn.setOnClickListener(new View.OnClickListener() {
+        acceptButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dbManager.setRegistrantStatus(eventID,userID,DBManager.RegistrantStatus.CONFIRMED);
+                dbManager.setRegistrantStatus( eventID, userID, DBManager.RegistrantStatus.CONFIRMED);
                 renderUserStatus(); // status has changed so re-render
             }
         });
 
-        declineBtn.setOnClickListener(new View.OnClickListener() {
+        declineButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO - we can change this later to fully remove them if we don't want a user of leaves of their own volition CANCELED
-                dbManager.setRegistrantStatus(eventID,userID,DBManager.RegistrantStatus.CANCELED);
+                // TODO - we can change this later to fully remove them if we don't want a user of leaves of their own volition CANCELLED
+                dbManager.setRegistrantStatus(eventID,userID,DBManager.RegistrantStatus.CANCELLED);
                 renderUserStatus();
             }
         });
 
-        unregBtn.setOnClickListener(new View.OnClickListener() {
+        unregisterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO - we can change this later to fully remove them if we don't want a user of leaves of their own volition CANCELED
-                dbManager.setRegistrantStatus(eventID,userID,DBManager.RegistrantStatus.CANCELED);
+                // TODO - we can change this later to fully remove them if we don't want a user of leaves of their own volition CANCELLED
+                dbManager.setRegistrantStatus(eventID,userID,DBManager.RegistrantStatus.CANCELLED);
                 renderUserStatus();
             }
         });
@@ -125,10 +131,7 @@ public class EventDetailUserActivity extends AppCompatActivity {
             if (eventObj instanceof Event) {
                 Event event = (Event) eventObj;
                 runOnUiThread(() -> {
-                    StringBuilder details = new StringBuilder();
-                    details.append("Event Name: ").append(event.getEventName()).append("\n\n");
-                    details.append("Description: ").append(event.getEventDescription()).append("\n\n");
-                    details.append("Date: ").append(event.getEventDate().toString()).append("\n\n");
+                    StringBuilder details = generateEventDetails(event);
                     eventDetailsTextView.setText(details.toString());
                 });
             } else {
@@ -143,6 +146,14 @@ public class EventDetailUserActivity extends AppCompatActivity {
         }));
     }
 
+    private StringBuilder generateEventDetails(Event event) {
+        StringBuilder details = new StringBuilder();
+        details.append("Event Name: ").append(event.getEventName()).append("\n\n");
+        details.append("Description: ").append(event.getEventDescription()).append("\n\n");
+        details.append("Date: ").append(event.getEventDate().toString()).append("\n\n");
+        return details;
+    }
+
     /**
      * Renders all information about event and user status
      * @see DBManager
@@ -150,10 +161,10 @@ public class EventDetailUserActivity extends AppCompatActivity {
     private void renderAll(){
         renderEventInfo();
         if(fromQR){
-            regBtn.setVisibility(View.VISIBLE);
+            registerButton.setVisibility(View.VISIBLE);
             userStatusTextView.setText("Unregistered");
             // TODO - we should check if the user has already registered
-        }else{
+        } else {
             dbManager.getUserStatusString(userID,eventID,(status)->{renderBasedOnUserStatus(status.toString());},()->{});
         }
     }
@@ -163,7 +174,7 @@ public class EventDetailUserActivity extends AppCompatActivity {
      * @see DBManager
      */
     private void renderUserStatus(){
-        dbManager.getUserStatusString(userID,eventID,(status)->{renderBasedOnUserStatus(status.toString());},()->{});
+        dbManager.getUserStatusString(userID,eventID, (status)->{renderBasedOnUserStatus(status.toString());},()->{});
     }
 
     /**
@@ -173,22 +184,22 @@ public class EventDetailUserActivity extends AppCompatActivity {
      */
     private void renderBasedOnUserStatus(String status){
         userStatusTextView.setText(status);
-        regBtn.setVisibility(View.GONE);
+        registerButton.setVisibility(View.GONE);
 
         Toast.makeText(EventDetailUserActivity.this,status,Toast.LENGTH_SHORT);
 
         if (status.equalsIgnoreCase("WAITLISTED") || status.equalsIgnoreCase("CONFIRMED")){
-            acceptBtn.setVisibility(View.GONE);
-            declineBtn.setVisibility(View.GONE);
-            unregBtn.setVisibility(View.VISIBLE);
+            acceptButton.setVisibility(View.GONE);
+            declineButton.setVisibility(View.GONE);
+            unregisterButton.setVisibility(View.VISIBLE);
         } else if (status.equalsIgnoreCase("SELECTED")) {
-            acceptBtn.setVisibility(View.VISIBLE);
-            declineBtn.setVisibility(View.VISIBLE);
-            unregBtn.setVisibility(View.GONE);
-        } else if (status.equalsIgnoreCase("CANCELED")){
-            acceptBtn.setVisibility(View.GONE);
-            declineBtn.setVisibility(View.GONE);
-            unregBtn.setVisibility(View.GONE);
+            acceptButton.setVisibility(View.VISIBLE);
+            declineButton.setVisibility(View.VISIBLE);
+            unregisterButton.setVisibility(View.GONE);
+        } else if (status.equalsIgnoreCase("CANCELLED")){
+            acceptButton.setVisibility(View.GONE);
+            declineButton.setVisibility(View.GONE);
+            unregisterButton.setVisibility(View.GONE);
         }
     }
 

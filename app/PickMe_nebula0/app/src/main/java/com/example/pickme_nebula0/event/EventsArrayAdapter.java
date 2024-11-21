@@ -21,7 +21,6 @@ import java.util.ArrayList;
  * Array adapter used for updating and displaying instances of Event
  *  */
 public class EventsArrayAdapter extends ArrayAdapter<Event> {
-
     public EventsArrayAdapter(Context context,int textViewResourceId, ArrayList<Event> events){
         super(context,textViewResourceId,events);
     }
@@ -30,15 +29,7 @@ public class EventsArrayAdapter extends ArrayAdapter<Event> {
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        View view;
-
-        if (convertView == null) {
-            view = LayoutInflater.from(getContext()).inflate(R.layout.item_event, parent, false);
-        }
-        else {
-            view = convertView;
-        }
-
+        View view = convertView == null ? LayoutInflater.from(getContext()).inflate(R.layout.item_event, parent, false) : convertView;
         Event event = getItem(position);
         TextView eventName = view.findViewById(R.id.event_name_text_view);
         eventName.setText(event.getEventName());

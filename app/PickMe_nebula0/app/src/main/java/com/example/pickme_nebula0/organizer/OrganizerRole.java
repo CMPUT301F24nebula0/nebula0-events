@@ -41,7 +41,6 @@ public class OrganizerRole extends User {
         this.organizerID = organizerID;
     }
 
-    // US 02.01.01 As a an organizer I want to create a new event and generate a unique promotional QR code that links to the event description and event poster in the app
     public boolean createEvent() {
 //        boolean eventCreated = false;
 //        // Create event
@@ -52,28 +51,24 @@ public class OrganizerRole extends User {
         throw new RuntimeException("NOT IMPLEMENTED");
     }
 
-    // US 02.01.01 As a an organizer I want to create a new event and generate a unique promotional QR code that links to the event description and event poster in the app
     public boolean generateQRCode() {
         boolean QRCodeGenerated = false;
         // Generate QR code
         return false;
     }
 
-    // US 02.01.04 As an organizer I want to store hash data of the generated QR code in my database
     public boolean storeHashDataQRCode() {
         boolean hashDataStored = false;
         // Store hash data
         return false;
     }
 
-    // US 02.01.04 As an organizer I want to store hash data of the generated QR code in my database
     public boolean deleteHashDataQRCode() {
         boolean hashDataDeleted = false;
         // Delete hash data
         return false;
     }
 
-    // US 02.02.01 As an organizer I want to view the list of entrants who joined my event waiting list
     public ArrayList<EntrantRole> viewWaitlist(Event event) {
         ArrayList<EntrantRole> entrantsInWaitlist = new ArrayList<EntrantRole>();
 
@@ -81,42 +76,34 @@ public class OrganizerRole extends User {
         return entrantsInWaitlist;
     }
 
-    // US 02.02.02 As an organizer I want to see on a map where entrants joined my event waiting list from.
     public void viewMapOfWaitlist(Event event) {
         // in future, show the map of entrants who joined the event waiting list
     }
 
-    // US 02.03.01 As an organizer I want to OPTIONALLY limit the number of entrants who can join my waiting list
     public int getWaitlistCapacity(Event event) {
         return event.getWaitlistCapacity();
     }
 
-    // US 02.03.01 As an organizer I want to OPTIONALLY limit the number of entrants who can join my waiting list
     public void setWaitlistCapacity(Event event, int capacity) {
         event.setWaitlistCapacity(capacity);
     }
 
-    // US 02.04.01 As an organizer I want to upload an event poster to provide visual information to entrants 
     public String getEventPoster(Event event) {
         return event.getEventPoster();
     }
 
-    // US 02.04.01 As an organizer I want to upload an event poster to provide visual information to entrants 
     public void setEventPoster(Event event, String eventPoster) {
         event.setEventPoster(eventPoster);
     }
 
 
     /**
-     * US 02.05.02
-     * As an organizer I want to set the system to sample a specified number of attendees to register for the event
-     *
      * Samples all users in the waitlist, based on the event capacity of the given event,
      * or samples all if event capacity is none.
      * Sets their status to SELECTED and updates the corresponding EventRegistrants status.
      * Passes the list of selected users to onSuccessCallback (as an Object.)
-     * @param eventID
-     * @param onSuccessCallback
+     * @param eventID eventID
+     * @param onSuccessCallback onSuccessCallback
      */
     public static void sampleAndSelectUsers(String eventID, DBManager.Obj2VoidCallback onSuccessCallback) {
         DBManager dbManager = new DBManager();
@@ -149,9 +136,9 @@ public class OrganizerRole extends User {
     /**
      * Utility function that randomly samples users registered for an event
      * and passes this list to the onSuccessCallback (as an Object.)
-     * @param eventID
-     * @param sampleNum
-     * @param onSuccessCallback
+     * @param eventID eventID
+     * @param sampleNum sampleNum
+     * @param onSuccessCallback onSuccessCallback
      */
     public static void sampleUsers(String eventID, int sampleNum, DBManager.Obj2VoidCallback onSuccessCallback) {
         DBManager dbManager = new DBManager();
@@ -177,16 +164,12 @@ public class OrganizerRole extends User {
     }
 
     /**
-     * US 02.05.03
-     * As an organizer I want to be able to draw a replacement applicant from the pooling system
-     * when a previously selected applicant cancels or rejects the invitation.
-     *
      * Resample users whose status remains waitlisted.
      * Sets their status to SELECTED and updates the corresponding EventRegistrants status.
      * Passes the list of resampled users to onSuccessCallback (as an Object.)
-     * @param eventID
-     * @param resampleNum
-     * @param onSuccessCallback
+     * @param eventID eventID
+     * @param resampleNum number of users to resample
+     * @param onSuccessCallback onSuccessCallback
      */
     public static void resampleAndSelectUsers(String eventID, int resampleNum, DBManager.Obj2VoidCallback onSuccessCallback) {
         // assumes all entrants in waitlist elected to be resampled
@@ -201,7 +184,7 @@ public class OrganizerRole extends User {
         });
     }
 
-    // US 02.06.01 As an organizer I want to view a list of all chosen entrants who are invited to apply
+
     public ArrayList<EntrantRole> getInvitedEntrants(Event event) {
         return event.getEntrantsChosen();
     }
@@ -225,27 +208,23 @@ public class OrganizerRole extends User {
     //---------- NOTIFICATIONS
     // US 02.07.01 As an organizer I want to send notifications to all entrants on the waiting list
     public boolean notifyEntrantsInWaitlist(Event event, String message) {
-        boolean notificationSent = notifyEntrants(event, event.getEntrantsInWaitlist(), message);
-        return notificationSent;
+        return notifyEntrants(event, event.getEntrantsInWaitlist(), message);
     }
 
     // US 02.07.02 As an organizer I want to send notifications to all selected entrants
     public boolean notifySelectedEntrants(Event event, String message) {
-        boolean notificationSent = notifyEntrants(event, event.getEntrantsChosen(), message);
-        return notificationSent;
+        return notifyEntrants(event, event.getEntrantsChosen(), message);
     }
 
-    // US 02.07.03 As an organizer I want to send a notification to all canceled entrants
+    // US 02.07.03 As an organizer I want to send a notification to all cancelled entrants
     public boolean notifyCancelledEntrants(Event event, String message) {
-        boolean notificationSent = notifyEntrants(event, event.getEntrantsCancelled(), message);
-        return notificationSent;
+        return notifyEntrants(event, event.getEntrantsCancelled(), message);
     }
 
     // US 02.05.01 As an organizer I want to send a notification to chosen entrants to sign up for events
     public boolean notifyEntrantsChosen(Event event) {
         String message = "You have been selected for "+event.getEventName()+". Sign up now.";
-        boolean notificationSent = notifyEntrants(event, event.getEntrantsChosen(), message);
-        return notificationSent;
+        return notifyEntrants(event, event.getEntrantsChosen(), message);
     }
 
     public boolean notifyEntrants(Event event, ArrayList<EntrantRole> entrants, String message) {

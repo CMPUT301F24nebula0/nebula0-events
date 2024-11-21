@@ -1,5 +1,6 @@
 package com.example.pickme_nebula0.organizer.fragments;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OrganizerConfirmedFragment extends Fragment {
-    private FirebaseFirestore db;
     private DBManager dbManager = new DBManager();
     ArrayList<User> enrolledUsers = new ArrayList<User>();
     private EnrolledAdapter adapter;
@@ -39,7 +39,7 @@ public class OrganizerConfirmedFragment extends Fragment {
         adapter = new EnrolledAdapter(getContext(), enrolledUsers);
         recyclerView.setAdapter(adapter);
 
-        db = FirebaseFirestore.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         return view;
     }
@@ -50,6 +50,7 @@ public class OrganizerConfirmedFragment extends Fragment {
         loadEnrolledUsers();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void loadEnrolledUsers() {
         enrolledUsers.clear();
         dbManager.loadUsersRegisteredInEvent(eventID, DBManager.RegistrantStatus.CONFIRMED, "OrganizerEnrolledFragment",

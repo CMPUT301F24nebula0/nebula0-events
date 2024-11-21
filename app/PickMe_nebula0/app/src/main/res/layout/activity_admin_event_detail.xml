@@ -16,6 +16,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+
+
     <Button
         android:id="@+id/button_aed_back"
         android:layout_width="wrap_content"
@@ -36,6 +38,18 @@
         android:textAlignment="viewStart"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button_aed_back" />
+
+
+    <TextView
+        android:id="@+id/eventqrcodehash"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="12dp"
+        android:text="TextView"
+        android:textAlignment="viewStart"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_aed_eventInfo" />
 
     <Button
         android:id="@+id/button_aed_delete_event"

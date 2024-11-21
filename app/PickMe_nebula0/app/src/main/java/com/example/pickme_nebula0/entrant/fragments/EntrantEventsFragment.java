@@ -53,7 +53,7 @@ public class EntrantEventsFragment extends Fragment {
 
         db = FirebaseFirestore.getInstance();
 
-        events = new ArrayList<Event>();
+        events = new ArrayList<>();
         eventList = rootView.findViewById(R.id.entrant_waitlisted_events_listview);
         eventAdapter = new EventsArrayAdapter(getActivity(), R.id.item_event, events);
         eventList.setAdapter(eventAdapter);

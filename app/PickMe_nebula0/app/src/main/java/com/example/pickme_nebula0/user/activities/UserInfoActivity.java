@@ -1,16 +1,26 @@
 package com.example.pickme_nebula0.user.activities;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.PickVisualMediaRequest;
+
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -18,7 +28,9 @@ import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.SharedDialogue;
+import com.example.pickme_nebula0.db.FBStorageManager;
 import com.example.pickme_nebula0.user.User;
+import com.squareup.picasso.Picasso;
 
 // TODO: add profile image LATER
 
@@ -41,15 +53,32 @@ public class UserInfoActivity extends AppCompatActivity {
     Button confirmButton;
     Button cancelButton;
     Button facilityButton;
+    ImageView profilePicImageView;
+    Button changeProfilePicButton;
+    Button removeProfilePicButton;
+    ActivityResultLauncher<PickVisualMediaRequest> pickMedia;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_info);
-
-        boolean newUser = getIntent().getBooleanExtra("newUser",false);
-        deviceID = DeviceManager.getDeviceId();
         dbManager = new DBManager();
+
+        deviceID = DeviceManager.getDeviceId();
+        boolean newUser = getIntent().getBooleanExtra("newUser",false);
+
+        // Registers a photo picker activity launcher in single-select mode.
+        pickMedia =
+                registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
+                    // Callback is invoked after the user selects a media item or closes the
+                    // photo picker.
+                    if (uri != null) {
+                        FBStorageManager.uploadProfilePic(uri,deviceID,this);
+                        renderProfilePicture(uri);
+                    } else {
+                        setAutoProfilePic();
+                    }
+                });
 
         headerTextView = findViewById(R.id.textViewUserInfoHeader);
         nameField = findViewById(R.id.editTextUserInfoName);
@@ -59,6 +88,9 @@ public class UserInfoActivity extends AppCompatActivity {
         confirmButton= findViewById(R.id.buttonUserInfoConfirm);
         cancelButton = findViewById(R.id.buttonUserInfoCancel);
         facilityButton = findViewById(R.id.buttonUserInfoManageFacility);
+        profilePicImageView = findViewById(R.id.imageViewProfilePic);
+        changeProfilePicButton = findViewById(R.id.buttonChangePicture);
+        removeProfilePicButton = findViewById(R.id.buttonRemovePicture);
 
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,11 +130,26 @@ public class UserInfoActivity extends AppCompatActivity {
             }
         });
 
+        changeProfilePicButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openImagePicker();
+            }
+        });
+
+        removeProfilePicButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setAutoProfilePic();
+            }
+        });
 
         if (newUser){ // new user's require a slightly different screen layout
+            setAutoProfilePic();
             headerTextView.setText(R.string.user_info_header_first_time);
             cancelButton.setVisibility(View.GONE);
             facilityButton.setVisibility(View.GONE);
+            enableNotifBox.setChecked(true);
         } else{ // returning users need to see their stored info, read it from DB
             headerTextView.setText(R.string.user_info_header_returning);
             dbManager.getUser(deviceID,this::populateFieldsFromDB,this::failedToPopulateFieldsFromDB);
@@ -119,8 +166,11 @@ public class UserInfoActivity extends AppCompatActivity {
         User castedUser = (User) user;
         nameField.setText(castedUser.getName());
         emailField.setText(castedUser.getEmail());
-        phoneField.setText(castedUser.getPhoneNumber());
-        enableNotifBox.setChecked(castedUser.notifEnabled());
+        if(castedUser.getPhone() != null){
+            phoneField.setText(castedUser.getPhone());
+        }
+        enableNotifBox.setChecked(castedUser.getNotificationsEnabled());
+        FBStorageManager.retrieveProfilePicUri(deviceID,this::renderProfilePicture,this::setAutoProfilePic);
     }
 
     /**
@@ -139,7 +189,6 @@ public class UserInfoActivity extends AppCompatActivity {
      * @return a blank string if all is valid, else returns a warning string containing information of invalidities
      */
     public static String validateUserInfo(String name, String email, String phone){
-        // TODO: data valildation should probably be done within the User Class, but this will work for now
         String warning = "";
         // verify name is non-numeric
         if (name.matches(".*\\d.*")){
@@ -175,21 +224,37 @@ public class UserInfoActivity extends AppCompatActivity {
         return warning;
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (requestCode == 100) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, you can notify the user in the background
-                Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show();
-
-            } else {
-                // Permission denied, handle accordingly
-                Toast.makeText(this, "Permission denied, can't show notifications", Toast.LENGTH_SHORT).show();
-            }
+    public void renderProfilePicture(Uri uri){
+        try {
+            Picasso.get()
+                    .load(uri)
+                    .fit()
+                    .centerInside()
+                    .placeholder(R.drawable.ic_profile_placeholder)
+                    .error(R.drawable.ic_profile_placeholder)
+                    .into(profilePicImageView);
+        } catch(Exception e){
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
+
+
+    private void openImagePicker() {
+        pickMedia.launch(new PickVisualMediaRequest.Builder()
+                .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                .build());
+    }
+
+    private void setAutoProfilePic(){
+        Toast.makeText(this,"Replacing image with auto",Toast.LENGTH_LONG).show();
+
+        // TODO - tie this in with auto gen profile pics
+//        Uri generatedImageUri;
+//        FBStorageManager.uploadProfilePic(generatedImageUri,deviceID,this);
+//        renderProfilePicture(generatedImageUri);
+    }
+
 
 
 }

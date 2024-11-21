@@ -20,9 +20,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 
 public class WaitlistedAdapter extends RecyclerView.Adapter<WaitlistedAdapter.WaitlistedViewHolder> {
-    private ArrayList<User> waitlistedUsers;
-    private Context context;
-    private FirebaseFirestore db;
+    private final ArrayList<User> waitlistedUsers;
+    private final Context context;
 
     public WaitlistedAdapter(Context context, ArrayList<User> waitlistedUsers) {
         this.context = context;
@@ -33,7 +32,7 @@ public class WaitlistedAdapter extends RecyclerView.Adapter<WaitlistedAdapter.Wa
     @Override
     public WaitlistedViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewTypes) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_user, parent, false);
-        db = FirebaseFirestore.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
         return new WaitlistedViewHolder(view);
     }
 
@@ -41,7 +40,6 @@ public class WaitlistedAdapter extends RecyclerView.Adapter<WaitlistedAdapter.Wa
     public void onBindViewHolder(@NonNull WaitlistedViewHolder holder, int position) {
         User user = waitlistedUsers.get(position);
         Log.d("User", user.toString());
-
 
         holder.userNameTextView.setText(user.getName());
 

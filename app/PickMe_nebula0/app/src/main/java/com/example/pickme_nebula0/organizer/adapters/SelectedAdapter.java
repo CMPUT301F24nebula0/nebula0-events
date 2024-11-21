@@ -17,12 +17,14 @@ import com.example.pickme_nebula0.user.activities.UserDetailActivity;
 import java.util.ArrayList;
 
 public class SelectedAdapter extends RecyclerView.Adapter<SelectedAdapter.SelectedViewHolder> {
-    private ArrayList<User> selectedUsers;
-    private Context context;
+    private final ArrayList<User> selectedUsers;
+    private final Context context;
+    private final String eventID;
 
-    public SelectedAdapter(Context context, ArrayList<User> selectedUsers) {
+    public SelectedAdapter(Context context, ArrayList<User> selectedUsers, String eventID) {
         this.context = context;
         this.selectedUsers = selectedUsers;
+        this.eventID = eventID;
     }
 
     @NonNull
@@ -40,6 +42,7 @@ public class SelectedAdapter extends RecyclerView.Adapter<SelectedAdapter.Select
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, UserDetailActivity.class);
             intent.putExtra("userID", user.getUserID());
+            intent.putExtra("eventID", eventID);
             context.startActivity(intent);
         });
     }
