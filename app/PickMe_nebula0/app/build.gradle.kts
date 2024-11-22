@@ -34,7 +34,7 @@ android {
 }
 
 dependencies {
-    // Firebase BoM for version management
+    // Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:32.7.1"))
 
     // Firebase dependencies
@@ -45,24 +45,16 @@ dependencies {
     implementation("com.google.firebase:firebase-messaging")
     implementation("com.google.firebase:firebase-storage:20.2.1")
 
-    // Image loading
-    implementation("com.squareup.picasso:picasso:2.8")
-
-    // QR code support with ZXing
-    implementation("com.journeyapps:zxing-android-embedded:4.1.0") {
-        exclude("com.google.protobuf", "protobuf-lite")
-    }
-
-    // UI and Compose dependencies
+    // AndroidX dependencies
     implementation("androidx.activity:activity-compose:1.9.3")
-    implementation("com.google.android.material:material:1.4.0")
-    implementation("androidx.viewpager2:viewpager2:1.0.0")
     implementation("androidx.core:core-ktx:1.10.0")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.constraintlayout)
 
     // Testing dependencies
+    testImplementation("org.hamcrest:hamcrest-core:2.2")
+    testImplementation("org.hamcrest:hamcrest-library:2.2")
     testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter)
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
@@ -70,19 +62,29 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-contrib:3.5.1") {
         exclude("com.google.protobuf", "protobuf-lite")
     }
+    androidTestImplementation("androidx.test:core:1.5.0")
+    androidTestImplementation("androidx.test:runner:1.5.2")
+    androidTestImplementation("androidx.test:rules:1.5.0")
 
-    // Force protobuf-javalite to avoid conflicts with protobuf-lite
+    // QR code and image loading
+    implementation("com.squareup.picasso:picasso:2.8")
+    implementation("com.journeyapps:zxing-android-embedded:4.1.0") {
+        exclude("com.google.protobuf", "protobuf-lite")
+    }
+
+    // Multidex for large method count
+    implementation("androidx.multidex:multidex:2.0.1")
+
+    // Force protobuf-javalite
     implementation("com.google.protobuf:protobuf-javalite:3.22.3")
-
-    // Additional tools
-    implementation(libs.rules)
-    testImplementation(libs.ext.junit)
-    testImplementation(libs.espresso.core)
 }
+
 
 configurations.all {
     // Force protobuf-javalite to avoid conflicts with protobuf-lite
     resolutionStrategy {
         force("com.google.protobuf:protobuf-javalite:3.22.3")
+        force("org.hamcrest:hamcrest-core:2.2")
+        force("org.hamcrest:hamcrest-library:2.2")
     }
 }
