@@ -88,7 +88,11 @@ public class EventDetailActivity extends AppCompatActivity {
         });
 
         // Participants Button
-        participantsButton.setOnClickListener(view -> navigateTo(OrganizerEventParticipantsActivity.class));
+        participantsButton.setOnClickListener(view -> {
+            Intent intent = new Intent(EventDetailActivity.this, OrganizerEventParticipantsActivity.class);
+            intent.putExtra("eventID", eventID);
+            startActivity(intent);
+        });
 
     }
 

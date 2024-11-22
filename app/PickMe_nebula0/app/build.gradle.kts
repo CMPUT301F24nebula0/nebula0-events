@@ -43,7 +43,7 @@ dependencies {
     implementation ("com.google.firebase:firebase-storage:20.2.1")
     implementation ("com.squareup.picasso:picasso:2.8")// For loading images
     implementation ("androidx.activity:activity-compose:1.9.3") // or the latest version
-
+    implementation("com.google.android.gms:play-services-maps:18.1.0")
 
     implementation(libs.rules)
     testImplementation(libs.ext.junit)
