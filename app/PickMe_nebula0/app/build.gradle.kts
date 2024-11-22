@@ -1,3 +1,17 @@
+import java.util.Properties
+
+// Define the getLocalProperty function at the top
+fun getLocalProperty(key: String): String {
+    val properties = Properties()
+    val localPropertiesFile = rootProject.file("local.properties")
+    return if (localPropertiesFile.exists()) {
+        properties.load(localPropertiesFile.inputStream())
+        "\"${properties.getProperty(key) ?: ""}\""
+    } else {
+        "\"\""
+    }
+}
+
 plugins {
     alias(libs.plugins.android.application)
     // Add the Google services Gradle plugin
@@ -16,6 +30,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        manifestPlaceholders["MAPS_API_KEY"] = getLocalProperty("MAPS_API_KEY")
+
     }
 
     buildTypes {
@@ -31,6 +48,8 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
+
 }
 
 dependencies {
