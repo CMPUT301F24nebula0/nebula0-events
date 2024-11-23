@@ -18,52 +18,40 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 public class OrganizerHomeActivity extends AppCompatActivity {
-
-    // tabs: "Past" and "Ongoing"
     private final String[] tabTitles = new String[]{"Past", "Ongoing"};
-
-    // back button and create event button
-    private Button backButton;
     private Button createEventButton;
-
-    // display tabs: "past" and "ongoing"
-    private ViewPager2 viewPager;
-    // displays corresponding fragment when tab is selected
-    private TabLayout tabLayout;
-    // Adapter for ViewPager2 (to provide fragments)
-    private FragmentStateAdapter pagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // attach components to layout
-        setContentView(R.layout.activity_organizer_home);
-        viewPager = findViewById(R.id.view_pager);
-        tabLayout = findViewById(R.id.tab_layout);
+        setContentView(R.layout.activity_organizer_home); // attach components to layout
 
-        pagerAdapter = new ScreensSlidePagerAdapter(this);
+        tabToggling(tabTitles);
+
+        backButton();
+        createEventButton();
+    }
+
+    /**
+     * Function to toggle between tabs
+     *
+     * @param tabTitles array of tab titles
+     */
+    private void tabToggling(String[] tabTitles) {
+        ViewPager2 viewPager = findViewById(R.id.view_pager); // display tabs: "past" and "ongoing"
+
+        // displays corresponding fragment when tab is selected
+        TabLayout tabLayout = findViewById(R.id.tab_layout);
+
+        // Adapter for ViewPager2 (to provide fragments)
+        FragmentStateAdapter pagerAdapter = new ScreensSlidePagerAdapter(this);
         viewPager.setAdapter(pagerAdapter);
-
-        backButton = findViewById(R.id.backButton);
-        createEventButton = findViewById(R.id.createEventButton);
-
 
         // Sync tabLayout with viewPager
         new TabLayoutMediator(tabLayout, viewPager,
                 (tab, position) -> tab.setText(tabTitles[position])
         ).attach();
-
-
-        // back button and create event button
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getOnBackPressedDispatcher().onBackPressed();
-            }
-        });
-        createEventButton.setOnClickListener(view -> navigateTo(OrganizerCreateEventActivity.class));
-
 
         // toggles the visibility of the createEventButton depending on selected tab
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
@@ -78,13 +66,30 @@ public class OrganizerHomeActivity extends AppCompatActivity {
         });
     }
 
-    // function for switching screens through intent
-    private void navigateTo(Class<?> targetActivity) {
-        Intent intent = new Intent(OrganizerHomeActivity.this, targetActivity);
+    /**
+     * Function for back button
+     */
+    private void backButton() {
+        Button backButton = findViewById(R.id.backButton);
+        backButton.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
+    }
+
+    /**
+     * Function for create event button
+     */
+    private void createEventButton() {
+        createEventButton = findViewById(R.id.createEventButton);
+        createEventButton.setOnClickListener(view -> navigateTo());
+    }
+
+    /**
+     * Function to navigate to the create event activity
+     */
+    private void navigateTo() {
+        Intent intent = new Intent(OrganizerHomeActivity.this, OrganizerCreateEventActivity.class);
         startActivity(intent);
     }
 
-    // Supplies the fragments for the ViewPager2
     private class ScreensSlidePagerAdapter extends FragmentStateAdapter {
         public ScreensSlidePagerAdapter(AppCompatActivity fa) {
             super(fa);

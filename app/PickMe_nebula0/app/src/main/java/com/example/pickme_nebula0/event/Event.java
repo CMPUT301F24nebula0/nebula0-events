@@ -9,7 +9,9 @@ import java.util.Collections;
 import java.util.Date;
 
 /**
- * Event
+ * Class to represent an event.
+ *
+ * @author Taekwan Yoon
  */
 public class Event {
     private String qrCodeData;
@@ -81,41 +83,144 @@ public class Event {
         this.eventCapacity = eventCapacity;
     }
 
-    // getters
+    /**
+     * Returns the event ID.
+     *
+     * @return event ID
+     */
     public String getEventID() {
         return this.eventID;
     }
 
+    /**
+     * Returns the event name.
+     *
+     * @return event name
+     */
     public String getEventName() { return this.eventName; }
+
+    /**
+     * Returns the event description.
+     *
+     * @return event description
+     */
     public String getEventDescription() { return this.eventDescription; }
+
+    /**
+     * Returns the event date.
+     *
+     * @return event date
+     */
     public Date getEventDate() { return this.eventDate; }
+
+    /**
+     * Returns whether geolocation is required.
+     *
+     * @return whether geolocation is required
+     */
     public boolean getGeolocationRequired() { return this.geolocationRequired; }
+
+    /**
+     * Returns the maximum distance for geolocation.
+     *
+     * @return maximum distance for geolocation
+     */
     public int getGeolocationMaxDistance() { return this.geolocationMaxDistance; }
     public boolean getWaitlistCapacityRequired() { return this.waitlistCapacityRequired; }
+
+    /**
+     * Returns the waitlist capacity.
+     *
+     * @return waitlist capacity
+     */
     public int getWaitlistCapacity() { return this.waitlistCapacity; }
+
+    /**
+     * Returns the event capacity.
+     *
+     * @return event capacity
+     */
     public int getEventCapacity() { return this.eventCapacity; }
+
+    /**
+     * Returns the organizer ID.
+     *
+     * @return organizer ID
+     */
     public String getOrganizerID() {return organizerID;}
+
+    /**
+     * Returns the event poster.
+     *
+     * @return event poster
+     */
     public String getEventPoster() {
         return this.eventPoster;
     }
+
+    /**
+     * Returns the created date and time.
+     *
+     * @return created date and time
+     */
     public Date getCreatedDateTime() { return this.createdDateTime; }
+
+    /**
+     * Returns the number of attendees.
+     *
+     * @return number of attendees
+     */
     public int getNumberOfAttendees() { return this.numberOfAttendees; }
+
+    /**
+     * Returns the geolocation requirement.
+     *
+     * @return geolocation requirement
+     */
     public int getGeolocationRequirement() { return this.geolocationRequirement; }
+
+    /**
+     * Returns the QR code data.
+     *
+     * @return QR code data
+     */
     public String getQrCodeData() {
         return qrCodeData;
     }
+
+    /**
+     * Returns the entrants in the waiting list.
+     *
+     * @return entrants in the waiting list
+     */
     public ArrayList<EntrantRole> getEntrantsInWaitlist() {
         return this.entrantsInWaitlist;
     }
 
+    /**
+     * Returns the entrants chosen.
+     *
+     * @return entrants chosen
+     */
     public ArrayList<EntrantRole> getEntrantsChosen() {
         return this.entrantsChosen;
     }
 
+    /**
+     * Returns the entrants cancelled.
+     *
+     * @return entrants cancelled
+     */
     public ArrayList<EntrantRole> getEntrantsCancelled() {
         // FETCH FROM DB INSTEAD
         return this.entrantsCancelled;
     }
+
+    /**
+     * Returns the entrants enrolled.
+     *
+     * @return entrants enrolled
+     */
     public ArrayList<EntrantRole> getEntrantsEnrolled() {
         return this.entrantsEnrolled;
     }
