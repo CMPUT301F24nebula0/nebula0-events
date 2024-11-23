@@ -101,111 +101,88 @@ public class AdminHomeActivity extends AppCompatActivity {
         btnBack = findViewById(R.id.button_admin_back);
 
         // Set up list view for events
-        events = new ArrayList<Event>();
+        events = new ArrayList<>();
         eventsList = findViewById(R.id.eventListView);
         eventAdapter = new EventsArrayAdapter(AdminHomeActivity.this,R.id.item_event, events);
         eventsList.setAdapter(eventAdapter);
         // for user profiles
-        users = new ArrayList<User>();
+        users = new ArrayList<>();
         usersList = findViewById(R.id.ProfileListView);
         userAdapter = new UserArrayAdapter(AdminHomeActivity.this,R.id.item_user, users);
         usersList.setAdapter(userAdapter);
         // for facility profiles
-        facilities = new ArrayList<Facility>();
+        facilities = new ArrayList<>();
         facilitiesList = findViewById(R.id.facilitiesListView);
         facilityAdapter = new FacilityArrayAdapter(AdminHomeActivity.this,R.id.item_facility, facilities);
         facilitiesList.setAdapter(facilityAdapter);
 
 
-        btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        btnBack.setOnClickListener(v -> finish());
 
         // upon clicking the manage events button, show the manage events layout
-        btnManageEvents.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Show Manage Events layout
-                viewFlipper.setDisplayedChild(0);
-                updateEvents();
+        btnManageEvents.setOnClickListener(v -> {
+            // Show Manage Events layout
+            viewFlipper.setDisplayedChild(0);
+            updateEvents();
 
-                // On click, show event details an allow admin to delete
-                eventsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
-                        Event clickedEvent = (Event) adapterView.getItemAtPosition(pos);
+            // On click, show event details an allow admin to delete
+            eventsList.setOnItemClickListener((adapterView, view, pos, id) -> {
+                Event clickedEvent = (Event) adapterView.getItemAtPosition(pos);
 
-                        Intent intent = new Intent(AdminHomeActivity.this, EventDetailAdminActivity.class);
-                        intent.putExtra("eventID",clickedEvent.getEventID());
-                        startActivity(intent);
-                    }
-                });
+                Intent intent = new Intent(AdminHomeActivity.this, EventDetailAdminActivity.class);
+                intent.putExtra("eventID",clickedEvent.getEventID());
+                startActivity(intent);
+            });
 
-                // Confirmation message for debugging and UI verification
-                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Events layout", Toast.LENGTH_SHORT).show();
-            }
+            // Confirmation message for debugging and UI verification
+            Toast.makeText(AdminHomeActivity.this, "Switched to Manage Events layout", Toast.LENGTH_SHORT).show();
         });
 
-        btnManageUsers.setOnClickListener(new View.OnClickListener() {
-            @Override
-            //TODO;
-            public void onClick(View v) {
-                viewFlipper.setDisplayedChild(1); // Show Manage Profile layout
-                updateProfiles();
+        //TODO;
+        btnManageUsers.setOnClickListener(v -> {
+            viewFlipper.setDisplayedChild(1); // Show Manage Profile layout
+            updateProfiles();
 
-                // On click, show user details an allow admin to delete
-                usersList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
-                        User clickedUser = (User) adapterView.getItemAtPosition(pos);
+            // On click, show user details an allow admin to delete
+            usersList.setOnItemClickListener((adapterView, view, pos, id) -> {
+                User clickedUser = (User) adapterView.getItemAtPosition(pos);
 
-                        Toast.makeText(AdminHomeActivity.this, clickedUser.getUserID(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(AdminHomeActivity.this, clickedUser.getUserID(), Toast.LENGTH_SHORT).show();
 
 
-                        Intent intent = new Intent(AdminHomeActivity.this, UserDetailActivity.class);
-                        intent.putExtra("userID",clickedUser.getUserID());
-                        intent.putExtra("admin",true);
-                        startActivity(intent);
-                    }
-                });
+                Intent intent = new Intent(AdminHomeActivity.this, UserDetailActivity.class);
+                intent.putExtra("userID",clickedUser.getUserID());
+                intent.putExtra("admin",true);
+                startActivity(intent);
+            });
 
-                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Users layout", Toast.LENGTH_SHORT).show();
-            }
+            Toast.makeText(AdminHomeActivity.this, "Switched to Manage Users layout", Toast.LENGTH_SHORT).show();
         });
 
-        btnManageImages.setOnClickListener(new View.OnClickListener() {
-            @Override
-            //TODO;
-            public void onClick(View v) {
-                viewFlipper.setDisplayedChild(2); // Show Manage Image layout
-                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Images layout", Toast.LENGTH_SHORT).show();
+        //TODO;
+        btnManageImages.setOnClickListener(v -> {
+            viewFlipper.setDisplayedChild(2); // Show Manage Image layout
+            Toast.makeText(AdminHomeActivity.this, "Switched to Manage Images layout", Toast.LENGTH_SHORT).show();
 
-            }
         });
 
-        btnManageQR.setOnClickListener(new View.OnClickListener() {
-            @Override
-            //TODO;
-            public void onClick(View v) {
-                viewFlipper.setDisplayedChild(3); // Show Manage QR Code layout
-                Toast.makeText(AdminHomeActivity.this, "Switched to Manage QR Code layout", Toast.LENGTH_SHORT).show();
-                // On click, show event details an allow admin to delete
-                QRcodesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
-                        Event clickedEvent = (Event) adapterView.getItemAtPosition(pos);
+        //TODO;
+        btnManageQR.setOnClickListener(v -> {
+            viewFlipper.setDisplayedChild(3); // Show Manage QR Code layout
+            Toast.makeText(AdminHomeActivity.this, "Switched to Manage QR Code layout", Toast.LENGTH_SHORT).show();
+            // On click, show event details an allow admin to delete
+            QRcodesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
+                    Event clickedEvent = (Event) adapterView.getItemAtPosition(pos);
 
-                        Intent intent = new Intent(AdminHomeActivity.this, EventDetailAdminActivity.class);
-                        intent.putExtra("eventID",clickedEvent.getEventID());
-                        startActivity(intent);
-                    }
-                });
-                // Confirmation message for debugging and UI verification
-                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Events layout", Toast.LENGTH_SHORT).show();
-            }
+                    Intent intent = new Intent(AdminHomeActivity.this, EventDetailAdminActivity.class);
+                    intent.putExtra("eventID",clickedEvent.getEventID());
+                    startActivity(intent);
+                }
+            });
+            // Confirmation message for debugging and UI verification
+            Toast.makeText(AdminHomeActivity.this, "Switched to Manage Events layout", Toast.LENGTH_SHORT).show();
         });
 
         btnManageFacilities.setOnClickListener(new View.OnClickListener() {
@@ -242,7 +219,7 @@ public class AdminHomeActivity extends AppCompatActivity {
 
     private void updateEvents(){
         events.clear();
-        eventAdapter.notifyDataSetChanged();
+//        eventAdapter.notifyDataSetChanged();
         db.collection("Events")
                 .get()
                 .addOnCompleteListener(task -> {
@@ -251,14 +228,14 @@ public class AdminHomeActivity extends AppCompatActivity {
                             Event e = document.toObject(Event.class);
                             events.add(e);
                         }
-                        eventAdapter.notifyDataSetChanged();
+//                        eventAdapter.notifyDataSetChanged();
                     }
                 });
     }
 
     private void updateProfiles(){
         users.clear();
-        userAdapter.notifyDataSetChanged();
+//        userAdapter.notifyDataSetChanged();
         db.collection("Users")
                 .get()
                 .addOnCompleteListener(task -> {
@@ -267,7 +244,7 @@ public class AdminHomeActivity extends AppCompatActivity {
                             User u = document.toObject(User.class);
                             users.add(u);
                         }
-                        userAdapter.notifyDataSetChanged();
+//                        userAdapter.notifyDataSetChanged();
                     }
                 });
     }
@@ -282,7 +259,7 @@ as a QR code doesn't exist on its own  aslo a change made to the QR code
     private void updateQRCodes(){
 
         events.clear();
-        QRAdapter.notifyDataSetChanged();
+//        QRAdapter.notifyDataSetChanged();
         db.collection("Events")
                 .get()
                 .addOnCompleteListener(task -> {
@@ -291,14 +268,14 @@ as a QR code doesn't exist on its own  aslo a change made to the QR code
                                Event e = document.toObject(Event.class);
                                 events.add(e);
                         }
-                        QRAdapter.notifyDataSetChanged();
+//                        QRAdapter.notifyDataSetChanged();
                     }
                 });
     }
 
     private void updateFacilities(){
         facilities.clear();
-        facilityAdapter.notifyDataSetChanged();
+//        facilityAdapter.notifyDataSetChanged();
         db.collection("Facilities")
                 .get()
                 .addOnCompleteListener(task -> {
@@ -307,7 +284,7 @@ as a QR code doesn't exist on its own  aslo a change made to the QR code
                             Facility f = document.toObject(Facility.class);
                             facilities.add(f);
                         }
-                        facilityAdapter.notifyDataSetChanged();
+//                        facilityAdapter.notifyDataSetChanged();
                     }
                 });
     }
