@@ -5,29 +5,27 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import com.example.pickme_nebula0.qr.QRCodeActivity;
+import com.example.pickme_nebula0.qr.QRCodeGenerator;
 import com.example.pickme_nebula0.qr.QRCodeManager;
 import org.junit.Test;
 
 public class QRcodeTest {
+QRCodeGenerator QRTester = new QRCodeGenerator();
 
     public void TestURIgen(){
-        QRCodeManager Test=new QRCodeManager();
-
-        String TestURI=Test.generateQRCodeURI("hello");
-        assert("PickMe://event/hello"== TestURI);
+        String TestURI=QRTester.generateQRCodeURI("hello");
+        assert("PickMe://event/hello".equals(TestURI));
 
     }
     public void TestQRcodegen(){
-
-        QRCodeManager Test=new QRCodeManager();
-     assert(Test.generateQRCodeBitmap("PickMe://event/hello") instanceof Bitmap);
-
+        Bitmap bitmap = QRTester.generateQRCodeBitmap("PickMe://event/hello");
+        assert(bitmap != null);
+        // if passes null assertion, bitmap is an instance of Bitmap
     }
 
     public void TestturntoBase64(){
-        QRCodeManager Test=new QRCodeManager();
         Bitmap testbitmap=Bitmap.createBitmap(12,16, Bitmap.Config.ARGB_8888);
-       assert( Test.bitmapToBase64(testbitmap) instanceof String);
+       assert(QRTester.bitmapToBase64(testbitmap) instanceof String);
     }
 
 }
