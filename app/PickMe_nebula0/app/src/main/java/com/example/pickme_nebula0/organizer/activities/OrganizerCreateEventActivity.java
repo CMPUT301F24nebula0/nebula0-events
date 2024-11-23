@@ -16,7 +16,11 @@ import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.event.Event;
 import com.example.pickme_nebula0.organizer.exceptions.OrganizerExceptions;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -71,6 +75,9 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
     // Exceptions
     OrganizerExceptions organizerExceptions;
 
+    // Firestore Instance
+    FirebaseFirestore db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,6 +105,8 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
 
         // Initialize exceptions
         organizerExceptions = new OrganizerExceptions();
+
+        db = FirebaseFirestore.getInstance();
 
         /* TODO:
         @Author: Sina Shaban
@@ -164,6 +173,7 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
 
             // Add event to database
             dbManager.addEvent(event);
+
             Toast.makeText(this, "Event created successfully with QR Code!", Toast.LENGTH_LONG).show();
 
             finish();
