@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory;
 
 import com.example.pickme_nebula0.qr.QRCodeActivity;
 import com.example.pickme_nebula0.qr.QRCodeGenerator;
-import com.example.pickme_nebula0.qr.QRCodeManager;
 import org.junit.Test;
 
 public class QRcodeTest {
