@@ -33,11 +33,13 @@ public class OrganizerEventParticipantsActivity extends AppCompatActivity {
     TabLayout tabLayout;
     FragmentStateAdapter pagerAdapter;
     Button backButton;
+    String eventID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        eventID = getIntent().getStringExtra("eventID");
         // set the layout
         setContentView(R.layout.activity_organizer_participants);
 
@@ -85,13 +87,13 @@ public class OrganizerEventParticipantsActivity extends AppCompatActivity {
         public Fragment createFragment(int position) {
             switch (position) {
                 // Waitlisted, Selected, Confirmed, Cancelled
-                case 0: return new OrganizerWaitlistedFragment();
+                case 0: return new OrganizerWaitlistedFragment(eventID);
                 case 1: return new OrganizerSelectedFragment();
                 case 2: return new OrganizerConfirmedFragment();
                 case 3: return new OrganizerCancelledFragment();
             }
             // default to Waitlisted
-            return new OrganizerWaitlistedFragment();
+            return new OrganizerWaitlistedFragment(eventID);
         }
 
         @Override

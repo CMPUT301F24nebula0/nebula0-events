@@ -6,6 +6,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.widget.Button;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -14,12 +16,14 @@ import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
 
+import com.example.pickme_nebula0.GeolocationManager;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.admin.activities.AdminHomeActivity;
 import com.example.pickme_nebula0.entrant.activities.EntrantHomeActivity;
 import com.example.pickme_nebula0.notification.MessageViewActivity;
 import com.example.pickme_nebula0.organizer.activities.OrganizerHomeActivity;
 import com.example.pickme_nebula0.user.activities.UserInfoActivity;
+
 
 /**
  * Home page activity for the app
@@ -40,6 +44,12 @@ public class HomePageActivity extends AppCompatActivity {
     Button organizerButton;
     Button messagesButton;
 
+    // START TY (example geolocation implementation)
+//    Button buttonSaveGeolocation;
+//    private GeolocationManager gm;
+//    private ActivityResultLauncher<String[]> locationPermissionLauncher;
+    // END TY
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +63,40 @@ public class HomePageActivity extends AppCompatActivity {
         entrantButton = findViewById(R.id.entrantButton);
         organizerButton = findViewById(R.id.organizerButton);
         messagesButton = findViewById(R.id.button_messages);
+
+        // START TY (example geolocation implementation)
+//        buttonSaveGeolocation = findViewById(R.id.button_save_geolocation);
+//        gm = new GeolocationManager(this);
+//        locationPermissionLauncher = registerForActivityResult(
+//                new ActivityResultContracts.RequestMultiplePermissions(),
+//                result -> {
+//                    boolean fineLocationGranted = result.getOrDefault(
+//                            Manifest.permission.ACCESS_FINE_LOCATION, false);
+//                    boolean coarseLocationGranted = result.getOrDefault(
+//                            Manifest.permission.ACCESS_COARSE_LOCATION, false);
+//
+//                    if (fineLocationGranted || coarseLocationGranted) {
+//                        Toast.makeText(this, "Location permission granted.", Toast.LENGTH_SHORT).show();
+//                        // Now, proceed to save geolocation
+//                        saveGeolocationData();
+//                    } else {
+//                        Toast.makeText(this, "Location permission denied.", Toast.LENGTH_SHORT).show();
+//                    }
+//                }
+//        );
+//        buttonSaveGeolocation.setOnClickListener(v -> {
+//            if (gm.hasLocationPermission()) {
+//                saveGeolocationData();
+//            } else {
+//                // Request location permissions
+//                locationPermissionLauncher.launch(new String[]{
+//                        Manifest.permission.ACCESS_FINE_LOCATION,
+//                        Manifest.permission.ACCESS_COARSE_LOCATION
+//                });
+//            }
+//        });
+
+        // END TY
 
         // actions once buttons are pressed
         profileButton.setOnClickListener(view -> navigateTo(UserInfoActivity.class));
@@ -76,6 +120,25 @@ public class HomePageActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_MEDIA_IMAGES}, REQUEST_CODE_MEDIA_PERMISSION);
         }
     }
+
+    // START TY example geolocation implementation
+//    private void saveGeolocationData() {
+//        String userID = "c5e9e56f41572d06"; // Replace with actual userID
+//        String eventID = "ouyj7XRzfSIqFRAXqnQ5"; // Replace with actual eventID
+//
+//        try {
+//            gm.saveGeolocation(userID, eventID, success -> {
+//                if (success) {
+//                    Toast.makeText(HomePageActivity.this, "Geolocation saved successfully.", Toast.LENGTH_SHORT).show();
+//                } else {
+//                    Toast.makeText(HomePageActivity.this, "Failed to save geolocation.", Toast.LENGTH_SHORT).show();
+//                }
+//            });
+//        } catch (SecurityException e) {
+//            Toast.makeText(this, "Location permission not granted.", Toast.LENGTH_SHORT).show();
+//        }
+//    }
+    // END TY
 
     /**
      * Navigate to the target activity
