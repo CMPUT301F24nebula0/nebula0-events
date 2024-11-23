@@ -2,10 +2,11 @@ package com.example.pickme_nebula0;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -19,6 +20,7 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
     private GoogleMap mMap;
     double latitude;
     double longitude;
+    Button backButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +41,15 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
             Log.e("MapActivity", "SupportMapFragment is null");
             finish();
         }
+
+        backButton = findViewById(R.id.back_button);
+
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getOnBackPressedDispatcher().onBackPressed();
+            }
+        });
     }
 
     @Override
