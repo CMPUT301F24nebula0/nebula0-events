@@ -123,6 +123,8 @@ public class AdminHomeActivity extends AppCompatActivity {
         QRcodesList.setAdapter(QRAdapter);
 
 
+        viewFlipper.setDisplayedChild(0);
+        updateAll();
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
