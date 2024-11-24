@@ -508,7 +508,20 @@ public class DBManager {
      */
     public void getEvent(String eventID,Obj2VoidCallback onSuccessCallback,
                          Void2VoidCallback onFailureCallback){
-        getDocumentAsObject(eventsCollection,eventID,this::eventConverter,onSuccessCallback,onFailureCallback);
+//        getDocumentAsObject(eventsCollection,eventID,this::eventConverter,onSuccessCallback,onFailureCallback);
+        DocumentReference eventDocRef = db.collection(eventsCollection).document(eventID);
+        eventDocRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    Event event = document.toObject(Event.class);
+                    onSuccessCallback.run(event);
+                }
+            }
+            else{
+                onFailureCallback.run();
+            }
+        });
     }
 
     /**

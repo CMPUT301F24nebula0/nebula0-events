@@ -101,11 +101,11 @@ public class OrganizerRole extends User {
     }
 
     public String getEventPoster(Event event) {
-        return event.getEventPoster();
+        return event.getPoster();
     }
 
     public void setEventPoster(Event event, String eventPoster) {
-        event.setEventPoster(eventPoster);
+        event.setPoster(eventPoster);
     }
 
 
