@@ -384,7 +384,9 @@ public class DBManager {
         String qrBase64 = qrCodeManager.bitmapToBase64(qrBitmap);
         eventData.put("qrCodeData", qrBase64);
 
-        String hashedQRCode = generateHashedQRCode(event.getEventID());
+        QRCodeGenerator qrCodeGenerator = new QRCodeGenerator();
+        String qrCodeURI  = qrCodeGenerator.generateQRCodeURI(event.getEventID());
+        String hashedQRCode = qrCodeGenerator.generateSHA256Hash(qrCodeURI);
 
         eventData.put("hashedQRCode", hashedQRCode);
 
@@ -395,29 +397,6 @@ public class DBManager {
         Map<String,Object> orgEventData = new HashMap<>();
         orgEventData.put("status", "OPEN");
         addUpdateDocument(orgsCreatedEventsCol,event.getEventID(),orgEventData);
-    }
-
-    private String generateHashedQRCode(String eventID) {
-        String QRCodeURI = "PickMe://event/" + eventID;
-
-        return generateSHA256Hash(QRCodeURI);
-    }
-
-    private String generateSHA256Hash(String QRCodeURI) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hashBytes = digest.digest(QRCodeURI.getBytes(StandardCharsets.UTF_8));
-
-            StringBuilder hexString = new StringBuilder();
-            for (byte b : hashBytes) {
-                String hex = Integer.toHexString(0xff & b);
-                if (hex.length() == 1) hexString.append('0');
-                hexString.append(hex);
-            }
-            return hexString.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Error generating hash: " + e.getMessage());
-        }
     }
 
     /**
