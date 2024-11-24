@@ -1,17 +1,23 @@
 package com.example.pickme_nebula0.event;
 
+import android.Manifest;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.pickme_nebula0.DeviceManager;
+import com.example.pickme_nebula0.GeolocationManager;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.db.DBManager;
+import com.example.pickme_nebula0.start.activities.HomePageActivity;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
@@ -34,6 +40,12 @@ public class EventDetailUserActivity extends AppCompatActivity {
     private Button unregisterButton, backButton, registerButton;
     private TextView eventDetailsTextView, userStatusTextView;
 
+
+    // START TY
+    private GeolocationManager gm;
+    private ActivityResultLauncher<String[]> locationPermissionLauncher;
+    // END TY
+
     // notification UI components
     private Button acceptButton, declineButton;
     private TextView notificationMessage;
@@ -42,6 +54,7 @@ public class EventDetailUserActivity extends AppCompatActivity {
     private FirebaseFirestore db;
 
     private boolean fromQR;
+
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,7 +112,23 @@ public class EventDetailUserActivity extends AppCompatActivity {
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                joinWaitlist(eventID, () -> { fromQR = false; renderAll(); });
+                EventManager.waitlist_full(eventID, () -> {
+                    // join waitlist
+                    joinWaitlist(eventID, () -> { fromQR = false; renderAll(); });
+                    if (gm.hasLocationPermission()) {
+                        saveGeolocationData(userID, eventID);
+                    } else {
+                        // Request location permissions
+                        locationPermissionLauncher.launch(new String[]{
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_COARSE_LOCATION
+                        });
+                    }
+                }, () -> {
+                    // waitlist is full
+                    // show some error message
+                    Toast.makeText(EventDetailUserActivity.this, "The waitlist of this event is full.", Toast.LENGTH_SHORT).show();
+                });
             }
         });
 
@@ -131,6 +160,26 @@ public class EventDetailUserActivity extends AppCompatActivity {
                 renderUserStatus();
             }
         });
+        // START TY
+        gm = new GeolocationManager(this);
+        locationPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestMultiplePermissions(),
+                result -> {
+                    boolean fineLocationGranted = result.getOrDefault(
+                            Manifest.permission.ACCESS_FINE_LOCATION, false);
+                    boolean coarseLocationGranted = result.getOrDefault(
+                            Manifest.permission.ACCESS_COARSE_LOCATION, false);
+
+                    if (fineLocationGranted || coarseLocationGranted) {
+                        Toast.makeText(this, "Location permission granted.", Toast.LENGTH_SHORT).show();
+                        // Now, proceed to save geolocation
+                        saveGeolocationData(userID, eventID);
+                    } else {
+                        Toast.makeText(this, "Location permission denied.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+        // END TY
 
         // Populate screen based on event info and user's status as registrant
         renderAll();
@@ -142,6 +191,22 @@ public class EventDetailUserActivity extends AppCompatActivity {
         renderAll();
     }
 
+    // START TY
+    private void saveGeolocationData(String userID, String eventID) {
+//        String userID = "c5e9e56f41572d06"; // Replace with actual userID
+//        String eventID = "ouyj7XRzfSIqFRAXqnQ5"; // Replace with actual eventID
+
+        try {
+            gm.saveGeolocation(userID, eventID, success -> {
+                if (success) {
+                } else {
+                }
+            });
+        } catch (SecurityException e) {
+            Toast.makeText(this, "Location permission not granted.", Toast.LENGTH_SHORT).show();
+        }
+    }
+    // END TY
     /**
      * Renders information about the event, unaffected by user's status
      */
@@ -254,6 +319,10 @@ public class EventDetailUserActivity extends AppCompatActivity {
             Toast.makeText(this, "User not authenticated.", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        // NOTE: could replace this with addRegistrantToWaitlist from DBManager (including callback functions)
+        // however, DBManager does not perform atomic writes so we can add that in later and then consider
+        // calling that function
 
         // Prepare data for Events -> eventID -> EventRegistrants -> userID
         DocumentReference eventRegistrantRef = db.collection("Events")

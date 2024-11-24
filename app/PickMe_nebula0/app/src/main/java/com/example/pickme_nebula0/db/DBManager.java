@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
 import android.util.Log;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.NonNull;
 
@@ -24,7 +26,11 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -327,7 +333,7 @@ public class DBManager {
      * @param userID deviceID of user we are sending the notification to
      * @param eventID ID of event associated with notification
      */
-    private void createNotification(String title, String message, String userID, String eventID){
+    public void createNotification(String title, String message, String userID, String eventID){
         CollectionReference userNotifCollection = db.collection(notificationCollection).document(userID).collection("userNotifs");
         String notifID = createIDForDocumentIn(userNotifCollection);
         Timestamp timestamp = new Timestamp(new Date());
@@ -377,6 +383,11 @@ public class DBManager {
         Bitmap qrBitmap = qrCodeManager.generateQRCodeBitmap(qrUri);
         String qrBase64 = qrCodeManager.bitmapToBase64(qrBitmap);
         eventData.put("qrCodeData", qrBase64);
+
+        String hashedQRCode = generateHashedQRCode(event.getEventID());
+
+        eventData.put("hashedQRCode", hashedQRCode);
+
         // Create document
         addUpdateDocument(eventsCollection, event.getEventID(), eventData);
         // Add this event to the organizer's list of created events
@@ -384,6 +395,29 @@ public class DBManager {
         Map<String,Object> orgEventData = new HashMap<>();
         orgEventData.put("status", "OPEN");
         addUpdateDocument(orgsCreatedEventsCol,event.getEventID(),orgEventData);
+    }
+
+    private String generateHashedQRCode(String eventID) {
+        String QRCodeURI = "PickMe://event/" + eventID;
+
+        return generateSHA256Hash(QRCodeURI);
+    }
+
+    private String generateSHA256Hash(String QRCodeURI) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hashBytes = digest.digest(QRCodeURI.getBytes(StandardCharsets.UTF_8));
+
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hashBytes) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Error generating hash: " + e.getMessage());
+        }
     }
 
     /**
@@ -596,7 +630,7 @@ public class DBManager {
 
         waitlistedUsersQuery.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                ArrayList<User> waitlistedUsers = new ArrayList<>();
+                List<User> waitlistedUsers = Collections.synchronizedList(new ArrayList<>());
 
                 for (QueryDocumentSnapshot registeredUserDoc : task.getResult()) {
                     String userID = registeredUserDoc.getId();
@@ -629,6 +663,12 @@ public class DBManager {
                     } catch (Exception e) {
                         Log.d("Firestore", "Error while fetching users: " + e.getMessage());
                     } finally {
+                        synchronized (waitlistedUsers) {
+                            new Handler(Looper.getMainLooper()).post(() -> {
+                                onSuccessCallback.run((List<User>) waitlistedUsers);
+                                Log.d("Firestore", "waitlisted users callback was invoked with size: " + waitlistedUsers.size());
+                            });
+                        }
                         executor.shutdown();
                         try {
                             if (!executor.awaitTermination(800, TimeUnit.MILLISECONDS)) {
@@ -637,8 +677,6 @@ public class DBManager {
                         } catch (InterruptedException e) {
                             executor.shutdownNow();
                         }
-
-                        onSuccessCallback.run(waitlistedUsers);
                     }
                 });
             } else {

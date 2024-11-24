@@ -1,3 +1,17 @@
+import java.util.Properties
+
+// Define the getLocalProperty function at the top
+fun getLocalProperty(key: String): String {
+    val properties = Properties()
+    val localPropertiesFile = rootProject.file("local.properties")
+    return if (localPropertiesFile.exists()) {
+        properties.load(localPropertiesFile.inputStream())
+        "\"${properties.getProperty(key) ?: ""}\""
+    } else {
+        "\"\""
+    }
+}
+
 plugins {
     alias(libs.plugins.android.application)
     // Google services Gradle plugin for Firebase
@@ -16,6 +30,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        manifestPlaceholders["MAPS_API_KEY"] = getLocalProperty("MAPS_API_KEY")
+
     }
 
     buildTypes {
@@ -31,6 +48,8 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
+
 }
 
 dependencies {
@@ -43,10 +62,12 @@ dependencies {
         exclude("com.google.protobuf", "protobuf-lite")
     }
     implementation("com.google.firebase:firebase-messaging")
-    implementation("com.google.firebase:firebase-storage:20.2.1")
 
-    // Image loading
-    implementation("com.squareup.picasso:picasso:2.8")
+    implementation ("com.google.firebase:firebase-storage:20.2.1")
+    implementation ("com.squareup.picasso:picasso:2.8")// For loading images
+    implementation ("androidx.activity:activity-compose:1.9.3") // or the latest version
+    implementation("com.google.android.gms:play-services-maps:18.1.0")
+
 
     // QR code support with ZXing
     implementation("com.journeyapps:zxing-android-embedded:4.1.0") {
@@ -65,19 +86,27 @@ dependencies {
     // Testing dependencies
     testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter)
+    androidTestImplementation(libs.ext.junit)
+    androidTestImplementation(libs.espresso.core)
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation("androidx.test.espresso:espresso-contrib:3.5.1") {
         exclude("com.google.protobuf", "protobuf-lite")
     }
+    
+    implementation("com.journeyapps:zxing-android-embedded:4.1.0")
+    implementation("com.google.zxing:core:3.3.3")
+    implementation("com.google.android.material:material:1.4.0")
+
+    implementation("androidx.core:core-ktx:1.10.0")
+    implementation("com.google.android.gms:play-services-location:21.0.1")   
 
     // Force protobuf-javalite to avoid conflicts with protobuf-lite
     implementation("com.google.protobuf:protobuf-javalite:3.22.3")
 
     // Additional tools
     implementation(libs.rules)
-    testImplementation(libs.ext.junit)
-    testImplementation(libs.espresso.core)
+
 }
 
 configurations.all {
@@ -86,3 +115,4 @@ configurations.all {
         force("com.google.protobuf:protobuf-javalite:3.22.3")
     }
 }
+

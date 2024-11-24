@@ -2,6 +2,7 @@ package com.example.pickme_nebula0.user.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -11,12 +12,14 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.example.pickme_nebula0.GoogleMapActivity;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.organizer.fragments.OrganizerSelectedFragment;
 import com.example.pickme_nebula0.user.User;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 
 /**
  * Activity for admin or organizer to view details about a user
@@ -37,18 +40,17 @@ public class UserDetailActivity extends AppCompatActivity {
         final Button backButton = findViewById(R.id.backButton);
         final Button delButton = findViewById(R.id.button_ud_delete);
         final Button cancelEntrantButton = findViewById(R.id.button_cancel_selected_entrant);
+        final Button mapButton = findViewById(R.id.button_map);
 
         if(!getIntent().getBooleanExtra("admin",false)){
             delButton.setVisibility(View.GONE);
         }
-
         String userID = getIntent().getStringExtra("userID");
         if (userID == null || userID.isEmpty()) {
             Toast.makeText(this, "Invalid User ID.", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
-
         String eventID = getIntent().getStringExtra("eventID");
         if (eventID == null || eventID.isEmpty()) {
             cancelEntrantButton.setVisibility(View.GONE);
@@ -68,6 +70,45 @@ public class UserDetailActivity extends AppCompatActivity {
                 finish();
             });
         }
+
+        // check if userID and eventID got passed from the intent
+        Log.d("UserDetailActivity", "userID: " + userID + ", eventID: " + eventID);
+
+        if(!getIntent().getBooleanExtra("organizer", true)){
+            mapButton.setVisibility(View.GONE);
+        } else {
+            mapButton.setVisibility(View.VISIBLE);
+            mapButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    db.collection("Events")
+                                    .document(eventID)
+                                            .collection("EventRegistrants")
+                                                    .document(userID)
+                                                            .get()
+                                                                    .addOnCompleteListener(task -> {
+                                                                        if (task.isSuccessful()) {
+                                                                            DocumentSnapshot document = task.getResult();
+                                                                            if (document.exists()) {
+                                                                                GeoPoint geolocation = document.getGeoPoint("geolocation");
+                                                                                assert geolocation != null;
+
+                                                                                double latitude = geolocation.getLatitude();
+                                                                                double longitude = geolocation.getLongitude();
+
+                                                                                Log.d("UserDetailActivity", "Latitude: " + latitude + ", Longitude: " + longitude);
+                                                                                Intent intent = new Intent(UserDetailActivity.this, GoogleMapActivity.class);
+                                                                                intent.putExtra("latitude", latitude);
+                                                                                intent.putExtra("longitude", longitude);
+                                                                                startActivity(intent);
+                                                                            }
+                                                                        }
+                                                                    });
+                }
+            });
+        }
+
+
 
         backButton.setOnClickListener(new View.OnClickListener(){
             @Override
