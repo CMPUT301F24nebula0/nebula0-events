@@ -2,6 +2,7 @@ package com.example.pickme_nebula0.event;
 
 import android.Manifest;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -111,16 +112,23 @@ public class EventDetailUserActivity extends AppCompatActivity {
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                joinWaitlist(eventID, () -> { fromQR = false; renderAll(); });
-                if (gm.hasLocationPermission()) {
-                    saveGeolocationData(userID, eventID);
-                } else {
-                    // Request location permissions
-                    locationPermissionLauncher.launch(new String[]{
-                            Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.ACCESS_COARSE_LOCATION
-                    });
-                }
+                EventManager.waitlist_full(eventID, () -> {
+                    // join waitlist
+                    joinWaitlist(eventID, () -> { fromQR = false; renderAll(); });
+                    if (gm.hasLocationPermission()) {
+                        saveGeolocationData(userID, eventID);
+                    } else {
+                        // Request location permissions
+                        locationPermissionLauncher.launch(new String[]{
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_COARSE_LOCATION
+                        });
+                    }
+                }, () -> {
+                    // waitlist is full
+                    // show some error message
+                    Toast.makeText(EventDetailUserActivity.this, "The waitlist of this event is full.", Toast.LENGTH_SHORT).show();
+                });
             }
         });
 
@@ -311,6 +319,10 @@ public class EventDetailUserActivity extends AppCompatActivity {
             Toast.makeText(this, "User not authenticated.", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        // NOTE: could replace this with addRegistrantToWaitlist from DBManager (including callback functions)
+        // however, DBManager does not perform atomic writes so we can add that in later and then consider
+        // calling that function
 
         // Prepare data for Events -> eventID -> EventRegistrants -> userID
         DocumentReference eventRegistrantRef = db.collection("Events")
