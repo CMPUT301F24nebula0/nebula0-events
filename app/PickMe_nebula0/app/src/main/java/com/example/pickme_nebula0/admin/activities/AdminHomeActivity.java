@@ -122,7 +122,6 @@ public class AdminHomeActivity extends AppCompatActivity {
         QRAdapter=new QRcodeAdapter(AdminHomeActivity.this,R.id.item_qrcode, events);
         QRcodesList.setAdapter(QRAdapter);
 
-
         viewFlipper.setDisplayedChild(0);
         updateAll();
         btnBack.setOnClickListener(new View.OnClickListener() {
