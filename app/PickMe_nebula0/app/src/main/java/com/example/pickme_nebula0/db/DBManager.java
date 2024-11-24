@@ -474,6 +474,7 @@ public class DBManager {
         updateField(eventDocRef,"waitlistCapacityRequired", event.getWaitlistCapacityRequired());
         updateField(eventDocRef,"waitlistCapacity", event.getWaitlistCapacity());
         updateField(eventDocRef,"numberOfAttendees", event.getEventCapacity());
+        updateField(eventDocRef,"qrCodeData", event.getQrCodeData());
     }
 
     /**

@@ -66,6 +66,7 @@ public class EventDetailAdminActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 DeleteQRcode(eventID);
+                QRcodeHashTextVeiw.setText("QRcodeHash: Null");
             }
         });
     }
@@ -76,6 +77,7 @@ public class EventDetailAdminActivity extends AppCompatActivity {
                 Event event = (Event) eventObj;
                 runOnUiThread(() -> {
                     event.setQrCodeData("null");
+                    dbManager.updateEvent(event);
                 });
             } else {
                 runOnUiThread(() -> {
@@ -86,16 +88,23 @@ public class EventDetailAdminActivity extends AppCompatActivity {
         }, () -> runOnUiThread(() -> {
             Toast.makeText(this, "Failed to retrieve event data.", Toast.LENGTH_SHORT).show();
             finish();
-        }));
 
+        }));
     }
     private void fetchQRcodehash(String eventID) {
         dbManager.getEvent(eventID, eventObj -> {
             if (eventObj instanceof Event) {
                 Event event = (Event) eventObj;
-                runOnUiThread(() -> {
+               runOnUiThread(() -> {
                     StringBuilder details = new StringBuilder();
-                    details.append("QRcodeHash: ").append(event.getQrCodeData()).append("\n\n");
+                    details.append("QRcodeHash: ");
+                    if (event.getQrCodeData()==null){
+                        details.append("null").append("\n\n");
+                    }
+                    else{
+                        details.append(event.getQrCodeData()).append("\n\n");
+                        //issue need to learn where the QR code data is held within events
+                    }
                     QRcodeHashTextVeiw.setText(details.toString());
                 });
             } else {

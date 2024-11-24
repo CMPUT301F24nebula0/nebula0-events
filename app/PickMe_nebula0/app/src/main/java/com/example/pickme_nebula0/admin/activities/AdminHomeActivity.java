@@ -103,6 +103,7 @@ public class AdminHomeActivity extends AppCompatActivity {
         // Set up list view for events
         events = new ArrayList<>();
         eventsList = findViewById(R.id.eventListView);
+
         eventAdapter = new EventsArrayAdapter(AdminHomeActivity.this,R.id.item_event, events);
         eventsList.setAdapter(eventAdapter);
         // for user profiles
@@ -116,8 +117,13 @@ public class AdminHomeActivity extends AppCompatActivity {
         facilityAdapter = new FacilityArrayAdapter(AdminHomeActivity.this,R.id.item_facility, facilities);
         facilitiesList.setAdapter(facilityAdapter);
 
+       // for QR codes
+        QRcodesList=findViewById(R.id.QRcodeListView);
+        QRAdapter=new QRcodeAdapter(AdminHomeActivity.this,R.id.item_qrcode, events);
+        QRcodesList.setAdapter(QRAdapter);
 
         btnBack.setOnClickListener(v -> finish());
+
 
         // upon clicking the manage events button, show the manage events layout
         btnManageEvents.setOnClickListener(v -> {
@@ -166,23 +172,27 @@ public class AdminHomeActivity extends AppCompatActivity {
 
         });
 
-        //TODO;
-        btnManageQR.setOnClickListener(v -> {
-            viewFlipper.setDisplayedChild(3); // Show Manage QR Code layout
-            Toast.makeText(AdminHomeActivity.this, "Switched to Manage QR Code layout", Toast.LENGTH_SHORT).show();
-            // On click, show event details an allow admin to delete
-            QRcodesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
-                    Event clickedEvent = (Event) adapterView.getItemAtPosition(pos);
+        btnManageQR.setOnClickListener(new View.OnClickListener() {
+            @Override
+            //TODO;
+            public void onClick(View v) {
+                viewFlipper.setDisplayedChild(3); // Show Manage QR Code layout
+                updateQRCodes();
+                Toast.makeText(AdminHomeActivity.this, "Switched to Manage QR Code layout", Toast.LENGTH_SHORT).show();
+                // On click, show event details an allow admin to delete
+                QRcodesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
+                        Event clickedEvent = (Event) adapterView.getItemAtPosition(pos);
 
-                    Intent intent = new Intent(AdminHomeActivity.this, EventDetailAdminActivity.class);
-                    intent.putExtra("eventID",clickedEvent.getEventID());
-                    startActivity(intent);
-                }
-            });
-            // Confirmation message for debugging and UI verification
-            Toast.makeText(AdminHomeActivity.this, "Switched to Manage Events layout", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(AdminHomeActivity.this, EventDetailAdminActivity.class);
+                        intent.putExtra("eventID",clickedEvent.getEventID());
+                        startActivity(intent);
+                    }
+                });
+                // Confirmation message for debugging and UI verification
+                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Events layout", Toast.LENGTH_SHORT).show();
+            }
         });
 
         btnManageFacilities.setOnClickListener(new View.OnClickListener() {
