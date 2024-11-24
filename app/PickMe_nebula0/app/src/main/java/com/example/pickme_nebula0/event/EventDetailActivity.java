@@ -22,6 +22,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.pickme_nebula0.R;
+import com.example.pickme_nebula0.SharedDialogue;
 import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.db.FBStorageManager;
 import com.example.pickme_nebula0.organizer.OrganizerRole;
@@ -166,7 +167,7 @@ public class EventDetailActivity extends AppCompatActivity {
         });
 
         viewPosterButton.setOnClickListener(view -> {
-            showImagePopup();
+            SharedDialogue.displayPosterPopup(this,eventID);
         });
 
         renderPosterButtons();
@@ -270,34 +271,6 @@ public class EventDetailActivity extends AppCompatActivity {
             e.printStackTrace();
             qrCodeImageView.setVisibility(View.GONE);
         }
-    }
-
-    private void showImagePopup() {
-        // Create a Dialog
-        Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.dialog_poster_viewer);
-
-        // Find the ImageView and Button
-        ImageView imageView = dialog.findViewById(R.id.imageViewPoster);
-        Button closeButton = dialog.findViewById(R.id.buttonPosterViewClose);
-
-        // Set the image resource
-        FBStorageManager.retrievePosterUri(eventID,(uri)->{Picasso.get()
-                .load(uri)
-                .fit()
-                .centerInside()
-                .placeholder(R.drawable.ic_profile_placeholder)
-                .error(R.drawable.ic_profile_placeholder)
-                .into(imageView);
-            dialog.show();
-            },()->{Toast.makeText(this,"Could not retrieve poster",Toast.LENGTH_SHORT).show();});
-
-        // Set close button action
-        closeButton.setOnClickListener(v -> dialog.dismiss());
-
-        // Show the dialog
-
-        Toast.makeText(this,"showImagePopup",Toast.LENGTH_SHORT).show();
     }
 
     private void renderPosterButtons(){

@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.GeolocationManager;
 import com.example.pickme_nebula0.R;
+import com.example.pickme_nebula0.SharedDialogue;
 import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.start.activities.HomePageActivity;
 import com.google.firebase.firestore.DocumentReference;
@@ -36,7 +37,7 @@ public class EventDetailUserActivity extends AppCompatActivity {
     private DBManager dbManager;
 
     // main UI components
-    private Button unregisterButton, backButton, registerButton;
+    private Button unregisterButton, backButton, registerButton, posterViewButton;
     private TextView eventDetailsTextView, userStatusTextView;
 
 
@@ -69,8 +70,6 @@ public class EventDetailUserActivity extends AppCompatActivity {
 
         // Retrieve eventID from intent, go back if we fail to get valid eventID
         eventID = getIntent().getStringExtra("eventID");
-
-
         if (eventID == null || eventID.isEmpty()) {
             Toast.makeText(this, "Invalid Event ID.", Toast.LENGTH_SHORT).show();
             finish();
@@ -82,6 +81,7 @@ public class EventDetailUserActivity extends AppCompatActivity {
         eventDetailsTextView = findViewById(R.id.textView_edu_details);
         userStatusTextView = findViewById(R.id.textView_edu_status);
         registerButton = findViewById(R.id.button_edu_reg);
+        posterViewButton = findViewById(R.id.buttonPosterView);
 
         // link notification components
         notificationLayout = findViewById(R.id.notification_layout);
@@ -98,6 +98,13 @@ public class EventDetailUserActivity extends AppCompatActivity {
         acceptButton.setVisibility(View.VISIBLE);
         declineButton.setVisibility(View.VISIBLE);
         notificationMessage.setVisibility(View.VISIBLE);
+
+        posterViewButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedDialogue.displayPosterPopup(EventDetailUserActivity.this,eventID);
+            }
+        });
 
         // when back button clicked, finish activity
         backButton.setOnClickListener(new View.OnClickListener() {
