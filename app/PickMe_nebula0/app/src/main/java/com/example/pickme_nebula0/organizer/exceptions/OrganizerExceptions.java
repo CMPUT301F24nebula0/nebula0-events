@@ -79,13 +79,13 @@ public class OrganizerExceptions {
         }
 
         // validate waitlist capacity
-        if (!validateWaitlistCapacity(waitlistCapacity)) {
+        if (waitlistCapacityRequired && !validateWaitlistCapacity(waitlistCapacity)) {
             warningMessage.append("\n- The waitlist capacity cannot be blank and must be a positive number.");
             validEvent = false;
         }
 
         // validate waitlist capacity is greater than or equal to number of attendees
-        if (!validateWaitlistCapacityGreaterThanNumberOfAttendees(waitlistCapacity, numberOfAttendees)) {
+        if (waitlistCapacityRequired && !validateWaitlistCapacityGreaterThanNumberOfAttendees(waitlistCapacity, numberOfAttendees)) {
             warningMessage.append("\n- The waitlist capacity must be equal to or greater than the number of attendees.");
             validEvent = false;
         }
