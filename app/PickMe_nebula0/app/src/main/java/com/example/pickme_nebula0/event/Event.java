@@ -33,7 +33,7 @@ public class Event {
     private int numberOfAttendees;
     private int geolocationRequirement;
 
-    protected String eventPoster;
+    protected String poster;
 
     private int unfilledSpots = 0;  // # of entrants to be resampled
 
@@ -154,8 +154,8 @@ public class Event {
      *
      * @return event poster
      */
-    public String getEventPoster() {
-        return this.eventPoster;
+    public String getPoster() {
+        return this.poster;
     }
 
     /**
@@ -236,7 +236,7 @@ public class Event {
     public void setWaitlistCapacity(int waitlistCapacity) { this.waitlistCapacity = waitlistCapacity; }
     public void setEventCapacity(int eventCapacity) { this.eventCapacity = eventCapacity; }
     public void setOrganizerID(String organizerID) { this.organizerID = organizerID; }
-    public void setEventPoster(String eventPoster) { this.eventPoster = eventPoster; }
+    public void setPoster(String poster) { this.poster = poster; }
     public void setCreatedDateTime(Date createdDateTime) { this.createdDateTime = createdDateTime; }
     public void setNumberOfAttendees (int numberOfAttendees) { this.numberOfAttendees = numberOfAttendees; }
     public void setGeolocationRequirement (int geolocationRequirement) { this.geolocationRequirement = geolocationRequirement; }

@@ -3,6 +3,8 @@ package com.example.pickme_nebula0.organizer.exceptions;
 import android.content.Context;
 import android.widget.Toast;
 
+import com.example.pickme_nebula0.SharedDialogue;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -90,7 +92,7 @@ public class OrganizerExceptions {
 
         // Display warning message if event is not valid
         if (!validEvent) {
-            Toast.makeText(context, warningMessage.toString(), Toast.LENGTH_LONG).show();
+            SharedDialogue.showInvalidDataAlert(warningMessage.toString(),context);
         }
 
         return validEvent;
