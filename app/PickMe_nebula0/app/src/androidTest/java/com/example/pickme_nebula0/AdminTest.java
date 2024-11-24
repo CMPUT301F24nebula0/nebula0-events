@@ -129,6 +129,31 @@ public void testAdminNavigationFlow() throws InterruptedException {
         Thread.sleep(1000);
     }
 
+    @Test
+    public void testManageFacilitiesFlow() throws InterruptedException {
+        // Click on "Manage Facilities" button
+        Espresso.onView(ViewMatchers.withText("Manage Facilities"))
+                .perform(ViewActions.click());
+        Thread.sleep(2000); // Wait for 2 seconds
 
+        // Select the first facility in the list
+        Espresso.onData(Matchers.anything())
+                .inAdapterView(ViewMatchers.withId(R.id.facilitiesListView))
+                .atPosition(0)
+                .perform(ViewActions.click());
+        Thread.sleep(2000); // Wait for 2 seconds
+
+        // Perform delete operation on facility
+        Espresso.onView(ViewMatchers.withText("Delete Facility"))
+                .perform(ViewActions.click());
+        Thread.sleep(3000); // Wait for 3 seconds
+
+        // Navigate back to admin home page
+        Espresso.onView(ViewMatchers.withText("Back"))
+                .perform(ViewActions.click());
+        Thread.sleep(1000); // Wait for 1 second
+
+
+    }
 
 }

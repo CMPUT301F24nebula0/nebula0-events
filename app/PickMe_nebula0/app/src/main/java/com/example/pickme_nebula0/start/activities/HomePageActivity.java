@@ -21,6 +21,7 @@ import com.example.pickme_nebula0.notification.MessageViewActivity;
 import com.example.pickme_nebula0.organizer.activities.OrganizerHomeActivity;
 import com.example.pickme_nebula0.user.activities.UserInfoActivity;
 
+
 /**
  * Home page activity for the app
  * Allows user to navigate to different parts of the app

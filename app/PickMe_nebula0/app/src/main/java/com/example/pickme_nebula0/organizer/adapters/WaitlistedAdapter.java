@@ -22,10 +22,12 @@ import java.util.ArrayList;
 public class WaitlistedAdapter extends RecyclerView.Adapter<WaitlistedAdapter.WaitlistedViewHolder> {
     private final ArrayList<User> waitlistedUsers;
     private final Context context;
+    private final String eventID;
 
-    public WaitlistedAdapter(Context context, ArrayList<User> waitlistedUsers) {
+    public WaitlistedAdapter(Context context, ArrayList<User> waitlistedUsers, String eventID) {
         this.context = context;
         this.waitlistedUsers = waitlistedUsers;
+        this.eventID = eventID;
     }
 
     @NonNull
@@ -46,6 +48,8 @@ public class WaitlistedAdapter extends RecyclerView.Adapter<WaitlistedAdapter.Wa
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, UserDetailActivity.class);
             intent.putExtra("userID", user.getUserID());
+            intent.putExtra("organizer", true);
+            intent.putExtra("eventID", eventID);
             context.startActivity(intent);
         });
     }

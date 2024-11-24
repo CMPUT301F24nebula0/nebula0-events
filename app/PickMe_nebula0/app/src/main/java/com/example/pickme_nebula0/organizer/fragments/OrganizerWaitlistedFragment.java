@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,7 +28,8 @@ public class OrganizerWaitlistedFragment extends Fragment {
     private WaitlistedAdapter adapter;
     String eventID;
 
-    public OrganizerWaitlistedFragment() {
+    public OrganizerWaitlistedFragment(String eventID) {
+        this.eventID = eventID;
     }
 
 
@@ -37,9 +39,8 @@ public class OrganizerWaitlistedFragment extends Fragment {
         RecyclerView recyclerView = view.findViewById(R.id.waitlisted_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        adapter = new WaitlistedAdapter(getContext(), waitlistedUsers);
+        adapter = new WaitlistedAdapter(getContext(), waitlistedUsers, this.eventID);
         recyclerView.setAdapter(adapter);
-        eventID = getActivity().getIntent().getStringExtra("eventID");
 
         db = FirebaseFirestore.getInstance();
 

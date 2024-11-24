@@ -1,25 +1,37 @@
 package com.example.pickme_nebula0.event;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Base64;
+import android.util.Log;
+import java.util.ArrayList;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.pickme_nebula0.R;
+import com.example.pickme_nebula0.SharedDialogue;
 import com.example.pickme_nebula0.db.DBManager;
+import com.example.pickme_nebula0.db.FBStorageManager;
+import com.example.pickme_nebula0.organizer.OrganizerRole;
+import com.example.pickme_nebula0.user.User;
 import com.example.pickme_nebula0.notification.NotificationCreationActivity;
 import com.example.pickme_nebula0.organizer.activities.OrganizerEventParticipantsActivity;
 import com.example.pickme_nebula0.DeviceManager;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.squareup.picasso.Picasso;
 
 public class EventDetailActivity extends AppCompatActivity {
 
@@ -28,11 +40,21 @@ public class EventDetailActivity extends AppCompatActivity {
     private ImageView qrCodeImageView;
     private Button participantsButton;
     private Button msgEntrantsButton;
+    private Button sampleEntrantsButton;
     private Button backButton;
+    private Button viewPosterButton;
+    private Button newPosterButton;
+    ActivityResultLauncher<PickVisualMediaRequest> pickMedia;
 
     private String eventID;
 
     private DBManager dbManager;
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        renderPosterButtons();
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,9 +66,16 @@ public class EventDetailActivity extends AppCompatActivity {
         // Initialize UI components
         backButton = findViewById(R.id.backButton);
         msgEntrantsButton = findViewById(R.id.button_ed_msgEntrants);
+        sampleEntrantsButton = findViewById(R.id.button_sample_entrants);
         participantsButton = findViewById(R.id.participantsButton);
         eventDetailsTextView = findViewById(R.id.event_details_text_view);
         qrCodeImageView = findViewById(R.id.qr_code_image_view);
+        viewPosterButton = findViewById(R.id.buttonViewPosterEventDetail);
+        newPosterButton = findViewById(R.id.buttonNewPosterEventDetail);
+
+        hideAllPosterButtons(); // generate these conditionally based on if there is a poster or not
+
+
 
         dbManager = new DBManager();
 
@@ -58,6 +87,24 @@ public class EventDetailActivity extends AppCompatActivity {
             finish();
             return;
         }
+
+        // Registers a photo picker activity launcher in single-select mode.
+        pickMedia =
+                registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
+                    // Callback is invoked after the user selects a media item or closes the
+                    // photo picker.
+                    if (uri != null) {
+                        FBStorageManager.uploadPoster(uri,eventID,this);
+                    } else {
+                        Toast.makeText(this,"Could not upload new poster.",Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+        // Check if event has already sampled entrants
+        OrganizerRole.sampledEntrantsExist(eventID, () -> {
+            // rename text to resample entrants
+            sampleEntrantsButton.setText("Resample Entrants");
+        }, () -> {});
 
         // Set up button listeners
         setupButtons(eventID);
@@ -87,9 +134,50 @@ public class EventDetailActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Participants Button
-        participantsButton.setOnClickListener(view -> navigateTo(OrganizerEventParticipantsActivity.class));
+        // Sample Entrants Button
+        sampleEntrantsButton.setOnClickListener(v -> {
+            OrganizerRole.sampledEntrantsExist(eventID, () -> {
+                Log.d("EventDetailActivity", "RESAMPLING USERS");
+                // sampled entrants exist
+                // do resampling instead
+                OrganizerRole.resampleAndSelectUsers(eventID, (resampledUsersObj) -> {
+                    for (User user : ((ArrayList<User>) resampledUsersObj)) {
+                        Log.d("EventDetailActivity", "resampled user "+user.getUserID());
+                    }});
+            }, () -> {
+                Log.d("EventDetailActivity", "SAMPLING USERS");
+                // do first sampling
+                OrganizerRole.sampleAndSelectUsers(eventID, (selectedUsersObj) -> {
+                    for (User user : ((ArrayList<User>) selectedUsersObj)) {
+                        Log.d("EventDetailActivity", "sampled user "+user.getUserID());
+                    }
+                });
+            });
+        });
 
+        // Participants Button
+        participantsButton.setOnClickListener(view -> {
+            Intent intent = new Intent(EventDetailActivity.this, OrganizerEventParticipantsActivity.class);
+            intent.putExtra("eventID", eventID);
+            startActivity(intent);
+        });
+
+        newPosterButton.setOnClickListener(view -> {
+            openImagePicker();
+        });
+
+        viewPosterButton.setOnClickListener(view -> {
+            SharedDialogue.displayPosterPopup(this,eventID);
+        });
+
+        renderPosterButtons();
+
+    }
+
+    private void openImagePicker() {
+        pickMedia.launch(new PickVisualMediaRequest.Builder()
+                .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                .build());
     }
 
     /**
@@ -184,4 +272,25 @@ public class EventDetailActivity extends AppCompatActivity {
             qrCodeImageView.setVisibility(View.GONE);
         }
     }
+
+    private void renderPosterButtons(){
+        FBStorageManager.retrievePosterUri(eventID,this::showButtonsIfPoster,this::showButtonsIfNoPoster);
+    }
+
+    private void hideAllPosterButtons(){
+        viewPosterButton.setVisibility(View.GONE);
+        newPosterButton.setVisibility(View.GONE);
+
+    }
+
+    private void showButtonsIfNoPoster(){
+        viewPosterButton.setVisibility(View.GONE);
+        newPosterButton.setVisibility(View.VISIBLE);
+    }
+
+    private void showButtonsIfPoster(Uri uri){
+        viewPosterButton.setVisibility(View.VISIBLE);
+        newPosterButton.setVisibility(View.VISIBLE);
+    }
+
 }

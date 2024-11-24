@@ -1,16 +1,24 @@
 package com.example.pickme_nebula0.event;
 
+import android.Manifest;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.pickme_nebula0.DeviceManager;
+import com.example.pickme_nebula0.GeolocationManager;
 import com.example.pickme_nebula0.R;
+import com.example.pickme_nebula0.SharedDialogue;
 import com.example.pickme_nebula0.db.DBManager;
+import com.example.pickme_nebula0.start.activities.HomePageActivity;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
@@ -29,13 +37,25 @@ public class EventDetailUserActivity extends AppCompatActivity {
     private final String userID = DeviceManager.getDeviceId();
     private DBManager dbManager;
 
-    // UI components
-    private Button acceptButton, declineButton, unregisterButton, backButton, registerButton;
+    // main UI components
+    private Button unregisterButton, backButton, registerButton, posterViewButton;
     private TextView eventDetailsTextView, userStatusTextView;
+
+
+    // START TY
+    private GeolocationManager gm;
+    private ActivityResultLauncher<String[]> locationPermissionLauncher;
+    // END TY
+
+    // notification UI components
+    private Button acceptButton, declineButton;
+    private TextView notificationMessage;
+    private LinearLayout notificationLayout;
 
     private FirebaseFirestore db;
 
     private boolean fromQR;
+
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,28 +71,43 @@ public class EventDetailUserActivity extends AppCompatActivity {
 
         // Retrieve eventID from intent, go back if we fail to get valid eventID
         eventID = getIntent().getStringExtra("eventID");
-
-
         if (eventID == null || eventID.isEmpty()) {
             Toast.makeText(this, "Invalid Event ID.", Toast.LENGTH_SHORT).show();
             finish();
         }
 
-        // Link components
+        // link main components
         backButton = findViewById(R.id.button_edu_back);
-        acceptButton = findViewById(R.id.button_edu_accept);
-        declineButton = findViewById(R.id.button_edu_decline);
         unregisterButton = findViewById(R.id.button_edu_unregister);
         eventDetailsTextView = findViewById(R.id.textView_edu_details);
         userStatusTextView = findViewById(R.id.textView_edu_status);
         registerButton = findViewById(R.id.button_edu_reg);
+        posterViewButton = findViewById(R.id.buttonPosterView);
 
-        // Initially set all buttons invisible (may take a second to query DB and update visibility)
-        acceptButton.setVisibility(View.GONE);
-        declineButton.setVisibility(View.GONE);
+        // link notification components
+        notificationLayout = findViewById(R.id.notification_layout);
+        acceptButton = findViewById(R.id.entrant_event_notification_accept);
+        declineButton = findViewById(R.id.entrant_event_notification_decline);
+        notificationMessage = findViewById(R.id.entrant_event_notification_message);
+
+        // Initially set main buttons invisible (may take a second to query DB and update visibility)
         unregisterButton.setVisibility(View.GONE);
         registerButton.setVisibility(View.GONE);
 
+        // initially set notification invisible, but components to visible
+        notificationLayout.setVisibility(View.GONE);
+        acceptButton.setVisibility(View.VISIBLE);
+        declineButton.setVisibility(View.VISIBLE);
+        notificationMessage.setVisibility(View.VISIBLE);
+
+        posterViewButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedDialogue.displayPosterPopup(EventDetailUserActivity.this,eventID);
+            }
+        });
+
+        // when back button clicked, finish activity
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -80,30 +115,31 @@ public class EventDetailUserActivity extends AppCompatActivity {
             }
         });
 
+        // when register button clicked, user joins waitlist
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                joinWaitlist(eventID, () -> { fromQR = false; renderAll(); });
+                EventManager.waitlist_full(eventID, () -> {
+                    // join waitlist
+                    joinWaitlist(eventID, () -> { fromQR = false; renderAll(); });
+                    if (gm.hasLocationPermission()) {
+                        saveGeolocationData(userID, eventID);
+                    } else {
+                        // Request location permissions
+                        locationPermissionLauncher.launch(new String[]{
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_COARSE_LOCATION
+                        });
+                    }
+                }, () -> {
+                    // waitlist is full
+                    // show some error message
+                    Toast.makeText(EventDetailUserActivity.this, "The waitlist of this event is full.", Toast.LENGTH_SHORT).show();
+                });
             }
         });
 
-        acceptButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dbManager.setRegistrantStatus( eventID, userID, DBManager.RegistrantStatus.CONFIRMED);
-                renderUserStatus(); // status has changed so re-render
-            }
-        });
-
-        declineButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO - we can change this later to fully remove them if we don't want a user of leaves of their own volition CANCELLED
-                dbManager.setRegistrantStatus(eventID,userID,DBManager.RegistrantStatus.CANCELLED);
-                renderUserStatus();
-            }
-        });
-
+        // when unregister button clicked, user status set to canceled
         unregisterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -112,6 +148,45 @@ public class EventDetailUserActivity extends AppCompatActivity {
                 renderUserStatus();
             }
         });
+
+        // when accept button clicked, user status set to confirmed
+        acceptButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dbManager.setRegistrantStatus( eventID, userID, DBManager.RegistrantStatus.CONFIRMED);
+                renderUserStatus(); // status has changed so re-render
+            }
+        });
+
+        // when decline button clicked, user status set to canceled
+        declineButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO - we can change this later to fully remove them if we don't want a user of leaves of their own volition CANCELLED
+                dbManager.setRegistrantStatus(eventID,userID,DBManager.RegistrantStatus.CANCELLED);
+                renderUserStatus();
+            }
+        });
+        // START TY
+        gm = new GeolocationManager(this);
+        locationPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestMultiplePermissions(),
+                result -> {
+                    boolean fineLocationGranted = result.getOrDefault(
+                            Manifest.permission.ACCESS_FINE_LOCATION, false);
+                    boolean coarseLocationGranted = result.getOrDefault(
+                            Manifest.permission.ACCESS_COARSE_LOCATION, false);
+
+                    if (fineLocationGranted || coarseLocationGranted) {
+                        Toast.makeText(this, "Location permission granted.", Toast.LENGTH_SHORT).show();
+                        // Now, proceed to save geolocation
+                        saveGeolocationData(userID, eventID);
+                    } else {
+                        Toast.makeText(this, "Location permission denied.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+        // END TY
 
         // Populate screen based on event info and user's status as registrant
         renderAll();
@@ -123,6 +198,22 @@ public class EventDetailUserActivity extends AppCompatActivity {
         renderAll();
     }
 
+    // START TY
+    private void saveGeolocationData(String userID, String eventID) {
+//        String userID = "c5e9e56f41572d06"; // Replace with actual userID
+//        String eventID = "ouyj7XRzfSIqFRAXqnQ5"; // Replace with actual eventID
+
+        try {
+            gm.saveGeolocation(userID, eventID, success -> {
+                if (success) {
+                } else {
+                }
+            });
+        } catch (SecurityException e) {
+            Toast.makeText(this, "Location permission not granted.", Toast.LENGTH_SHORT).show();
+        }
+    }
+    // END TY
     /**
      * Renders information about the event, unaffected by user's status
      */
@@ -183,24 +274,45 @@ public class EventDetailUserActivity extends AppCompatActivity {
      * @see DBManager
      */
     private void renderBasedOnUserStatus(String status){
+        // show status
         userStatusTextView.setText(status);
+
+        // user cannot register (assumption: they have already registered)
         registerButton.setVisibility(View.GONE);
 
+        // Toast to show user this is running?
         Toast.makeText(EventDetailUserActivity.this,status,Toast.LENGTH_SHORT);
 
+        // user is waitlisted or confirmed:
+        // - no notification sent to them
+        // - can unregister from event
         if (status.equalsIgnoreCase("WAITLISTED") || status.equalsIgnoreCase("CONFIRMED")){
-            acceptButton.setVisibility(View.GONE);
-            declineButton.setVisibility(View.GONE);
+            notificationLayout.setVisibility(View.GONE);
             unregisterButton.setVisibility(View.VISIBLE);
+
+            // user is selected:
+            // - notification sent to them: accept or decline
         } else if (status.equalsIgnoreCase("SELECTED")) {
-            acceptButton.setVisibility(View.VISIBLE);
-            declineButton.setVisibility(View.VISIBLE);
+            showNotificationChoice();
             unregisterButton.setVisibility(View.GONE);
+
+            // user is canceled:
+            // - canceled their registration in the event
         } else if (status.equalsIgnoreCase("CANCELLED")){
-            acceptButton.setVisibility(View.GONE);
-            declineButton.setVisibility(View.GONE);
+            notificationLayout.setVisibility(View.GONE);
             unregisterButton.setVisibility(View.GONE);
         }
+    }
+
+    /**
+     * Shows a notification allowing user to accept or decline
+     */
+    private void showNotificationChoice() {
+        // set text to say user is accepted
+        String message = "You have been accepted!";
+        notificationMessage.setText(message);
+        // show notification layout
+        notificationLayout.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -214,6 +326,10 @@ public class EventDetailUserActivity extends AppCompatActivity {
             Toast.makeText(this, "User not authenticated.", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        // NOTE: could replace this with addRegistrantToWaitlist from DBManager (including callback functions)
+        // however, DBManager does not perform atomic writes so we can add that in later and then consider
+        // calling that function
 
         // Prepare data for Events -> eventID -> EventRegistrants -> userID
         DocumentReference eventRegistrantRef = db.collection("Events")
