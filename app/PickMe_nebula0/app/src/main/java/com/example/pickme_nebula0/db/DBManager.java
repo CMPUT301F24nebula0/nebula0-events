@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
 import android.util.Log;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.NonNull;
 
@@ -28,6 +30,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -330,7 +333,7 @@ public class DBManager {
      * @param userID deviceID of user we are sending the notification to
      * @param eventID ID of event associated with notification
      */
-    private void createNotification(String title, String message, String userID, String eventID){
+    public void createNotification(String title, String message, String userID, String eventID){
         CollectionReference userNotifCollection = db.collection(notificationCollection).document(userID).collection("userNotifs");
         String notifID = createIDForDocumentIn(userNotifCollection);
         Timestamp timestamp = new Timestamp(new Date());
@@ -627,7 +630,7 @@ public class DBManager {
 
         waitlistedUsersQuery.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                ArrayList<User> waitlistedUsers = new ArrayList<>();
+                List<User> waitlistedUsers = Collections.synchronizedList(new ArrayList<>());
 
                 for (QueryDocumentSnapshot registeredUserDoc : task.getResult()) {
                     String userID = registeredUserDoc.getId();
@@ -660,6 +663,12 @@ public class DBManager {
                     } catch (Exception e) {
                         Log.d("Firestore", "Error while fetching users: " + e.getMessage());
                     } finally {
+                        synchronized (waitlistedUsers) {
+                            new Handler(Looper.getMainLooper()).post(() -> {
+                                onSuccessCallback.run((List<User>) waitlistedUsers);
+                                Log.d("Firestore", "waitlisted users callback was invoked with size: " + waitlistedUsers.size());
+                            });
+                        }
                         executor.shutdown();
                         try {
                             if (!executor.awaitTermination(800, TimeUnit.MILLISECONDS)) {
@@ -668,8 +677,6 @@ public class DBManager {
                         } catch (InterruptedException e) {
                             executor.shutdownNow();
                         }
-
-                        onSuccessCallback.run(waitlistedUsers);
                     }
                 });
             } else {
