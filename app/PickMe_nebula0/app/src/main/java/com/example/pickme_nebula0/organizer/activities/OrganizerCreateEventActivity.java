@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
+import com.example.pickme_nebula0.SharedDialogue;
 import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.db.FBStorageManager;
 import com.example.pickme_nebula0.event.Event;
@@ -54,6 +55,7 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
     private Button eventCreationSubmitButton;
     private Button eventCreationCancelButton;
     private Button selectPosterButton;
+    private Button previewPosterButton;
 
     ActivityResultLauncher<PickVisualMediaRequest> pickMedia;
 
@@ -111,6 +113,7 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         eventCreationSubmitButton = findViewById(R.id.event_creation_submit_button);
         eventCreationCancelButton = findViewById(R.id.event_creation_cancel_button);
         selectPosterButton = findViewById(R.id.buttonSelectPoster);
+        previewPosterButton = findViewById(R.id.buttonPreviewPoster);
 
         // Get device ID
         deviceID = DeviceManager.getDeviceId();
@@ -150,12 +153,16 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
                     // photo picker.
                     if (uri != null) {
                         posterUri = uri;
+                        Toast.makeText(this,"Poster selected",Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(this,"Poster was not selected.",Toast.LENGTH_SHORT).show();
                     }
                 });
         selectPosterButton.setOnClickListener(view -> {
             openImagePicker();
+        });
+        previewPosterButton.setOnClickListener(view->{
+            SharedDialogue.displayPosterPopup(this,posterUri);
         });
 
         // Submit button logic
