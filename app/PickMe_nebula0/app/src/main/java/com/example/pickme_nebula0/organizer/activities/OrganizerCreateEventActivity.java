@@ -1,5 +1,6 @@
 package com.example.pickme_nebula0.organizer.activities;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -8,12 +9,17 @@ import android.widget.Switch;
 import android.widget.Toast;
 import android.app.DatePickerDialog;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
+import com.example.pickme_nebula0.SharedDialogue;
 import com.example.pickme_nebula0.db.DBManager;
+import com.example.pickme_nebula0.db.FBStorageManager;
 import com.example.pickme_nebula0.event.Event;
 import com.example.pickme_nebula0.organizer.exceptions.OrganizerExceptions;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -48,6 +54,10 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
     private EditText numberOfAttendeesField;
     private Button eventCreationSubmitButton;
     private Button eventCreationCancelButton;
+    private Button selectPosterButton;
+    private Button previewPosterButton;
+
+    ActivityResultLauncher<PickVisualMediaRequest> pickMedia;
 
     // User input variables
     String eventName;
@@ -65,6 +75,7 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
     int waitlistMaxCapacity;
     int maxNumberOfAttendees;
     boolean eventCreated;
+    Uri posterUri = null;
 
     // Device ID
     String deviceID;
@@ -85,6 +96,8 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         // Initialize database manager
         dbManager = new DBManager();
 
+
+
         // attach to screen component xml
         setContentView(R.layout.activity_organizer_create_event);
 
@@ -99,6 +112,8 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         numberOfAttendeesField = findViewById(R.id.number_of_attendees_field);
         eventCreationSubmitButton = findViewById(R.id.event_creation_submit_button);
         eventCreationCancelButton = findViewById(R.id.event_creation_cancel_button);
+        selectPosterButton = findViewById(R.id.buttonSelectPoster);
+        previewPosterButton = findViewById(R.id.buttonPreviewPoster);
 
         // Get device ID
         deviceID = DeviceManager.getDeviceId();
@@ -130,6 +145,25 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         // Initially disable fields since both switches are off at the beginning
         waitlistCapacityField.setEnabled(false);
         geolocationRequirementField.setEnabled(false);
+
+        // set up poster selection
+        pickMedia =
+                registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
+                    // Callback is invoked after the user selects a media item or closes the
+                    // photo picker.
+                    if (uri != null) {
+                        posterUri = uri;
+                        Toast.makeText(this,"Poster selected",Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(this,"Poster was not selected.",Toast.LENGTH_SHORT).show();
+                    }
+                });
+        selectPosterButton.setOnClickListener(view -> {
+            openImagePicker();
+        });
+        previewPosterButton.setOnClickListener(view->{
+            SharedDialogue.displayPosterPopup(this,posterUri);
+        });
 
         // Submit button logic
         eventCreationSubmitButton.setOnClickListener(v -> {
@@ -172,9 +206,13 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
             }
 
             // Add event to database
-            dbManager.addEvent(event);
+            if(posterUri != null){
+                dbManager.addEvent(this,event,posterUri);
+            } else{
+                dbManager.addEvent(this, event);
+            }
 
-            Toast.makeText(this, "Event created successfully with QR Code!", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Event Created", Toast.LENGTH_LONG).show();
 
             finish();
         });
@@ -256,5 +294,11 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
             Log.d("OrganizerCreateEventActivity", "parseDate failed with error: " + e.getMessage());
             return null; // Handle exception as needed
         }
+    }
+
+    private void openImagePicker() {
+        pickMedia.launch(new PickVisualMediaRequest.Builder()
+                .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                .build());
     }
 }
