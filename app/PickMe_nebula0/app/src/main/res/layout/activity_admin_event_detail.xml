@@ -49,7 +49,11 @@
         android:text="TextView"
         android:textAlignment="viewStart"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_aed_eventInfo" />
+        app:layout_constraintTop_toBottomOf="@+id/textView_aed_eventInfo"
+        android:maxLines="1"
+        android:maxLength="30"
+        android:ellipsize="end"
+        />
 
     <Button
         android:id="@+id/button_aed_delete_event"

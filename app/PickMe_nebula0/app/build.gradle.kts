@@ -93,13 +93,14 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-contrib:3.5.1") {
         exclude("com.google.protobuf", "protobuf-lite")
     }
-    
+    testImplementation("org.hamcrest:hamcrest-core:2.2")
+    testImplementation("org.hamcrest:hamcrest-library:2.2")
     implementation("com.journeyapps:zxing-android-embedded:4.1.0")
     implementation("com.google.zxing:core:3.3.3")
     implementation("com.google.android.material:material:1.4.0")
 
     implementation("androidx.core:core-ktx:1.10.0")
-    implementation("com.google.android.gms:play-services-location:21.0.1")   
+    implementation("com.google.android.gms:play-services-location:21.0.1")
 
     // Force protobuf-javalite to avoid conflicts with protobuf-lite
     implementation("com.google.protobuf:protobuf-javalite:3.22.3")
@@ -113,6 +114,7 @@ configurations.all {
     // Force protobuf-javalite to avoid conflicts with protobuf-lite
     resolutionStrategy {
         force("com.google.protobuf:protobuf-javalite:3.22.3")
+        force("org.hamcrest:hamcrest-core:2.2")
+        force("org.hamcrest:hamcrest-library:2.2")
     }
 }
-
