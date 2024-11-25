@@ -1,9 +1,29 @@
 package com.example.pickme_nebula0.user;
 
+import static java.lang.System.in;
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.os.Build;
+
 import androidx.annotation.NonNull;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import com.example.pickme_nebula0.qr.QRCodeGenerator;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import com.squareup.picasso.Picasso;
+import java.util.Random;
+
 
 
 /**
@@ -13,6 +33,7 @@ public class User {
     protected String userID;
     protected String name;
     protected String email;
+
     protected String phone;
     boolean notificationsEnabled = true;
     protected String profilePic;
@@ -43,6 +64,7 @@ public class User {
         this.userID = deviceID;
         this.name = name;
         this.email = email;
+        this.genProfilePic();
     }
 
     public User(Boolean admin, String email, String nam, boolean notificationsEnabled, String phone, String profilePic)
@@ -70,6 +92,7 @@ public class User {
         this.email = email;
         this.phone = phoneNumber;
         this.notificationsEnabled = notifEnabled;
+        this.genProfilePic();
     }
 
     public User(String deviceID, String name, String email, String phoneNumber ,String profilePicture) {
@@ -139,11 +162,65 @@ public class User {
     public String getProfilePic() {
         return this.profilePic;
     }
-    public void genProfilePic(){
-        char Firstletter=this.getName().charAt(0);
-        
+    private void genProfilePic(){
+        byte[] byte_name= name.getBytes();
+        Bitmap name_bit = BitmapFactory.decodeByteArray(byte_name, 0, byte_name.length);
+        Bitmap profile_pic=Bitmap.createBitmap(name_bit.getWidth(), name_bit.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas drawing_tool=new Canvas(profile_pic);
+        drawing_tool.drawColor(Color.WHITE);
+        ArrayList <Integer> rand_array=new ArrayList<Integer>();
+        rand_array.add(Color.BLACK);
+        rand_array.add(Color.BLUE);
+        rand_array.add( Color.GREEN);
+        rand_array.add(Color.CYAN);
+        rand_array.add( Color.DKGRAY);
+        rand_array.add( Color.GRAY);
+        rand_array.add( Color.LTGRAY);
+        rand_array.add(Color.RED);
+        rand_array.add( Color.MAGENTA);
+        rand_array.add( Color.YELLOW);
+
+        Random rand=new Random();
+        float r= rand.nextFloat();
+        float g= rand.nextFloat();
+        float b=rand.nextFloat();
+        float a=rand.nextFloat();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Color RandomColor=Color.valueOf(r,b,g,a);
+
+            Paint Randompaint=new Paint();
+            Randompaint.setColor(Color.parseColor(RandomColor.toString()));
+            drawing_tool.drawBitmap(name_bit,0,0,Randompaint);
+        }
+        else {
+            int k=rand.nextInt(rand_array.size());
+            Paint Randompaint=new Paint();
+            Randompaint.setColor(Color.parseColor(rand_array.get(k).toString()));
+            drawing_tool.drawBitmap(name_bit,0,0,Randompaint);
+        }
+        this.setProfilePic(Save(profile_pic.toString(), profile_pic));
 
     }
+    public String Save(String name, Bitmap bitmapImage) {
+
+        File path = new File(name);
+
+        try {
+
+            FileOutputStream fileOutputStream = new FileOutputStream(path);
+            bitmapImage.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+            fileOutputStream.close();
+
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+            return "";
+        }
+
+        return path.toString();
+    }
+
+
     public void setProfilePic(String profilePic) {
         this.profilePic = profilePic;
     }

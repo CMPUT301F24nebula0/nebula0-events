@@ -144,7 +144,6 @@ public class AdminHomeActivity extends AppCompatActivity {
             Toast.makeText(AdminHomeActivity.this, "Switched to Manage Events layout", Toast.LENGTH_SHORT).show();
         });
 
-        //TODO;
         btnManageUsers.setOnClickListener(v -> {
             viewFlipper.setDisplayedChild(1); // Show Manage Profile layout
             updateProfiles();
@@ -174,7 +173,6 @@ public class AdminHomeActivity extends AppCompatActivity {
 
         btnManageQR.setOnClickListener(new View.OnClickListener() {
             @Override
-            //TODO;
             public void onClick(View v) {
                 viewFlipper.setDisplayedChild(3); // Show Manage QR Code layout
                 updateQRCodes();
@@ -197,7 +195,6 @@ public class AdminHomeActivity extends AppCompatActivity {
 
         btnManageFacilities.setOnClickListener(new View.OnClickListener() {
             @Override
-            //TODO;
             public void onClick(View v) {
                 viewFlipper.setDisplayedChild(4); // Show Manage Facilities layout
                 updateFacilities();
