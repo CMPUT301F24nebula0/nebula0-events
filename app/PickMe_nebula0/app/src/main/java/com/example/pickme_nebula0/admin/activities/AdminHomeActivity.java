@@ -229,7 +229,7 @@ public class AdminHomeActivity extends AppCompatActivity {
 
     private void updateEvents(){
         events.clear();
-//        eventAdapter.notifyDataSetChanged();
+        eventAdapter.notifyDataSetChanged();
         db.collection("Events")
                 .get()
                 .addOnCompleteListener(task -> {
@@ -238,14 +238,14 @@ public class AdminHomeActivity extends AppCompatActivity {
                             Event e = document.toObject(Event.class);
                             events.add(e);
                         }
-//                        eventAdapter.notifyDataSetChanged();
+                        eventAdapter.notifyDataSetChanged();
                     }
                 });
     }
 
     private void updateProfiles(){
         users.clear();
-//        userAdapter.notifyDataSetChanged();
+        userAdapter.notifyDataSetChanged();
         db.collection("Users")
                 .get()
                 .addOnCompleteListener(task -> {
@@ -254,7 +254,7 @@ public class AdminHomeActivity extends AppCompatActivity {
                             User u = document.toObject(User.class);
                             users.add(u);
                         }
-//                        userAdapter.notifyDataSetChanged();
+                        userAdapter.notifyDataSetChanged();
                     }
                 });
     }
@@ -269,7 +269,7 @@ as a QR code doesn't exist on its own  aslo a change made to the QR code
     private void updateQRCodes(){
 
         events.clear();
-//        QRAdapter.notifyDataSetChanged();
+        QRAdapter.notifyDataSetChanged();
         db.collection("Events")
                 .get()
                 .addOnCompleteListener(task -> {
@@ -278,14 +278,14 @@ as a QR code doesn't exist on its own  aslo a change made to the QR code
                                Event e = document.toObject(Event.class);
                                 events.add(e);
                         }
-//                        QRAdapter.notifyDataSetChanged();
+                        QRAdapter.notifyDataSetChanged();
                     }
                 });
     }
 
     private void updateFacilities(){
         facilities.clear();
-//        facilityAdapter.notifyDataSetChanged();
+        facilityAdapter.notifyDataSetChanged();
         db.collection("Facilities")
                 .get()
                 .addOnCompleteListener(task -> {
@@ -294,7 +294,7 @@ as a QR code doesn't exist on its own  aslo a change made to the QR code
                             Facility f = document.toObject(Facility.class);
                             facilities.add(f);
                         }
-//                        facilityAdapter.notifyDataSetChanged();
+                       facilityAdapter.notifyDataSetChanged();
                     }
                 });
     }
