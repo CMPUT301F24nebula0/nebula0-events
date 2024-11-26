@@ -1051,7 +1051,6 @@ public class DBManager {
                             onSuccess.run();
                             // Toast.makeText(OrganizerCreateEventActivity.this, "Event data saved successfully", Toast.LENGTH_SHORT).show())
                             // TODO add these toast messages to key operations
-                            onSuccessCallback.run();
                         })
                         .addOnFailureListener(e -> {
                             Log.d("Firestore", operationDescription + "found/created doc but failed to set with error:" + e.getMessage());
