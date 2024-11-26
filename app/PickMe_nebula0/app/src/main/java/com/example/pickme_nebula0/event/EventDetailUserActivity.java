@@ -20,6 +20,7 @@ import com.example.pickme_nebula0.SharedDialogue;
 import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.start.activities.HomePageActivity;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
@@ -115,27 +116,58 @@ public class EventDetailUserActivity extends AppCompatActivity {
             }
         });
 
-        // when register button clicked, user joins waitlist
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EventManager.waitlist_full(eventID, () -> {
-                    // join waitlist
-                    joinWaitlist(eventID, () -> { fromQR = false; renderAll(); });
-                    if (gm.hasLocationPermission()) {
-                        saveGeolocationData(userID, eventID);
-                    } else {
-                        // Request location permissions
-                        locationPermissionLauncher.launch(new String[]{
-                                Manifest.permission.ACCESS_FINE_LOCATION,
-                                Manifest.permission.ACCESS_COARSE_LOCATION
+                // Check if the event requires geolocation
+                db.collection("Events")
+                        .document(eventID)
+                        .get()
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                // Ensure document exists and fetch the "geolocationRequired" field
+                                DocumentSnapshot document = task.getResult();
+                                if (document != null && document.exists()) {
+                                    Boolean requiresGeolocation = document.getBoolean("geolocationRequired");
+
+                                    // Handle geolocation requirement
+                                    if (requiresGeolocation != null && requiresGeolocation) {
+                                        // Geolocation required: Show dialog to notify the user
+                                        showGeolocationRequiredDialog(() -> {
+                                            // User agrees: Join waitlist
+                                            joinWaitlist(eventID, () -> {
+                                                fromQR = false;
+                                                renderAll();
+                                            });
+
+                                            // Check location permissions and save geolocation if needed
+                                            if (gm.hasLocationPermission()) {
+                                                saveGeolocationData(userID, eventID);
+                                            } else {
+                                                // Request location permissions
+                                                locationPermissionLauncher.launch(new String[]{
+                                                        Manifest.permission.ACCESS_FINE_LOCATION,
+                                                        Manifest.permission.ACCESS_COARSE_LOCATION
+                                                });
+                                            }
+                                        });
+                                    } else {
+                                        // Geolocation not required: Proceed with joining the waitlist
+                                        joinWaitlist(eventID, () -> {
+                                            fromQR = false;
+                                            renderAll();
+                                        });
+                                    }
+                                } else {
+                                    // Document does not exist
+                                    Toast.makeText(EventDetailUserActivity.this, "Event not found.", Toast.LENGTH_LONG).show();
+                                }
+                            } else {
+                                // Firestore query failed
+                                Exception e = task.getException();
+                                Toast.makeText(EventDetailUserActivity.this, "Failed to fetch event details: " + (e != null ? e.getMessage() : "Unknown error"), Toast.LENGTH_LONG).show();
+                            }
                         });
-                    }
-                }, () -> {
-                    // waitlist is full
-                    // show some error message
-                    Toast.makeText(EventDetailUserActivity.this, "The waitlist of this event is full.", Toast.LENGTH_SHORT).show();
-                });
             }
         });
 
@@ -362,4 +394,25 @@ public class EventDetailUserActivity extends AppCompatActivity {
             e.printStackTrace();
         });
     }
+    /**
+     * Shows a dialog to notify the user that the event requires geolocation.
+     *
+     * @param onConfirm Callback to execute if the user agrees to continue.
+     */
+    private void showGeolocationRequiredDialog(Runnable onConfirm) {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Geolocation Required")
+                .setMessage("This event requires geolocation information to join the waitlist. Do you want to proceed?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    // User agrees to proceed
+                    onConfirm.run();
+                })
+                .setNegativeButton("No", (dialog, which) -> {
+                    // User cancels
+                    dialog.dismiss();
+                })
+                .setCancelable(true)
+                .show();
+    }
+
 }

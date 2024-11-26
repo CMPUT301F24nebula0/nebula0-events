@@ -1,11 +1,14 @@
 package com.example.pickme_nebula0.db;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.util.Base64;
 import android.util.Log;
 import android.os.Handler;
 import android.os.Looper;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -25,6 +28,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -391,10 +396,16 @@ public class DBManager {
      *
      * @param event instance of event containing information to be added to database Events collection
      */
-    public void addEvent(Event event){
+    public void addEvent(Context context,Event event){
+        addEvent(context,event,null);
+    }
+
+    public void addEvent(Context context, Event event, Uri uri){
+        String eventID = event.getEventID();
+
         // Populate fields with data from object
         Map<String, Object> eventData = new HashMap<>();
-        eventData.put("eventID",event.getEventID());
+        eventData.put("eventID",eventID);
         eventData.put("organizerID", event.getOrganizerID());
         eventData.put("eventName", event.getEventName());
         eventData.put("eventDescription", event.getEventDescription());
@@ -412,18 +423,22 @@ public class DBManager {
         eventData.put("qrCodeData", qrBase64);
 
         QRCodeGenerator qrCodeGenerator = new QRCodeGenerator();
-        String qrCodeURI  = qrCodeGenerator.generateQRCodeURI(event.getEventID());
+        String qrCodeURI  = qrCodeGenerator.generateQRCodeURI(eventID);
         String hashedQRCode = qrCodeGenerator.generateSHA256Hash(qrCodeURI);
 
         eventData.put("hashedQRCode", hashedQRCode);
 
         // Create document
-        addUpdateDocument(eventsCollection, event.getEventID(), eventData);
+        if(uri != null){
+            addUpdateDocument(db.collection(eventsCollection), eventID, eventData,()->{FBStorageManager.uploadPoster(uri,eventID,context);});
+        } else{
+            addUpdateDocument(db.collection(eventsCollection), eventID, eventData);
+        }
         // Add this event to the organizer's list of created events
         CollectionReference orgsCreatedEventsCol = db.collection(usersCollection).document(event.getOrganizerID()).collection(organizerEventsCollection);
         Map<String,Object> orgEventData = new HashMap<>();
         orgEventData.put("status", "OPEN");
-        addUpdateDocument(orgsCreatedEventsCol,event.getEventID(),orgEventData);
+        addUpdateDocument(orgsCreatedEventsCol,eventID,orgEventData);
     }
 
     /**
@@ -1036,6 +1051,7 @@ public class DBManager {
                             onSuccess.run();
                             // Toast.makeText(OrganizerCreateEventActivity.this, "Event data saved successfully", Toast.LENGTH_SHORT).show())
                             // TODO add these toast messages to key operations
+                            onSuccessCallback.run();
                         })
                         .addOnFailureListener(e -> {
                             Log.d("Firestore", operationDescription + "found/created doc but failed to set with error:" + e.getMessage());
