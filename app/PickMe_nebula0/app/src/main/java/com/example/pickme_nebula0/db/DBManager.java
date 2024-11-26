@@ -35,6 +35,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -158,6 +159,11 @@ public class DBManager {
         checkExistenceOfDocument(usersCollection,user.getUserID(),()->updateUser(user),()->createNewUser(user));
     }
 
+    public void addUpdateUserProfile(User user, Void2VoidCallback onSuccess) {
+        checkExistenceOfDocument(usersCollection,user.getUserID(),()->updateUser(user,onSuccess),()->createNewUser(user,onSuccess));
+    }
+
+
     /**
      * Adds a given user to the database.
      * If this user (same user.deviceID) already exists, their data will be overwritten.
@@ -177,6 +183,19 @@ public class DBManager {
         addUpdateDocument(usersCollection,user.getUserID(),userData);
     }
 
+    private void createNewUser(User user, Void2VoidCallback onSuccess){
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("userID",user.getUserID());
+        userData.put("name", user.getName());
+        userData.put("email", user.getEmail());
+        userData.put("phone", user.getPhone());
+        userData.put("profilePic", user.getProfilePic());
+        userData.put("notificationsEnabled", user.getNotificationsEnabled());
+        userData.put("admin", false);
+
+        addUpdateDocument(db.collection(usersCollection),user.getUserID(),userData,onSuccess);
+    }
+
     /**
      * Updates a user's profile in the database.
      *
@@ -187,8 +206,16 @@ public class DBManager {
         updateField(docRef,"name",user.getName());
         updateField(docRef,"email",user.getEmail());
         updateField(docRef,"phone",user.getPhone());
-        updateField(docRef,"profilePic",user.getProfilePic());
         updateField(docRef,"notificationsEnabled",user.getNotificationsEnabled());
+    }
+
+    private void updateUser(User user, Void2VoidCallback onSuccess){
+        DocumentReference docRef = db.collection(usersCollection).document(user.getUserID());
+        updateField(docRef,"name",user.getName());
+        updateField(docRef,"email",user.getEmail());
+        updateField(docRef,"phone",user.getPhone());
+        updateField(docRef,"notificationsEnabled",user.getNotificationsEnabled());
+        onSuccess.run();
     }
 
     /**
@@ -1010,12 +1037,7 @@ public class DBManager {
      * @param data hashmap of data to be added or used to overwrite old data
      */
     private void addUpdateDocument(CollectionReference colRef, String documentID,
-                                   Map<String, Object> data){
-        addUpdateDocument(colRef,documentID,data,()->{});
-    }
-
-    private void addUpdateDocument(CollectionReference colRef, String documentID,
-                                   Map<String, Object> data,Void2VoidCallback onSuccessCallback){
+                                   Map<String, Object> data,Void2VoidCallback onSuccess){
         String operationDescription = String.format("addUpdateDocument for [%s,%s]", colRef.getId(), documentID);
 
         DocumentReference docRef = colRef.document(documentID);
@@ -1026,9 +1048,9 @@ public class DBManager {
                 docRef.set(data)
                         .addOnSuccessListener(aVoid -> {
                             Log.d("Firestore", operationDescription + " succeeded");
+                            onSuccess.run();
                             // Toast.makeText(OrganizerCreateEventActivity.this, "Event data saved successfully", Toast.LENGTH_SHORT).show())
                             // TODO add these toast messages to key operations
-                            onSuccessCallback.run();
                         })
                         .addOnFailureListener(e -> {
                             Log.d("Firestore", operationDescription + "found/created doc but failed to set with error:" + e.getMessage());
@@ -1048,7 +1070,11 @@ public class DBManager {
      * @param data hashmap of data to be added or used to overwrite old data
      */
     private void addUpdateDocument(String collectionName, String documentID, Map<String,Object> data){
-        addUpdateDocument(db.collection(collectionName),documentID,data);
+        addUpdateDocument(db.collection(collectionName),documentID,data,()->{});
+    }
+
+    private void addUpdateDocument(CollectionReference collection,String docID,Map<String,Object> data){
+        addUpdateDocument(collection,docID,data,()->{});
     }
 
     /**
