@@ -27,6 +27,7 @@ import com.example.pickme_nebula0.facility.FacilityDetailActivity;
 import com.example.pickme_nebula0.notification.MessageViewActivity;
 import com.example.pickme_nebula0.notification.Notification;
 import com.example.pickme_nebula0.notification.NotificationArrayAdapter;
+import com.example.pickme_nebula0.qr.ImageAdapter;
 import com.example.pickme_nebula0.qr.QRcodeAdapter;
 import com.example.pickme_nebula0.user.User;
 import com.example.pickme_nebula0.user.UserArrayAdapter;
@@ -57,6 +58,9 @@ public class AdminHomeActivity extends AppCompatActivity {
     // Profiles
     private ArrayList<User> users;
     private ListView usersList;
+
+    private ListView imagesList;
+    private ImageAdapter imageAdapter;
     private ListView QRcodesList;
     private QRcodeAdapter QRAdapter;
 
@@ -117,6 +121,9 @@ public class AdminHomeActivity extends AppCompatActivity {
         facilityAdapter = new FacilityArrayAdapter(AdminHomeActivity.this,R.id.item_facility, facilities);
         facilitiesList.setAdapter(facilityAdapter);
 
+        imagesList=findViewById(R.id.ImageListView);
+        imageAdapter=new ImageAdapter(AdminHomeActivity.this,R.id.item_image, events);
+        imagesList.setAdapter(imageAdapter);
        // for QR codes
         QRcodesList=findViewById(R.id.QRcodeListView);
         QRAdapter=new QRcodeAdapter(AdminHomeActivity.this,R.id.item_qrcode, events);
@@ -165,10 +172,27 @@ public class AdminHomeActivity extends AppCompatActivity {
         });
 
         //TODO;
-        btnManageImages.setOnClickListener(v -> {
-            viewFlipper.setDisplayedChild(2); // Show Manage Image layout
-            Toast.makeText(AdminHomeActivity.this, "Switched to Manage Images layout", Toast.LENGTH_SHORT).show();
+        btnManageImages.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewFlipper.setDisplayedChild(2); // Show Manage QR Code layout
+                updateImages();
+                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Image layout", Toast.LENGTH_SHORT).show();
+                // On click, show event details an allow admin to delete
+                imagesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
+                        Event clickedEvent = (Event) adapterView.getItemAtPosition(pos);
 
+                        Intent intent = new Intent(AdminHomeActivity.this, EventDetailAdminActivity.class);
+                        intent.putExtra("eventID",clickedEvent.getEventID());
+                        intent.putExtra("isImage", true);
+                        startActivity(intent);
+                    }
+                });
+                // Confirmation message for debugging and UI verification
+                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Events layout", Toast.LENGTH_SHORT).show();
+            }
         });
 
         btnManageQR.setOnClickListener(new View.OnClickListener() {
@@ -257,7 +281,19 @@ public class AdminHomeActivity extends AppCompatActivity {
     }
 
     private void updateImages(){
-
+        events.clear();
+        imageAdapter.notifyDataSetChanged();
+        db.collection("Events")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            Event e = document.toObject(Event.class);
+                            events.add(e);
+                        }
+                        imageAdapter.notifyDataSetChanged();
+                    }
+                });
     }
 /*
 there is no reason to separate the QR codes from their respective event
