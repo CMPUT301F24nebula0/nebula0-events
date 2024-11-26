@@ -1,12 +1,14 @@
 package com.example.pickme_nebula0.user.activities;
 
-import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -19,10 +21,8 @@ import androidx.activity.result.PickVisualMediaRequest;
 
 
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 
 import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.DeviceManager;
@@ -31,6 +31,11 @@ import com.example.pickme_nebula0.SharedDialogue;
 import com.example.pickme_nebula0.db.FBStorageManager;
 import com.example.pickme_nebula0.user.User;
 import com.squareup.picasso.Picasso;
+
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Random;
 
 // TODO: add profile image LATER
 
@@ -58,6 +63,16 @@ public class UserInfoActivity extends AppCompatActivity {
     Button removeProfilePicButton;
     ActivityResultLauncher<PickVisualMediaRequest> pickMedia;
 
+    Uri profilePicUri = null;
+
+    private void conditionalPicUpload(String name, boolean newUser){
+        if (profilePicUri != null){
+            FBStorageManager.uploadProfilePic(profilePicUri,deviceID,UserInfoActivity.this);
+        } else if (newUser) {
+            FBStorageManager.uploadProfilePic(genProfilePic(name),deviceID,UserInfoActivity.this);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,10 +88,8 @@ public class UserInfoActivity extends AppCompatActivity {
                     // Callback is invoked after the user selects a media item or closes the
                     // photo picker.
                     if (uri != null) {
-                        FBStorageManager.uploadProfilePic(uri,deviceID,this);
+                        profilePicUri = uri;
                         renderProfilePicture(uri);
-                    } else {
-                        setAutoProfilePic();
                     }
                 });
 
@@ -117,7 +130,8 @@ public class UserInfoActivity extends AppCompatActivity {
                 }
 
                 User u = new User(deviceID,name,email,phone,notifEnabled);
-                dbManager.addUpdateUserProfile(u);
+                dbManager.addUpdateUserProfile(u,()->{
+                    conditionalPicUpload(name,newUser);});
                 finish();
             }
         });
@@ -145,7 +159,6 @@ public class UserInfoActivity extends AppCompatActivity {
         });
 
         if (newUser){ // new user's require a slightly different screen layout
-            setAutoProfilePic();
             headerTextView.setText(R.string.user_info_header_first_time);
             cancelButton.setVisibility(View.GONE);
             facilityButton.setVisibility(View.GONE);
@@ -170,7 +183,7 @@ public class UserInfoActivity extends AppCompatActivity {
             phoneField.setText(castedUser.getPhone());
         }
         enableNotifBox.setChecked(castedUser.getNotificationsEnabled());
-        FBStorageManager.retrieveProfilePicUri(deviceID,this::renderProfilePicture,this::setAutoProfilePic);
+        FBStorageManager.retrieveProfilePicUri(deviceID,this::renderProfilePicture,()->{});
     }
 
     /**
@@ -249,12 +262,62 @@ public class UserInfoActivity extends AppCompatActivity {
     private void setAutoProfilePic(){
         Toast.makeText(this,"Replacing image with auto",Toast.LENGTH_LONG).show();
 
-        // TODO - tie this in with auto gen profile pics
-//        Uri generatedImageUri;
-//        FBStorageManager.uploadProfilePic(generatedImageUri,deviceID,this);
-//        renderProfilePicture(generatedImageUri);
+        Uri generatedImageUri = genProfilePic(nameField.getText().toString());
+        if (generatedImageUri == null){
+            Toast.makeText(this,"Failed to auto generate profile picture",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        profilePicUri = generatedImageUri;
+        renderProfilePicture(generatedImageUri);
     }
 
+    // based on code from: https://stackoverflow.com/a/26060004
+    public Uri getImageUri(Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(this.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
+
+    private ArrayList<Integer> colors = new ArrayList<>(Arrays.asList(
+            Color.RED,
+            Color.GREEN,
+            Color.BLUE,
+            Color.YELLOW,
+            Color.CYAN,
+            Color.LTGRAY,
+            Color.MAGENTA
+    ));
+    // based on code generated from OpenAI's chatGPT4 based on prompt "in android studio using java, I want to create a bitmap image of the first letter of a given string on a background of a random color"
+    private Uri genProfilePic(String name){
+        if (name == null || name.isEmpty()) return null;
+
+        String firstLetter = name.substring(0, 1).toUpperCase();
+
+        int color = colors.get(new Random().nextInt(colors.size()));
+
+        // Set up paint
+        Paint paint = new Paint();
+        paint.setTextSize(100); // Adjust the size as needed
+        paint.setColor(Color.WHITE); // Text color
+        paint.setAntiAlias(true);
+        paint.setTextAlign(Paint.Align.CENTER);
+
+        // Measure the size of the letter
+        Rect bounds = new Rect();
+        paint.getTextBounds(firstLetter, 0, firstLetter.length(), bounds);
+
+        // Create a square bitmap
+        int size = Math.max(bounds.width(), bounds.height()) + 50; // Add some padding
+        Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+
+        // Draw the background and letter
+        Canvas canvas = new Canvas(bitmap);
+        canvas.drawColor(color); // Fill the background with the random color
+        canvas.drawText(firstLetter, size / 2f, (size / 2f) - bounds.exactCenterY(), paint);
+
+        return getImageUri(bitmap);
+    }
 
 
 }
