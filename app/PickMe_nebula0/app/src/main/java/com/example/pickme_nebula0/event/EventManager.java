@@ -21,6 +21,10 @@ public class EventManager {
     private static FirebaseFirestore db = dbm.db;
     private static String event_manager_tag = "EventManager";
 
+    public enum EventStatus {
+        PAST, ONGOING
+    }
+
     /**
      * Checks if the waitlist of a given event is full.
      * Runs a success callback if not full, and a failure callback if full.
