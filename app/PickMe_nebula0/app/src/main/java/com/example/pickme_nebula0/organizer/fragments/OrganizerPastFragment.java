@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.event.Event;
+import com.example.pickme_nebula0.event.EventManager;
+import com.example.pickme_nebula0.organizer.OrganizerRole;
 import com.example.pickme_nebula0.organizer.adapters.PastEventsAdapter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -52,20 +54,29 @@ public class OrganizerPastFragment extends Fragment {
 
     @SuppressLint("NotifyDataSetChanged")
     private void loadPastEvents() {
-        pastEvents.clear();
-        db.collection("Events")
-                .whereEqualTo("organizerID", DeviceManager.getDeviceId())
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            Event event = document.toObject(Event.class);
-                            if (event.getEventDate() != null && event.getEventDate().before(new Date())) {
-                                pastEvents.add(event);
-                            }
-                        }
-                        adapter.notifyDataSetChanged();
-                    }
-                });
+        OrganizerRole.get_event_by_status(DeviceManager.getDeviceId(), EventManager.EventStatus.PAST, (pastEventsObj) -> {
+            ArrayList<Event> events = (ArrayList<Event>) pastEventsObj;
+
+            pastEvents.clear();
+            pastEvents.addAll(events);
+            adapter.notifyDataSetChanged();
+        }, () -> Log.d(this.getClass().getSimpleName(), "Could not load past events"));
+
+
+//        pastEvents.clear();
+//        db.collection("Events")
+//                .whereEqualTo("organizerID", DeviceManager.getDeviceId())
+//                .get()
+//                .addOnCompleteListener(task -> {
+//                    if (task.isSuccessful()) {
+//                        for (QueryDocumentSnapshot document : task.getResult()) {
+//                            Event event = document.toObject(Event.class);
+//                            if (event.getEventDate() != null && event.getEventDate().before(new Date())) {
+//                                pastEvents.add(event);
+//                            }
+//                        }
+//                        adapter.notifyDataSetChanged();
+//                    }
+//                });
     }
 }
