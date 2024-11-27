@@ -3,6 +3,8 @@
     <style name="Base.Theme.PickMe_nebula0" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="fontFamily">@font/catamaran_semibold</item>
+        <item name="android:fontFamily">@font/catamaran_semibold</item>
     </style>
 
     <style name="Theme.PickMe_nebula0" parent="Base.Theme.PickMe_nebula0" />
