@@ -253,10 +253,12 @@ public class AdminHomeActivity extends AppCompatActivity {
     private void updateEvents(){
         EventManager.get_all_events((eventsObj) -> {
             ArrayList<Event> fetched_events = (ArrayList<Event>) eventsObj;
-            events.clear();
-            events.addAll(fetched_events);
-            eventAdapter.notifyDataSetChanged();
 
+            runOnUiThread(() -> {
+                events.clear();
+                events.addAll(fetched_events);
+                eventAdapter.notifyDataSetChanged();
+            });
         }, () -> {});
 //        events.clear();
 //        eventAdapter.notifyDataSetChanged();
@@ -312,16 +314,19 @@ as a QR code doesn't exist on its own  aslo a change made to the QR code
 
         EventManager.get_all_events((eventsObj) -> {
             ArrayList<Event> fetched_events = (ArrayList<Event>) eventsObj;
-            events.clear();
+            runOnUiThread(() -> {
+                events.clear();
 
-            // only add qr code to list if its data exists
-            for (Event event: fetched_events) {
-                String qr_code_data = event.getQrCodeData();
-                if (qr_code_data == null || qr_code_data.equals("null")) { continue; }
-                events.add(event);
-            }
+                for (Event event: fetched_events) {
+                    // only add qr code to list if its data exists
+                    String qr_code_data = event.getQrCodeData();
+                    if (qr_code_data == null || qr_code_data.equals("null")) { continue; }
+                    events.add(event);
+                }
 
-            QRAdapter.notifyDataSetChanged();
+                QRAdapter.notifyDataSetChanged();
+            });
+
         }, () -> Log.d(this.getClass().getSimpleName(), "Failed to update QR code list"));
 
 //        events.clear();
