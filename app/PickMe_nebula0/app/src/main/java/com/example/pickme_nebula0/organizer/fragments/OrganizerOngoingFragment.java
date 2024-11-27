@@ -2,6 +2,7 @@ package com.example.pickme_nebula0.organizer.fragments;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +14,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.event.Event;
+import com.example.pickme_nebula0.event.EventManager;
+import com.example.pickme_nebula0.organizer.OrganizerRole;
 import com.example.pickme_nebula0.organizer.adapters.OngoingEventsAdapter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -51,20 +55,27 @@ public class OrganizerOngoingFragment extends Fragment {
 
     @SuppressLint("NotifyDataSetChanged")
     private void loadOngoingEvents() {
-        ongoingEvents.clear();
-        db.collection("Events")
-                .whereEqualTo("organizerID", DeviceManager.getDeviceId())
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            Event event = document.toObject(Event.class);
-                            if (event.getEventDate() != null && !event.getEventDate().before(new Date())) {
-                                ongoingEvents.add(event);
-                            }
-                        }
-                        adapter.notifyDataSetChanged();
-                    }
-                });
+        OrganizerRole.get_event_by_status(DeviceManager.getDeviceId(), EventManager.EventStatus.ONGOING, (ongoingEventsObj) -> {
+            ArrayList<Event> events = (ArrayList<Event>) ongoingEventsObj;
+
+            ongoingEvents.clear();
+            ongoingEvents.addAll(events);
+            adapter.notifyDataSetChanged();
+        }, () -> Log.d(this.getClass().getSimpleName(), "Could not load ongoing events"));
+//        ongoingEvents.clear();
+//        db.collection("Events")
+//                .whereEqualTo("organizerID", DeviceManager.getDeviceId())
+//                .get()
+//                .addOnCompleteListener(task -> {
+//                    if (task.isSuccessful()) {
+//                        for (QueryDocumentSnapshot document : task.getResult()) {
+//                            Event event = document.toObject(Event.class);
+//                            if (event.getEventDate() != null && !event.getEventDate().before(new Date())) {
+//                                ongoingEvents.add(event);
+//                            }
+//                        }
+//                        adapter.notifyDataSetChanged();
+//                    }
+//                });
     }
 }
