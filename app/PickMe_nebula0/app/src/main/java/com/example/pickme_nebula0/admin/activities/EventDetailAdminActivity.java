@@ -31,6 +31,7 @@ public class EventDetailAdminActivity extends AppCompatActivity {
     private ImageView imageView;
     private StorageReference storageRef;
     Button delImageBtn;
+    Button delQRcodeBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +66,15 @@ public class EventDetailAdminActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 deleteImageFromFirebase(eventID);
+                finish();
+            }
+        });
+
+        delQRcodeBtn = findViewById(R.id.button_delete_qr);
+        delQRcodeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DeleteQRcode(eventID);
                 finish();
             }
         });

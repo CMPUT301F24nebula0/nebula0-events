@@ -70,7 +70,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/button_aed_delete_event" />
 
-
+    <Button
+        android:id="@+id/button_delete_qr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Delete QRCode"
+        app:layout_constraintBottom_toTopOf="@+id/button_delete_image"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
         android:id="@+id/image_view_poster"
