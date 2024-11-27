@@ -141,6 +141,7 @@ public class UserInfoActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(UserInfoActivity.this, FacilityInfoActivity.class);
                 startActivity(intent);
+                finish();
             }
         });
 

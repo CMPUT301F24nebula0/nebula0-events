@@ -995,6 +995,28 @@ public class DBManager {
         });
     }
 
+    public void doIfAdmin(String userID, Void2VoidCallback callback){
+        DocumentReference userDoc = db.collection(usersCollection).document(userID);
+        performIfFieldPopulated(userDoc,"admin",(fieldVal)->
+        {Boolean isAdmin = (Boolean) fieldVal;
+            if(isAdmin){
+            callback.run();}
+        }, ()->{});
+    }
+
+    public void doIfOrganizer(String userID, Void2VoidCallback callback){
+        DocumentReference userDoc = db.collection(usersCollection).document(userID);
+        performIfFieldPopulated(userDoc,"facilityID",(fieldVal)->{
+            if(fieldVal == null){
+                return;
+            }
+            if(fieldVal.toString().isBlank()){
+                return;
+            }
+            callback.run();
+            }, ()->{});
+    }
+
     /**
      * Attempts to perform given function on field value if that field is populated
      *
