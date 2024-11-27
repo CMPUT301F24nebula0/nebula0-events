@@ -38,6 +38,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import org.checkerframework.framework.qual.DefaultQualifier;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -250,19 +251,26 @@ public class AdminHomeActivity extends AppCompatActivity {
     }
 
     private void updateEvents(){
-        events.clear();
-        eventAdapter.notifyDataSetChanged();
-        db.collection("Events")
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            Event e = document.toObject(Event.class);
-                            events.add(e);
-                        }
-                        eventAdapter.notifyDataSetChanged();
-                    }
-                });
+        EventManager.get_all_events((eventsObj) -> {
+            ArrayList<Event> fetched_events = (ArrayList<Event>) eventsObj;
+            events.clear();
+            events.addAll(fetched_events);
+            eventAdapter.notifyDataSetChanged();
+
+        }, () -> {});
+//        events.clear();
+//        eventAdapter.notifyDataSetChanged();
+//        db.collection("Events")
+//                .get()
+//                .addOnCompleteListener(task -> {
+//                    if (task.isSuccessful()) {
+//                        for (QueryDocumentSnapshot document : task.getResult()) {
+//                            Event e = document.toObject(Event.class);
+//                            events.add(e);
+//                        }
+//                        eventAdapter.notifyDataSetChanged();
+//                    }
+//                });
     }
 
     private void updateProfiles(){
