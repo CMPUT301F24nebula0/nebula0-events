@@ -316,6 +316,20 @@ as a QR code doesn't exist on its own  aslo a change made to the QR code
             QRAdapter.notifyDataSetChanged();
         }, () -> Log.d(this.getClass().getSimpleName(), "Failed to update QR code list"));
 
+//        events.clear();
+//        QRAdapter.notifyDataSetChanged();
+//        db.collection("Events")
+//                .get()
+//                .addOnCompleteListener(task -> {
+//                    if (task.isSuccessful()) {
+//                        for (QueryDocumentSnapshot document : task.getResult()) {
+//                            Event e = document.toObject(Event.class);
+//                            events.add(e);
+//                        }
+//                        QRAdapter.notifyDataSetChanged();
+//                    }
+//                });
+
     }
 
     private void updateFacilities(){
