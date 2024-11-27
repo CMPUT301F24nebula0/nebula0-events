@@ -146,6 +146,7 @@ public class AdminHomeActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(AdminHomeActivity.this, EventDetailAdminActivity.class);
                 intent.putExtra("eventID",clickedEvent.getEventID());
+                intent.putExtra("isEvent", true);
                 startActivity(intent);
             });
 
@@ -211,6 +212,7 @@ public class AdminHomeActivity extends AppCompatActivity {
 
                         Intent intent = new Intent(AdminHomeActivity.this, EventDetailAdminActivity.class);
                         intent.putExtra("eventID",clickedEvent.getEventID());
+                        intent.putExtra("isQRCode", true);
                         startActivity(intent);
                     }
                 });

@@ -40,6 +40,8 @@ public class EventDetailAdminActivity extends AppCompatActivity {
 
         String eventID = getIntent().getStringExtra("eventID");
         boolean isImage = getIntent().getBooleanExtra("isImage", false);
+        boolean isQRcode = getIntent().getBooleanExtra("isQRCode", false);
+        boolean isEvent = getIntent().getBooleanExtra("isEvent", false);
         if (eventID == null || eventID.isEmpty()) {
             Toast.makeText(this, "Invalid Event ID.", Toast.LENGTH_SHORT).show();
             finish();
@@ -101,12 +103,28 @@ public class EventDetailAdminActivity extends AppCompatActivity {
 
         if (isImage) {
             imageView.setVisibility(View.VISIBLE);
+            delImageBtn.setVisibility(View.VISIBLE);
             loadImageFromFirebase(eventID);
 
         } else
         {
             imageView.setVisibility(View.GONE);
+            delImageBtn.setVisibility(View.GONE);
         }
+
+        if (isQRcode) {
+            delQRcodeBtn.setVisibility(View.VISIBLE);
+        } else {
+            delQRcodeBtn.setVisibility(View.GONE);
+        }
+
+        if (isEvent) {
+            delEventBtn.setVisibility(View.VISIBLE);
+        } else {
+            delEventBtn.setVisibility(View.GONE);
+        }
+
+
     }
 
     public void DeleteQRcode(String eventID){
