@@ -43,7 +43,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="24dp"
-        android:text="TextView"
+        android:text="Message:"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editText_nc_subjectLine" />
 
@@ -72,20 +72,20 @@
 
     <Button
         android:id="@+id/button_nc_cancel"
-        android:layout_width="wrap_content"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp"
         android:text="Cancel"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_nc_notfiCancelled" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/button_nc_notifWaitlist"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Send to Waitlist Entrants"
+        android:layout_marginTop="32dp"
+        android:text="Send to Waitlisted Entrants"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button_nc_notifAll" />

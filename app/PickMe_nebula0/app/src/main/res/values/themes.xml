@@ -2,7 +2,17 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.PickMe_nebula0" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+
+        <!-- Primary color for buttons -->
+        <item name="colorPrimary">#55B0A1</item>
+        <!-- Darker shade for button presses -->
+        <item name="colorPrimaryVariant">#38766B</item>
+        <!-- Text color on primary buttons -->
+        <item name="colorOnPrimary">#000000</item>
+
+        <!-- Font -->
+        <item name="fontFamily">@font/catamaran_semibold</item>
+        <item name="android:fontFamily">@font/catamaran_semibold</item>
     </style>
 
     <style name="Theme.PickMe_nebula0" parent="Base.Theme.PickMe_nebula0" />
