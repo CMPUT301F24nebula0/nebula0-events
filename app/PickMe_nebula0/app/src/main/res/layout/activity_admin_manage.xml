@@ -5,25 +5,23 @@
     android:padding="16dp"
     android:background="#E0E0E0">
 
-    <!-- Profile Picture and Admin Title -->
-
-    <!-- Tabs -->
-
+    <!-- Back Button -->
     <Button
         android:id="@+id/button_admin_back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/view_flipper"
-        android:layout_marginTop="21dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="16dp"
         android:text="Back" />
 
+    <!-- Tabs Layout -->
     <LinearLayout
         android:id="@+id/Admin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/button_admin_back"
         android:layout_marginTop="16dp"
         android:orientation="horizontal"
-
         android:weightSum="5">
 
         <Button
