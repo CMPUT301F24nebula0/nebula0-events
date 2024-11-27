@@ -122,4 +122,37 @@ public class EntrantTest {
                 .perform(click());
         Thread.sleep(2000);
     }
+
+    /**
+     * Test case to verify that an entrant can view the event poster
+     * from the event details page. The test navigates to the event's details,
+     * clicks the "View Poster" button, and verifies that the poster is displayed.
+     */
+    @Test
+    public void viewEventPosterTest() throws InterruptedException {
+
+        Thread.sleep(2000);
+
+        // Step 2: Select the first event in the "Waiting List"
+        Espresso.onData(Matchers.anything())
+                .inAdapterView(withId(R.id.entrant_waitlisted_events_listview))
+                .atPosition(0)
+                .perform(ViewActions.click());
+        Thread.sleep(1000); // Wait for the event details page to load
+
+        // Step 3: Click the "View Poster" button
+        onView(withId(R.id.buttonViewPosterEventDetail)) // Replace with actual ID of the "View Poster" button
+                .perform(click());
+        Thread.sleep(2000); // Wait for the poster to be displayed
+
+        // Step 4: Verify that the poster is displayed
+        onView(withId(R.id.imageViewPoster))
+                .check(matches(isDisplayed()));
+
+        // Step 5: Close the poster view (if applicable)
+        onView(withId(R.id.back_button))
+                .perform(click());
+        Thread.sleep(1000);
+    }
+
 }

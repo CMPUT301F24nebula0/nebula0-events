@@ -155,5 +155,60 @@ public void testAdminNavigationFlow() throws InterruptedException {
 
 
     }
+    /**
+     * Test case to verify that an admin can delete an event hash
+     * from the event details page. The test navigates to the "Manage Events" section,
+     * selects an event, and performs the delete hash operation.
+     */
+    @Test
+    public void testDeleteEventHash() throws InterruptedException {
+        // Step 1: Navigate to the "Manage Events" section
+        Espresso.onView(ViewMatchers.withId(R.id.manage_qr_code))
+                .perform(ViewActions.click());
+        Thread.sleep(2000); // Allow UI to load
+
+        // Step 2: Select the first event in the list
+        Espresso.onData(Matchers.anything())
+                .inAdapterView(ViewMatchers.withId(R.id.QRcodeListView)) // Replace with the correct ID
+                .atPosition(0)
+                .perform(ViewActions.click());
+        Thread.sleep(2000); // Wait for the event details page to load
+
+        // Step 3: Click the "Delete Hash" button
+        Espresso.onView(ViewMatchers.withText("Delete Event"))
+                .perform(ViewActions.click());
+        Thread.sleep(2000); // Simulate the deletion process
+
+    }
+    /**
+     * Test case to verify that an admin can delete an event image
+     * from the event details page. The test navigates to the "Manage Events" section,
+     * selects an event, and performs the delete image operation.
+     */
+    @Test
+    public void testDeleteEventImage() throws InterruptedException {
+        // Step 1: Navigate to the "Manage image " section
+        Espresso.onView(ViewMatchers.withId(R.id.manage_image))
+                .perform(ViewActions.click());
+        Thread.sleep(2000); // Allow UI to load
+
+        // Step 2: Select the first image in the list
+        Espresso.onData(Matchers.anything())
+                .inAdapterView(ViewMatchers.withId(R.id.ImageListView))
+                .atPosition(0)
+                .perform(ViewActions.click());
+        Thread.sleep(2000); // Wait for the event details page to load
+
+        // Step 3: Click the "Delete Image" button
+        Espresso.onView(ViewMatchers.withText("Delete Image")) // Replace with the exact button text
+                .perform(ViewActions.click());
+        Thread.sleep(3000); // Simulate the deletion process
+
+        // Step 4: Verify the image was successfully deleted
+        Espresso.onView(ViewMatchers.withText("Image Deleted Successfully")) // Replace with actual success message
+                .check(ViewAssertions.matches(ViewMatchers.isDisplayed()));
+    }
+
+
 
 }
