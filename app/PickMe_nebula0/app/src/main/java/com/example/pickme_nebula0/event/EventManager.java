@@ -5,7 +5,10 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import com.example.pickme_nebula0.db.DBManager;
+import com.example.pickme_nebula0.db.FBStorageManager;
 import com.example.pickme_nebula0.user.User;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -23,6 +26,31 @@ public class EventManager {
 
     public enum EventStatus {
         PAST, ONGOING
+    }
+
+    public interface String2VoidCallback {
+        void run(String event);
+    }
+
+
+    /**
+     * Passes the poster URI to callback if it exists for a given event.
+     * Otherwise, runs posterNotFound callback.
+     * Use for admin poster viewing.
+     *
+     * @param eventID
+     * @param posterFoundCallback
+     * @param posterNotFoundCallback
+     */
+    public static void event_has_poster(String eventID, String2VoidCallback posterFoundCallback, DBManager.Void2VoidCallback posterNotFoundCallback) {
+        DocumentReference eventDoc = db.collection(dbm.eventsCollection).document(eventID);
+        dbm.performIfFieldPopulated(eventDoc, FBStorageManager.event_poster_field, (posterURIObj) -> {
+            posterFoundCallback.run((String) posterURIObj);
+            Log.d(event_manager_tag, "poster found: " + (String) posterURIObj);
+        }, () -> {
+            posterNotFoundCallback.run();
+            Log.d(event_manager_tag, "no poster found");
+        });
     }
 
     /**
