@@ -54,12 +54,13 @@ public class OrganizerHomeActivity extends AppCompatActivity {
         ).attach();
 
         // toggles the visibility of the createEventButton depending on selected tab
+        // FIXED: visibility of createEventButton is set to VISIBLE for both tabs
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
                 // if "Past" selected
-                if (position == 0) { createEventButton.setVisibility(View.GONE); }
+                if (position == 0) { createEventButton.setVisibility(View.VISIBLE); }
                 // if "Ongoing" selected
                 else { createEventButton.setVisibility(View.VISIBLE); }
             }
