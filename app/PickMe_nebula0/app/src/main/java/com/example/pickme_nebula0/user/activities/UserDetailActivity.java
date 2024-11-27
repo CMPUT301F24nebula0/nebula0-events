@@ -46,6 +46,7 @@ public class UserDetailActivity extends AppCompatActivity {
             delButton.setVisibility(View.GONE);
         }
         String userID = getIntent().getStringExtra("userID");
+        boolean isAdmin = getIntent().getBooleanExtra("admin", false);
         if (userID == null || userID.isEmpty()) {
             Toast.makeText(this, "Invalid User ID.", Toast.LENGTH_SHORT).show();
             finish();
@@ -125,6 +126,13 @@ public class UserDetailActivity extends AppCompatActivity {
         userDetailsTextView = findViewById(R.id.user_details_text_view);
 
         fetchUserDetails(userID);
+
+        if (isAdmin) {
+            mapButton.setVisibility(View.GONE);
+        } else {
+            mapButton.setVisibility(View.VISIBLE);
+        }
+
     }
 
     private void fetchUserDetails(String userID) {
