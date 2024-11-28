@@ -1,6 +1,7 @@
 package com.example.pickme_nebula0.admin.activities;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -152,6 +153,12 @@ public class AdminHomeActivity extends AppCompatActivity {
             viewFlipper.setDisplayedChild(0);
             updateEvents();
 
+            btnManageEvents.setTypeface(null, Typeface.BOLD);
+            btnManageUsers.setTypeface(null, Typeface.NORMAL);
+            btnManageImages.setTypeface(null, Typeface.NORMAL);
+            btnManageFacilities.setTypeface(null, Typeface.NORMAL);
+            btnManageQR.setTypeface(null, Typeface.NORMAL);
+
             // On click, show event details an allow admin to delete
             eventsList.setOnItemClickListener((adapterView, view, pos, id) -> {
                 Event clickedEvent = (Event) adapterView.getItemAtPosition(pos);
@@ -161,9 +168,8 @@ public class AdminHomeActivity extends AppCompatActivity {
                 intent.putExtra("isEvent", true);
                 startActivity(intent);
             });
-
             // Confirmation message for debugging and UI verification
-            Toast.makeText(AdminHomeActivity.this, "Switched to Manage Events layout", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(AdminHomeActivity.this, "Switched to Manage Events layout", Toast.LENGTH_SHORT).show();
         });
 
         // sets up interaction with first visible layout, ie. the manage events layout
@@ -172,6 +178,12 @@ public class AdminHomeActivity extends AppCompatActivity {
         btnManageUsers.setOnClickListener(v -> {
             viewFlipper.setDisplayedChild(1); // Show Manage Profile layout
             updateProfiles();
+
+            btnManageEvents.setTypeface(null, Typeface.NORMAL);
+            btnManageUsers.setTypeface(null, Typeface.BOLD);
+            btnManageImages.setTypeface(null, Typeface.NORMAL);
+            btnManageFacilities.setTypeface(null, Typeface.NORMAL);
+            btnManageQR.setTypeface(null, Typeface.NORMAL);
 
             // On click, show user details an allow admin to delete
             usersList.setOnItemClickListener((adapterView, view, pos, id) -> {
@@ -186,16 +198,23 @@ public class AdminHomeActivity extends AppCompatActivity {
                 startActivity(intent);
             });
 
-            Toast.makeText(AdminHomeActivity.this, "Switched to Manage Users layout", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(AdminHomeActivity.this, "Switched to Manage Users layout", Toast.LENGTH_SHORT).show();
         });
 
         //TODO;
         btnManageImages.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
                 viewFlipper.setDisplayedChild(2); // Show Manage QR Code layout
                 updateImages();
-                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Image layout", Toast.LENGTH_SHORT).show();
+
+                btnManageEvents.setTypeface(null, Typeface.NORMAL);
+                btnManageUsers.setTypeface(null, Typeface.NORMAL);
+                btnManageImages.setTypeface(null, Typeface.BOLD);
+                btnManageFacilities.setTypeface(null, Typeface.NORMAL);
+                btnManageQR.setTypeface(null, Typeface.NORMAL);
+//                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Image layout", Toast.LENGTH_SHORT).show();
                 // On click, show event details an allow admin to delete
                 imagesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
@@ -209,7 +228,7 @@ public class AdminHomeActivity extends AppCompatActivity {
                     }
                 });
                 // Confirmation message for debugging and UI verification
-                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Events layout", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Events layout", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -218,6 +237,13 @@ public class AdminHomeActivity extends AppCompatActivity {
             public void onClick(View v) {
                 viewFlipper.setDisplayedChild(3); // Show Manage QR Code layout
                 updateQRCodes();
+
+                btnManageEvents.setTypeface(null, Typeface.NORMAL);
+                btnManageUsers.setTypeface(null, Typeface.NORMAL);
+                btnManageImages.setTypeface(null, Typeface.NORMAL);
+                btnManageFacilities.setTypeface(null, Typeface.NORMAL);
+                btnManageQR.setTypeface(null, Typeface.BOLD);
+
                 Toast.makeText(AdminHomeActivity.this, "Switched to Manage QR Code layout", Toast.LENGTH_SHORT).show();
                 // On click, show event details an allow admin to delete
                 QRcodesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -232,7 +258,7 @@ public class AdminHomeActivity extends AppCompatActivity {
                     }
                 });
                 // Confirmation message for debugging and UI verification
-                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Events layout", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Events layout", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -241,6 +267,12 @@ public class AdminHomeActivity extends AppCompatActivity {
             public void onClick(View v) {
                 viewFlipper.setDisplayedChild(4); // Show Manage Facilities layout
                 updateFacilities();
+
+                btnManageEvents.setTypeface(null, Typeface.NORMAL);
+                btnManageUsers.setTypeface(null, Typeface.NORMAL);
+                btnManageImages.setTypeface(null, Typeface.NORMAL);
+                btnManageFacilities.setTypeface(null, Typeface.BOLD);
+                btnManageQR.setTypeface(null, Typeface.NORMAL);
 
                 // On click, show user details an allow admin to delete
                 facilitiesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -254,7 +286,7 @@ public class AdminHomeActivity extends AppCompatActivity {
                     }
                 });
 
-                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Facilities layout", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Facilities layout", Toast.LENGTH_SHORT).show();
             }
         });
     }
