@@ -215,7 +215,7 @@ public class EventDetailAdminActivity extends AppCompatActivity {
         FirebaseStorage storage = FirebaseStorage.getInstance("gs://pickme-c2fb3.firebasestorage.app");
         storageRef = storage.getReference();
         // TODO: FIX THE PATH ACCORDINGLY
-        StorageReference imageRef = storageRef.child("eventPosters/" + eventID + ".jpg");
+        StorageReference imageRef = storageRef.child("eventPosters/" + eventID);
 
         imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
             // Load the image using Picasso
