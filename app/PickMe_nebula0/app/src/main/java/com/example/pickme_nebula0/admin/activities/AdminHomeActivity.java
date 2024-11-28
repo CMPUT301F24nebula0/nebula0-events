@@ -20,6 +20,7 @@ import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.event.Event;
 import com.example.pickme_nebula0.event.EventDetailUserActivity;
+import com.example.pickme_nebula0.event.EventManager;
 import com.example.pickme_nebula0.event.EventsArrayAdapter;
 import com.example.pickme_nebula0.facility.Facility;
 import com.example.pickme_nebula0.facility.FacilityArrayAdapter;
@@ -37,6 +38,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import org.checkerframework.framework.qual.DefaultQualifier;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -144,6 +146,7 @@ public class AdminHomeActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(AdminHomeActivity.this, EventDetailAdminActivity.class);
                 intent.putExtra("eventID",clickedEvent.getEventID());
+                intent.putExtra("isEvent", true);
                 startActivity(intent);
             });
 
@@ -209,6 +212,7 @@ public class AdminHomeActivity extends AppCompatActivity {
 
                         Intent intent = new Intent(AdminHomeActivity.this, EventDetailAdminActivity.class);
                         intent.putExtra("eventID",clickedEvent.getEventID());
+                        intent.putExtra("isQRCode", true);
                         startActivity(intent);
                     }
                 });
@@ -249,19 +253,28 @@ public class AdminHomeActivity extends AppCompatActivity {
     }
 
     private void updateEvents(){
-        events.clear();
-        eventAdapter.notifyDataSetChanged();
-        db.collection("Events")
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            Event e = document.toObject(Event.class);
-                            events.add(e);
-                        }
-                        eventAdapter.notifyDataSetChanged();
-                    }
-                });
+        EventManager.get_all_events((eventsObj) -> {
+            ArrayList<Event> fetched_events = (ArrayList<Event>) eventsObj;
+
+            runOnUiThread(() -> {
+                events.clear();
+                events.addAll(fetched_events);
+                eventAdapter.notifyDataSetChanged();
+            });
+        }, () -> {});
+//        events.clear();
+//        eventAdapter.notifyDataSetChanged();
+//        db.collection("Events")
+//                .get()
+//                .addOnCompleteListener(task -> {
+//                    if (task.isSuccessful()) {
+//                        for (QueryDocumentSnapshot document : task.getResult()) {
+//                            Event e = document.toObject(Event.class);
+//                            events.add(e);
+//                        }
+//                        eventAdapter.notifyDataSetChanged();
+//                    }
+//                });
     }
 
     private void updateProfiles(){
@@ -301,19 +314,37 @@ as a QR code doesn't exist on its own  aslo a change made to the QR code
  */
     private void updateQRCodes(){
 
-        events.clear();
-        QRAdapter.notifyDataSetChanged();
-        db.collection("Events")
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                               Event e = document.toObject(Event.class);
-                                events.add(e);
-                        }
-                        QRAdapter.notifyDataSetChanged();
-                    }
-                });
+        EventManager.get_all_events((eventsObj) -> {
+            ArrayList<Event> fetched_events = (ArrayList<Event>) eventsObj;
+            runOnUiThread(() -> {
+                events.clear();
+
+                for (Event event: fetched_events) {
+                    // only add qr code to list if its data exists
+                    String qr_code_data = event.getQrCodeData();
+                    if (qr_code_data == null || qr_code_data.equals("null")) { continue; }
+                    events.add(event);
+                }
+
+                QRAdapter.notifyDataSetChanged();
+            });
+
+        }, () -> Log.d(this.getClass().getSimpleName(), "Failed to update QR code list"));
+
+//        events.clear();
+//        QRAdapter.notifyDataSetChanged();
+//        db.collection("Events")
+//                .get()
+//                .addOnCompleteListener(task -> {
+//                    if (task.isSuccessful()) {
+//                        for (QueryDocumentSnapshot document : task.getResult()) {
+//                            Event e = document.toObject(Event.class);
+//                            events.add(e);
+//                        }
+//                        QRAdapter.notifyDataSetChanged();
+//                    }
+//                });
+
     }
 
     private void updateFacilities(){

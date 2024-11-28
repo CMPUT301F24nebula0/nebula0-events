@@ -2,13 +2,21 @@ package com.example.pickme_nebula0.organizer;
 
 import android.util.Log;
 
+import androidx.annotation.Nullable;
+
+import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.entrant.EntrantRole;
 import com.example.pickme_nebula0.event.Event;
+import com.example.pickme_nebula0.event.EventManager;
 import com.example.pickme_nebula0.user.User;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -29,6 +37,7 @@ public class OrganizerRole extends User {
     private static String usersNotSelectedKey = "not selected";
     private static String organizer_tag = "OrganizerRole";  // for logging
     private static DBManager dbm = new DBManager();
+    private static FirebaseFirestore db = dbm.db;
 
     /**
      * Constructor
@@ -106,6 +115,56 @@ public class OrganizerRole extends User {
 
     public void setEventPoster(Event event, String eventPoster) {
         event.setPoster(eventPoster);
+    }
+
+
+    //--------------- EVENT MANAGEMENT
+
+    /**
+     * Use to fetch past or ongoing events for organizer home activity.
+     * @param organizerID
+     * @param event_status
+     * @param onSuccessCallback
+     * @param onFailureCallback
+     */
+    public static void get_event_by_status(String organizerID, EventManager.EventStatus event_status, DBManager.Obj2VoidCallback onSuccessCallback, DBManager.Void2VoidCallback onFailureCallback) {
+        db.collection(dbm.eventsCollection)
+            .whereEqualTo("organizerID", organizerID)
+            .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                @Override
+                public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
+                    if (error != null) {
+                        Log.w(organizer_tag, "Listen failed.", error);
+                        onFailureCallback.run();
+                    }
+
+                    // pass all ongoing events to success callback
+                    ArrayList<Event> events_matching_status = new ArrayList<>();
+                    for (QueryDocumentSnapshot doc : querySnapshots) {
+                        if (doc == null) { Log.d(organizer_tag, "ongoing event doc was null"); continue; }
+                        Event event = doc.toObject(Event.class);
+                        Date event_date = event.getEventDate();
+
+                        if (event_date != null ) {
+                            if (event_status == EventManager.EventStatus.PAST) {
+                                // event date should come before current date
+                                if (!event_date.before(new Date())) { continue; }
+
+                            } else if (event_status == EventManager.EventStatus.ONGOING) {
+                                // event date should come after current date
+                                if (event_date.before(new Date())) { continue; }
+                            }
+
+                            // event matches desired status
+                            events_matching_status.add(event);
+
+                        }
+                    }
+
+                    Log.d(organizer_tag, String.format("Fetched %d %s events", events_matching_status.size(), event_status.toString()));
+                    onSuccessCallback.run(events_matching_status);
+                }
+            });
     }
 
 
@@ -354,7 +413,7 @@ public class OrganizerRole extends User {
 
     // for resampling users
     private static void countConfirmedAndSelected(String eventID, DBManager.Obj2VoidCallback onSuccessCallback) {
-//        DBManager dbm = new DBManager();
+
         // reference to EventRegistrants subcollection
         CollectionReference eventRegistrantsRef = dbm.db.collection(dbm.eventsCollection)
                 .document(eventID)

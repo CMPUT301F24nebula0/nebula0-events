@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 
 import androidx.annotation.NonNull;
@@ -14,8 +15,10 @@ import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
 
+import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.admin.activities.AdminHomeActivity;
+import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.entrant.activities.EntrantHomeActivity;
 import com.example.pickme_nebula0.notification.MessageViewActivity;
 import com.example.pickme_nebula0.organizer.activities.OrganizerHomeActivity;
@@ -34,12 +37,20 @@ public class HomePageActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_NOTIF_PERMISSION = 100;
     private static final int REQUEST_CODE_MEDIA_PERMISSION = 101;
 
+    DBManager dbManager = new DBManager();
+
     // UI components
     Button profileButton;
     Button adminButton;
     Button entrantButton;
     Button organizerButton;
     Button messagesButton;
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        updateButtonVisibility();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +65,10 @@ public class HomePageActivity extends AppCompatActivity {
         entrantButton = findViewById(R.id.entrantButton);
         organizerButton = findViewById(R.id.organizerButton);
         messagesButton = findViewById(R.id.button_messages);
+
+        // admin and organizer button rendered conditionally if user is admin/organizer
+        adminButton.setVisibility(View.GONE);
+        organizerButton.setVisibility(View.GONE);
 
         // actions once buttons are pressed
         profileButton.setOnClickListener(view -> navigateTo(UserInfoActivity.class));
@@ -85,6 +100,12 @@ public class HomePageActivity extends AppCompatActivity {
     private void navigateTo(Class<?> targetActivity ) {
         Intent intent = new Intent(HomePageActivity.this, targetActivity);
         startActivity(intent);
+    }
+
+    private void updateButtonVisibility(){
+        String userID = DeviceManager.getDeviceId();
+        dbManager.doIfAdmin(userID,()->{adminButton.setVisibility(View.VISIBLE);});
+        dbManager.doIfOrganizer(userID,()->{organizerButton.setVisibility(View.VISIBLE);});
     }
 
     /**
