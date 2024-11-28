@@ -51,11 +51,14 @@ public class SharedDialogue {
                     .load(uri)
                     .fit()
                     .centerInside()
-                    .placeholder(R.drawable.ic_profile_placeholder)
-                    .error(R.drawable.ic_profile_placeholder)
+                    .placeholder(R.drawable.no_poster_placeholder)
+                    .error(R.drawable.error_image)
                     .into(imageView);
         },()->{
-            noPosterText.setText("This event has no poster.");});
+            Picasso.get()
+                    .load(R.drawable.no_poster_placeholder)
+                    .into(imageView);
+            noPosterText.setText("this event has no poster");});
 
         // Set close button action
         closeButton.setOnClickListener(v -> dialog.dismiss());
