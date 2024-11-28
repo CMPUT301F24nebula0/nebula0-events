@@ -2,6 +2,7 @@ package com.example.pickme_nebula0.notification;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -12,11 +13,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
+import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.event.EventDetailUserActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Activity that lets all users view the messages they've received.
@@ -27,6 +30,7 @@ import java.util.ArrayList;
 public class MessageViewActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
+    public DBManager dbManager;
     private ArrayList<Notification> notifs;
     private ListView notifsList;
     private NotificationArrayAdapter notifAdapter;
@@ -36,6 +40,8 @@ public class MessageViewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_msg_view);
 
         db = FirebaseFirestore.getInstance();
+
+        dbManager = new DBManager();
 
         final Button backBtn = findViewById(R.id.button_mv_back);
 
@@ -82,9 +88,12 @@ public class MessageViewActivity extends AppCompatActivity {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         for (QueryDocumentSnapshot document : task.getResult()) {
+                            // get a notification
                             Notification n = document.toObject(Notification.class);
 
-                            notifs.add(n);
+                            if (dbManager.notificationShouldExist(n)) {
+                                notifs.add(n);
+                            }
                         }
                         notifAdapter.notifyDataSetChanged();
                     }

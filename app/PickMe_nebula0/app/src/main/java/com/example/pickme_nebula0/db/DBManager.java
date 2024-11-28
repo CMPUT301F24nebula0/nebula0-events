@@ -8,7 +8,6 @@ import android.util.Base64;
 import android.util.Log;
 import android.os.Handler;
 import android.os.Looper;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -28,24 +27,20 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Class encompassing database access and modification
@@ -383,7 +378,78 @@ public class DBManager {
                    // Handle failure
                    Log.w("Firestore", "Error writing document", e);
                });
-}
+    }
+
+    /**
+     * Delete a notification for a given user.
+     *
+     * @param notification Notification object to delete
+     */
+    public void deleteNotification(Notification notification) {
+        // get the userID for notifications
+        String userIDFromNote = notification.getUserID();
+        Log.d("delete", userIDFromNote);
+        // get the "userNotif" collection
+        CollectionReference userNotifCollection = db.collection(notificationCollection).document(userIDFromNote).collection("userNotifs");
+        // get the document of the notification
+        String docID = notification.getNotificationID();
+        DocumentReference docRef = userNotifCollection.document(docID);
+        // delete the document
+        docRef.delete();
+    }
+
+    /**
+     * Given a notification object, return true if it should exist within the database
+     * It should exist if
+     * - eventID exists in Events
+     * - userID exists in Users
+     */
+    public boolean notificationShouldExist(Notification notification) {
+        // Variable to track whether the notification should exist
+        AtomicBoolean result = new AtomicBoolean(true);
+
+        CountDownLatch latch = new CountDownLatch(1);
+
+        // Check if the corresponding event exists
+        String collectionName = "Events";
+        // Do nothing if event exists
+        checkExistenceOfDocument(
+                collectionName,
+                notification.getEventID(),
+                // Event exists
+                latch::countDown,
+                // Event does not exist
+                () -> {
+                    result.set(false);
+                    latch.countDown();
+                }
+        );
+
+//        // Check if the corresponding user exists
+//        collectionName = "User";
+//        checkExistenceOfDocument(
+//                collectionName,
+//                notification.getUserID(),
+//                // User exists
+//                () -> {
+//                    // Do nothing if user exists
+//                },
+//                // User does not exist
+//                () -> {
+//                    result.set(false);
+//                }
+//        );
+
+        try {
+            // Wait for both checks to complete
+            latch.await();
+        } catch (InterruptedException e) {
+            // Handle interruption
+            Thread.currentThread().interrupt();
+        }
+
+        return result.get();
+    }
 
 // -------------------- / Notifications \ ---------------------------------------------------------
 
