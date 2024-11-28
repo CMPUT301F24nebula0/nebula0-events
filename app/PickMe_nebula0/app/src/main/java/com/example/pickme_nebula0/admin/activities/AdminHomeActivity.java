@@ -343,7 +343,6 @@ as a QR code doesn't exist on its own  aslo a change made to the QR code
 
         EventManager.get_all_events((eventsObj) -> {
             ArrayList<Event> fetched_events = (ArrayList<Event>) eventsObj;
-<<<<<<< HEAD
             eventsWithQR.clear();
 
             // only add qr code to list if its data exists
@@ -353,21 +352,6 @@ as a QR code doesn't exist on its own  aslo a change made to the QR code
                 eventsWithQR.add(event);
             }
             QRAdapter.notifyDataSetChanged();
-=======
-            runOnUiThread(() -> {
-                events.clear();
-
-                for (Event event: fetched_events) {
-                    // only add qr code to list if its data exists
-                    String qr_code_data = event.getQrCodeData();
-                    if (qr_code_data == null || qr_code_data.equals("null")) { continue; }
-                    events.add(event);
-                }
-
-                QRAdapter.notifyDataSetChanged();
-            });
-
->>>>>>> origin/main
         }, () -> Log.d(this.getClass().getSimpleName(), "Failed to update QR code list"));
 
 //        events.clear();
