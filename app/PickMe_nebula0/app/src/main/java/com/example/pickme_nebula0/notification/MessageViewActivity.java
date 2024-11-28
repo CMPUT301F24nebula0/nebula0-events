@@ -91,11 +91,19 @@ public class MessageViewActivity extends AppCompatActivity {
                             // get a notification
                             Notification n = document.toObject(Notification.class);
 
-                            if (dbManager.notificationShouldExist(n)) {
-                                notifs.add(n);
-                            }
+                            dbManager.notificationShouldExist(
+                                    n,
+                                    () -> {
+                                        // if it should exist, add it
+                                        notifs.add(n);
+                                        notifAdapter.notifyDataSetChanged();
+                                    },
+                                    () -> {
+                                        // else delete it
+                                        dbManager.deleteNotification(n);
+                                    }
+                            );
                         }
-                        notifAdapter.notifyDataSetChanged();
                     }
                 });
     }

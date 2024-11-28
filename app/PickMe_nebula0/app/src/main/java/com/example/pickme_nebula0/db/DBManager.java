@@ -41,6 +41,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Class encompassing database access and modification
@@ -404,51 +405,45 @@ public class DBManager {
      * - eventID exists in Events
      * - userID exists in Users
      */
-    public boolean notificationShouldExist(Notification notification) {
-        // Variable to track whether the notification should exist
-        AtomicBoolean result = new AtomicBoolean(true);
-
-        CountDownLatch latch = new CountDownLatch(1);
+    public void notificationShouldExist(
+            Notification notification,
+            Void2VoidCallback onSuccessCallback,
+            Void2VoidCallback onFailureCallback
+    ) {
+        AtomicInteger successCount = new AtomicInteger(0);
+        int numChecks = 2;
 
         // Check if the corresponding event exists
-        String collectionName = "Events";
-        // Do nothing if event exists
         checkExistenceOfDocument(
-                collectionName,
+                eventsCollection,
                 notification.getEventID(),
                 // Event exists
-                latch::countDown,
+                () -> {
+                    if (successCount.incrementAndGet() == numChecks) {
+                        onSuccessCallback.run();
+                    }
+                },
                 // Event does not exist
                 () -> {
-                    result.set(false);
-                    latch.countDown();
+                    onFailureCallback.run();
                 }
         );
 
-//        // Check if the corresponding user exists
-//        collectionName = "User";
-//        checkExistenceOfDocument(
-//                collectionName,
-//                notification.getUserID(),
-//                // User exists
-//                () -> {
-//                    // Do nothing if user exists
-//                },
-//                // User does not exist
-//                () -> {
-//                    result.set(false);
-//                }
-//        );
-
-        try {
-            // Wait for both checks to complete
-            latch.await();
-        } catch (InterruptedException e) {
-            // Handle interruption
-            Thread.currentThread().interrupt();
-        }
-
-        return result.get();
+        // Check if the corresponding user exists
+        checkExistenceOfDocument(
+                usersCollection,
+                notification.getUserID(),
+                // User exists
+                () -> {
+                    if (successCount.incrementAndGet() == numChecks) {
+                        onSuccessCallback.run();
+                    }
+                },
+                // User does not exist
+                () -> {
+                    onFailureCallback.run();
+                }
+        );
     }
 
 // -------------------- / Notifications \ ---------------------------------------------------------
