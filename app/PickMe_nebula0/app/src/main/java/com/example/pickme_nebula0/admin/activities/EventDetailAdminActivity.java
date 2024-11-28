@@ -250,13 +250,11 @@ public class EventDetailAdminActivity extends AppCompatActivity {
     }
 
     private void loadImageFromFirebase(String eventID) {
-
         // Initialize FirebaseStorage with the correct bucket URL
         FirebaseStorage storage = FirebaseStorage.getInstance("gs://pickme-c2fb3.firebasestorage.app");
         storageRef = storage.getReference();
         // TODO: FIX THE PATH ACCORDINGLY
         StorageReference imageRef = storageRef.child("eventPosters/" + eventID);
-
         imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
             // Load the image using Picasso
             Picasso.get()
@@ -264,26 +262,11 @@ public class EventDetailAdminActivity extends AppCompatActivity {
                     .placeholder(R.drawable.no_poster_placeholder)
                     .error(R.drawable.error_image)
                     .into(imageView);
-        }, (error_message) -> {
-            Toast.makeText(EventDetailAdminActivity.this, "Failed to load image: "+error_message, Toast.LENGTH_LONG).show();
+        }).addOnFailureListener(exception -> {
+            // Handle any errors
+            Toast.makeText(EventDetailAdminActivity.this, "Failed to load image: " + exception.getMessage(), Toast.LENGTH_LONG).show();
             imageView.setVisibility(View.GONE);
         });
-//        // Initialize FirebaseStorage with the correct bucket URL
-//        FirebaseStorage storage = FirebaseStorage.getInstance("gs://pickme-c2fb3.firebasestorage.app");
-//        storageRef = storage.getReference();
-//        // TODO: FIX THE PATH ACCORDINGLY
-//        StorageReference imageRef = storageRef.child("eventPosters/" + eventID + ".jpg");
-//
-//        imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-//            // Load the image using Picasso
-//            Picasso.get()
-//                    .load(uri)
-//                    .into(imageView);
-//        }).addOnFailureListener(exception -> {
-//            // Handle any errors
-//            Toast.makeText(EventDetailAdminActivity.this, "Failed to load image: " + exception.getMessage(), Toast.LENGTH_LONG).show();
-//            imageView.setVisibility(View.GONE);
-//        });
     }
 
     private void deleteImageFromFirebase(String eventID) {
