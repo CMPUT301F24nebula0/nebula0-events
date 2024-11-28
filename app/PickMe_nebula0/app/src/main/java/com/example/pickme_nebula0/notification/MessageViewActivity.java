@@ -97,6 +97,13 @@ public class MessageViewActivity extends AppCompatActivity {
                                         // if it should exist, add it
                                         notifs.add(n);
                                         notifAdapter.notifyDataSetChanged();
+                                        // show notifications from newest to oldest
+                                        notifs.sort(new Comparator<Notification>() {
+                                            @Override
+                                            public int compare(Notification n1, Notification n2) {
+                                                return n2.getTimestamp().compareTo(n1.getTimestamp());
+                                            }
+                                        });
                                     },
                                     () -> {
                                         // else delete it
@@ -104,13 +111,6 @@ public class MessageViewActivity extends AppCompatActivity {
                                     }
                             );
                         }
-                        // show notifications from newest to oldest
-                        notifs.sort(new Comparator<Notification>() {
-                            @Override
-                            public int compare(Notification n1, Notification n2) {
-                                return n2.getTimestamp().compareTo(n1.getTimestamp());
-                            }
-                        });
                     }
                 });
     }
