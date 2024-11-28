@@ -221,6 +221,8 @@ public class EventDetailAdminActivity extends AppCompatActivity {
             // Load the image using Picasso
             Picasso.get()
                     .load(uri)
+                    .placeholder(R.drawable.placeholder_image)
+                    .error(R.drawable.error_image)
                     .into(imageView);
         }).addOnFailureListener(exception -> {
             // Handle any errors
