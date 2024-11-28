@@ -568,7 +568,7 @@ public class DBManager {
                         // Remove Event from organizer
                         removeEventFromOrganizer(e.getOrganizerID(),eventID);
 
-                        // Remove Event from all users who signed up
+                        // Remove Event from all users who signed up, including removing notifications
                         iterateOverCollection(collectionOfEventRegistrants, (regDoc)->{removeEventFromRegistrant(regDoc.getId(),eventID);});
 
                         // Remove Event from Events
@@ -591,7 +591,30 @@ public class DBManager {
      * @param eventID eventID of event we are removing the registrant from
      */
     private void removeEventFromRegistrant(String registrantID,String eventID){
+        removeEventNotificationsFromRegistrant(registrantID,eventID);
         removeDocument(getDocOfEventInRegistrant(eventID,registrantID));
+    }
+
+    private void removeEventNotificationsFromRegistrant(String registrantID, String eventID){
+        CollectionReference allUserNotifs =  db.collection(notificationCollection).document(registrantID).collection("userNotifs");
+        allUserNotifs.whereEqualTo("eventID",eventID)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        // Loop through the results and delete each document
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            allUserNotifs.document(document.getId()).delete()
+                                    .addOnSuccessListener(aVoid ->
+                                            Log.d("Firestore", "Document successfully deleted!")
+                                    )
+                                    .addOnFailureListener(e ->
+                                            Log.w("Firestore", "Error deleting document", e)
+                                    );
+                        }
+                    } else {
+                        Log.w("Firestore", "Error getting documents", task.getException());
+                    }
+                });
     }
 
     /**
