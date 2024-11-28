@@ -14,6 +14,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.pickme_nebula0.DeviceManager;
@@ -33,13 +34,17 @@ import com.example.pickme_nebula0.qr.QRcodeAdapter;
 import com.example.pickme_nebula0.user.User;
 import com.example.pickme_nebula0.user.UserArrayAdapter;
 import com.example.pickme_nebula0.user.activities.UserDetailActivity;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import org.checkerframework.framework.qual.DefaultQualifier;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -61,8 +66,11 @@ public class AdminHomeActivity extends AppCompatActivity {
     private ArrayList<User> users;
     private ListView usersList;
 
+    private ArrayList<Event> eventsWithImage;
     private ListView imagesList;
     private ImageAdapter imageAdapter;
+
+    private ArrayList<Event> eventsWithQR;
     private ListView QRcodesList;
     private QRcodeAdapter QRAdapter;
 
@@ -123,12 +131,16 @@ public class AdminHomeActivity extends AppCompatActivity {
         facilityAdapter = new FacilityArrayAdapter(AdminHomeActivity.this,R.id.item_facility, facilities);
         facilitiesList.setAdapter(facilityAdapter);
 
+        // for images
+        eventsWithImage = new ArrayList<>();
         imagesList=findViewById(R.id.ImageListView);
-        imageAdapter=new ImageAdapter(AdminHomeActivity.this,R.id.item_image, events);
+        imageAdapter=new ImageAdapter(AdminHomeActivity.this,R.id.item_image, eventsWithImage);
         imagesList.setAdapter(imageAdapter);
+
        // for QR codes
+        eventsWithQR = new ArrayList<>();
         QRcodesList=findViewById(R.id.QRcodeListView);
-        QRAdapter=new QRcodeAdapter(AdminHomeActivity.this,R.id.item_qrcode, events);
+        QRAdapter=new QRcodeAdapter(AdminHomeActivity.this,R.id.item_qrcode, eventsWithQR);
         QRcodesList.setAdapter(QRAdapter);
 
         btnBack.setOnClickListener(v -> finish());
@@ -153,6 +165,9 @@ public class AdminHomeActivity extends AppCompatActivity {
             // Confirmation message for debugging and UI verification
             Toast.makeText(AdminHomeActivity.this, "Switched to Manage Events layout", Toast.LENGTH_SHORT).show();
         });
+
+        // sets up interaction with first visible layout, ie. the manage events layout
+        btnManageEvents.performClick();
 
         btnManageUsers.setOnClickListener(v -> {
             viewFlipper.setDisplayedChild(1); // Show Manage Profile layout
@@ -293,20 +308,32 @@ public class AdminHomeActivity extends AppCompatActivity {
                 });
     }
 
-    private void updateImages(){
-        events.clear();
+    private void updateImages() {
+        eventsWithImage.clear();
         imageAdapter.notifyDataSetChanged();
+
         db.collection("Events")
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            Event e = document.toObject(Event.class);
-                            events.add(e);
-                        }
-                        imageAdapter.notifyDataSetChanged();
+            .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                @Override
+                public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
+                    if (error != null || querySnapshots == null) {
+                        Log.w("AdminHomeActivity", "Listen failed.", error);
+                        return;
                     }
-                });
+
+                    eventsWithImage.clear();
+                    // check if each fetched event has a non null image
+                    for (QueryDocumentSnapshot doc : querySnapshots) {
+                        if (doc == null) { continue; }
+                        if (doc.contains("poster") && doc.get("poster") != null) {
+                            Event event = doc.toObject(Event.class);
+                            eventsWithImage.add(event);
+                        }
+                    }
+
+                    imageAdapter.notifyDataSetChanged();
+                }
+            });
     }
 /*
 there is no reason to separate the QR codes from their respective event
@@ -316,35 +343,16 @@ as a QR code doesn't exist on its own  aslo a change made to the QR code
 
         EventManager.get_all_events((eventsObj) -> {
             ArrayList<Event> fetched_events = (ArrayList<Event>) eventsObj;
-            runOnUiThread(() -> {
-                events.clear();
+            eventsWithQR.clear();
 
-                for (Event event: fetched_events) {
-                    // only add qr code to list if its data exists
-                    String qr_code_data = event.getQrCodeData();
-                    if (qr_code_data == null || qr_code_data.equals("null")) { continue; }
-                    events.add(event);
-                }
-
-                QRAdapter.notifyDataSetChanged();
-            });
-
+            // only add qr code to list if its data exists
+            for (Event event: fetched_events) {
+                String qr_code_data = event.getQrCodeData();
+                if (qr_code_data == null || qr_code_data.equals("null")) { continue; }
+                eventsWithQR.add(event);
+            }
+            QRAdapter.notifyDataSetChanged();
         }, () -> Log.d(this.getClass().getSimpleName(), "Failed to update QR code list"));
-
-//        events.clear();
-//        QRAdapter.notifyDataSetChanged();
-//        db.collection("Events")
-//                .get()
-//                .addOnCompleteListener(task -> {
-//                    if (task.isSuccessful()) {
-//                        for (QueryDocumentSnapshot document : task.getResult()) {
-//                            Event e = document.toObject(Event.class);
-//                            events.add(e);
-//                        }
-//                        QRAdapter.notifyDataSetChanged();
-//                    }
-//                });
-
     }
 
     private void updateFacilities(){

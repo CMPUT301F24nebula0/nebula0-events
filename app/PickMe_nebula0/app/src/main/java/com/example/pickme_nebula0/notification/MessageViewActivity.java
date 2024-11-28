@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -19,6 +18,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -104,6 +104,13 @@ public class MessageViewActivity extends AppCompatActivity {
                                     }
                             );
                         }
+                        // show notifications from newest to oldest
+                        notifs.sort(new Comparator<Notification>() {
+                            @Override
+                            public int compare(Notification n1, Notification n2) {
+                                return n2.getTimestamp().compareTo(n1.getTimestamp());
+                            }
+                        });
                     }
                 });
     }
