@@ -3,7 +3,9 @@ package com.example.pickme_nebula0.admin.activities;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Base64;
+
 import android.view.View;
 
 import android.widget.Button;
@@ -15,10 +17,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.db.DBManager;
+import com.example.pickme_nebula0.db.FBStorageManager;
 import com.example.pickme_nebula0.event.Event;
+
+import com.example.pickme_nebula0.event.EventManager;
+
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
@@ -77,7 +84,19 @@ public class EventDetailAdminActivity extends AppCompatActivity {
         delImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                deleteImageFromFirebase(eventID);
+                EventManager.removePoster(eventID, () -> {
+                    // poster removed from storage and event doc
+                    Toast.makeText(EventDetailAdminActivity.this, "Image Deleted", Toast.LENGTH_SHORT).show();
+                    imageView.setVisibility(View.GONE);
+                    delImageBtn.setVisibility(View.GONE);
+                }, () -> {
+                    // poster could not be removed
+                    Toast.makeText(EventDetailAdminActivity.this, "Failed to delete image", Toast.LENGTH_LONG).show();
+                    imageView.setVisibility(View.GONE);
+                    delImageBtn.setVisibility(View.GONE);
+                });
+
+//                deleteImageFromFirebase(eventID);
                 finish();
             }
         });
@@ -231,22 +250,30 @@ public class EventDetailAdminActivity extends AppCompatActivity {
     }
 
     private void loadImageFromFirebase(String eventID) {
-        // Initialize FirebaseStorage with the correct bucket URL
-        FirebaseStorage storage = FirebaseStorage.getInstance("gs://pickme-c2fb3.firebasestorage.app");
-        storageRef = storage.getReference();
-        // TODO: FIX THE PATH ACCORDINGLY
-        StorageReference imageRef = storageRef.child("eventPosters/" + eventID + ".jpg");
-
-        imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-            // Load the image using Picasso
+        FBStorageManager.eventPosterExists(eventID, (uri) -> {
             Picasso.get()
                     .load(uri)
                     .into(imageView);
-        }).addOnFailureListener(exception -> {
-            // Handle any errors
-            Toast.makeText(EventDetailAdminActivity.this, "Failed to load image: " + exception.getMessage(), Toast.LENGTH_LONG).show();
+        }, (error_message) -> {
+            Toast.makeText(EventDetailAdminActivity.this, "Failed to load image: "+error_message, Toast.LENGTH_LONG).show();
             imageView.setVisibility(View.GONE);
         });
+//        // Initialize FirebaseStorage with the correct bucket URL
+//        FirebaseStorage storage = FirebaseStorage.getInstance("gs://pickme-c2fb3.firebasestorage.app");
+//        storageRef = storage.getReference();
+//        // TODO: FIX THE PATH ACCORDINGLY
+//        StorageReference imageRef = storageRef.child("eventPosters/" + eventID + ".jpg");
+//
+//        imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+//            // Load the image using Picasso
+//            Picasso.get()
+//                    .load(uri)
+//                    .into(imageView);
+//        }).addOnFailureListener(exception -> {
+//            // Handle any errors
+//            Toast.makeText(EventDetailAdminActivity.this, "Failed to load image: " + exception.getMessage(), Toast.LENGTH_LONG).show();
+//            imageView.setVisibility(View.GONE);
+//        });
     }
 
     private void deleteImageFromFirebase(String eventID) {
