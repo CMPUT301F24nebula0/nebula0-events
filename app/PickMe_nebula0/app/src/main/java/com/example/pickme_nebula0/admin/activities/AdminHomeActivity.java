@@ -1,6 +1,7 @@
 package com.example.pickme_nebula0.admin.activities;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Editable;
@@ -45,6 +46,7 @@ import org.checkerframework.framework.qual.DefaultQualifier;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -153,11 +155,7 @@ public class AdminHomeActivity extends AppCompatActivity {
             viewFlipper.setDisplayedChild(0);
             updateEvents();
 
-            btnManageEvents.setTypeface(null, Typeface.BOLD);
-            btnManageUsers.setTypeface(null, Typeface.NORMAL);
-            btnManageImages.setTypeface(null, Typeface.NORMAL);
-            btnManageFacilities.setTypeface(null, Typeface.NORMAL);
-            btnManageQR.setTypeface(null, Typeface.NORMAL);
+            updateButtonAppearanceOnClick(btnManageEvents);
 
             // On click, show event details an allow admin to delete
             eventsList.setOnItemClickListener((adapterView, view, pos, id) -> {
@@ -179,11 +177,7 @@ public class AdminHomeActivity extends AppCompatActivity {
             viewFlipper.setDisplayedChild(1); // Show Manage Profile layout
             updateProfiles();
 
-            btnManageEvents.setTypeface(null, Typeface.NORMAL);
-            btnManageUsers.setTypeface(null, Typeface.BOLD);
-            btnManageImages.setTypeface(null, Typeface.NORMAL);
-            btnManageFacilities.setTypeface(null, Typeface.NORMAL);
-            btnManageQR.setTypeface(null, Typeface.NORMAL);
+            updateButtonAppearanceOnClick(btnManageUsers);
 
             // On click, show user details an allow admin to delete
             usersList.setOnItemClickListener((adapterView, view, pos, id) -> {
@@ -209,11 +203,7 @@ public class AdminHomeActivity extends AppCompatActivity {
                 viewFlipper.setDisplayedChild(2); // Show Manage QR Code layout
                 updateImages();
 
-                btnManageEvents.setTypeface(null, Typeface.NORMAL);
-                btnManageUsers.setTypeface(null, Typeface.NORMAL);
-                btnManageImages.setTypeface(null, Typeface.BOLD);
-                btnManageFacilities.setTypeface(null, Typeface.NORMAL);
-                btnManageQR.setTypeface(null, Typeface.NORMAL);
+                updateButtonAppearanceOnClick(btnManageImages);
 //                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Image layout", Toast.LENGTH_SHORT).show();
                 // On click, show event details an allow admin to delete
                 imagesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -238,11 +228,7 @@ public class AdminHomeActivity extends AppCompatActivity {
                 viewFlipper.setDisplayedChild(3); // Show Manage QR Code layout
                 updateQRCodes();
 
-                btnManageEvents.setTypeface(null, Typeface.NORMAL);
-                btnManageUsers.setTypeface(null, Typeface.NORMAL);
-                btnManageImages.setTypeface(null, Typeface.NORMAL);
-                btnManageFacilities.setTypeface(null, Typeface.NORMAL);
-                btnManageQR.setTypeface(null, Typeface.BOLD);
+                updateButtonAppearanceOnClick(btnManageQR);
 
                 Toast.makeText(AdminHomeActivity.this, "Switched to Manage QR Code layout", Toast.LENGTH_SHORT).show();
                 // On click, show event details an allow admin to delete
@@ -268,11 +254,7 @@ public class AdminHomeActivity extends AppCompatActivity {
                 viewFlipper.setDisplayedChild(4); // Show Manage Facilities layout
                 updateFacilities();
 
-                btnManageEvents.setTypeface(null, Typeface.NORMAL);
-                btnManageUsers.setTypeface(null, Typeface.NORMAL);
-                btnManageImages.setTypeface(null, Typeface.NORMAL);
-                btnManageFacilities.setTypeface(null, Typeface.BOLD);
-                btnManageQR.setTypeface(null, Typeface.NORMAL);
+                updateButtonAppearanceOnClick(btnManageFacilities);
 
                 // On click, show user details an allow admin to delete
                 facilitiesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -401,5 +383,21 @@ as a QR code doesn't exist on its own  aslo a change made to the QR code
                        facilityAdapter.notifyDataSetChanged();
                     }
                 });
+    }
+
+    private void updateButtonAppearanceOnClick(Button clickedButton) {
+        ArrayList<Button> buttonArrayList = new ArrayList<>(
+                Arrays.asList(btnManageEvents, btnManageUsers, btnManageImages, btnManageFacilities, btnManageQR)
+        );
+
+        for (Button button: buttonArrayList) {
+            if (button == clickedButton) {
+                button.setTypeface(null, Typeface.BOLD_ITALIC);
+                button.setTextColor(Color.BLACK);
+            } else {
+                button.setTypeface(null, Typeface.NORMAL);
+                button.setTextColor(Color.GRAY);
+            }
+        }
     }
 }
