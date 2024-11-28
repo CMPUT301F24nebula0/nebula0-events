@@ -230,7 +230,7 @@ public class AdminHomeActivity extends AppCompatActivity {
 
                 updateButtonAppearanceOnClick(btnManageQR);
 
-                Toast.makeText(AdminHomeActivity.this, "Switched to Manage QR Code layout", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(AdminHomeActivity.this, "Switched to Manage QR Code layout", Toast.LENGTH_SHORT).show();
                 // On click, show event details an allow admin to delete
                 QRcodesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
@@ -291,19 +291,6 @@ public class AdminHomeActivity extends AppCompatActivity {
                 eventAdapter.notifyDataSetChanged();
             });
         }, () -> {});
-//        events.clear();
-//        eventAdapter.notifyDataSetChanged();
-//        db.collection("Events")
-//                .get()
-//                .addOnCompleteListener(task -> {
-//                    if (task.isSuccessful()) {
-//                        for (QueryDocumentSnapshot document : task.getResult()) {
-//                            Event e = document.toObject(Event.class);
-//                            events.add(e);
-//                        }
-//                        eventAdapter.notifyDataSetChanged();
-//                    }
-//                });
     }
 
     private void updateProfiles(){
