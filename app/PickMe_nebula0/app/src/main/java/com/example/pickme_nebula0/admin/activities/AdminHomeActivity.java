@@ -166,6 +166,9 @@ public class AdminHomeActivity extends AppCompatActivity {
             Toast.makeText(AdminHomeActivity.this, "Switched to Manage Events layout", Toast.LENGTH_SHORT).show();
         });
 
+        // sets up interaction with first visible layout, ie. the manage events layout
+        btnManageEvents.performClick();
+
         btnManageUsers.setOnClickListener(v -> {
             viewFlipper.setDisplayedChild(1); // Show Manage Profile layout
             updateProfiles();
