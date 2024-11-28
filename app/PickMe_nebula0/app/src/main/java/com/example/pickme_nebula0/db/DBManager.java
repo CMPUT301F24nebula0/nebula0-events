@@ -8,7 +8,6 @@ import android.util.Base64;
 import android.util.Log;
 import android.os.Handler;
 import android.os.Looper;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -28,14 +27,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -46,6 +39,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Class encompassing database access and modification
@@ -568,7 +562,7 @@ public class DBManager {
                         // Remove Event from organizer
                         removeEventFromOrganizer(e.getOrganizerID(),eventID);
 
-                        // Remove Event from all users who signed up
+                        // Remove Event from all users who signed up, including removing notifications
                         iterateOverCollection(collectionOfEventRegistrants, (regDoc)->{removeEventFromRegistrant(regDoc.getId(),eventID);});
 
                         // Remove Event from Events
@@ -591,7 +585,30 @@ public class DBManager {
      * @param eventID eventID of event we are removing the registrant from
      */
     private void removeEventFromRegistrant(String registrantID,String eventID){
+        removeEventNotificationsFromRegistrant(registrantID,eventID);
         removeDocument(getDocOfEventInRegistrant(eventID,registrantID));
+    }
+
+    private void removeEventNotificationsFromRegistrant(String registrantID, String eventID){
+        CollectionReference allUserNotifs =  db.collection(notificationCollection).document(registrantID).collection("userNotifs");
+        allUserNotifs.whereEqualTo("eventID",eventID)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        // Loop through the results and delete each document
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            allUserNotifs.document(document.getId()).delete()
+                                    .addOnSuccessListener(aVoid ->
+                                            Log.d("Firestore", "Document successfully deleted!")
+                                    )
+                                    .addOnFailureListener(e ->
+                                            Log.w("Firestore", "Error deleting document", e)
+                                    );
+                        }
+                    } else {
+                        Log.w("Firestore", "Error getting documents", task.getException());
+                    }
+                });
     }
 
     /**

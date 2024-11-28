@@ -1,7 +1,11 @@
 package com.example.pickme_nebula0.admin.activities;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Base64;
+
 import android.view.View;
 
 import android.widget.Button;
@@ -11,15 +15,22 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.bumptech.glide.Glide;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.db.FBStorageManager;
 import com.example.pickme_nebula0.event.Event;
+
 import com.example.pickme_nebula0.event.EventManager;
+
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
@@ -33,8 +44,10 @@ public class EventDetailAdminActivity extends AppCompatActivity {
     private DBManager dbManager;
     private ImageView imageView;
     private StorageReference storageRef;
+    private ImageView qrCode;
     Button delImageBtn;
     Button delQRcodeBtn;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +68,7 @@ public class EventDetailAdminActivity extends AppCompatActivity {
 
         eventDetailsTextView = findViewById(R.id.textView_aed_eventInfo);
         imageView = findViewById(R.id.image_view_poster);
+        qrCode = findViewById(R.id.qrCode);
 
         final Button delEventBtn = findViewById(R.id.button_aed_delete_event);
         delEventBtn.setOnClickListener(new View.OnClickListener() {
@@ -120,7 +134,6 @@ public class EventDetailAdminActivity extends AppCompatActivity {
             imageView.setVisibility(View.VISIBLE);
             delImageBtn.setVisibility(View.VISIBLE);
             loadImageFromFirebase(eventID);
-
         } else
         {
             imageView.setVisibility(View.GONE);
@@ -129,8 +142,19 @@ public class EventDetailAdminActivity extends AppCompatActivity {
 
         if (isQRcode) {
             delQRcodeBtn.setVisibility(View.VISIBLE);
+            qrCode.setVisibility(View.VISIBLE);
+
+            getQRCodeData(eventID, qrBase64 -> {
+                if (qrBase64 != null) {
+                    displayQRCode(qrBase64);
+                } else {
+                    qrCode.setVisibility(View.GONE);
+                    Toast.makeText(this, "QR Code data not available.", Toast.LENGTH_SHORT).show();
+                }
+            });
         } else {
             delQRcodeBtn.setVisibility(View.GONE);
+            qrCode.setVisibility(View.GONE);
         }
 
         if (isEvent) {
@@ -265,5 +289,49 @@ public class EventDetailAdminActivity extends AppCompatActivity {
         }).addOnFailureListener(exception -> {
             Toast.makeText(EventDetailAdminActivity.this, "Failed to delete image: " + exception.getMessage(), Toast.LENGTH_LONG).show();
         });
+    }
+
+    private void displayQRCode(String qrBase64) {
+        if (qrBase64 == null || qrBase64.trim().isEmpty()) {
+
+            qrCode.setVisibility(View.GONE);
+            return;
+        }
+
+        try {
+            byte[] decodedBytes = Base64.decode(qrBase64, Base64.DEFAULT);
+            Bitmap qrBitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+
+            if (qrBitmap != null) {
+                qrCode.setImageBitmap(qrBitmap);
+                qrCode.setVisibility(View.VISIBLE);
+            } else {
+                qrCode.setVisibility(View.GONE);
+            }
+        } catch (IllegalArgumentException e) {
+            qrCode.setVisibility(View.GONE);
+        }
+    }
+
+    public void getQRCodeData(String eventID, QRCodeCallback callback) {
+        DocumentReference docRef = db.collection("Events").document(eventID);
+
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    String qrCodeData = document.getString("qrCodeData");
+                    callback.onQRCodeFetched(qrCodeData); // Pass data to the callback
+                } else {
+                    callback.onQRCodeFetched(null); // Handle case where document doesn't exist
+                }
+            } else {
+                callback.onQRCodeFetched(null); // Handle failure
+            }
+        });
+    }
+
+    public interface QRCodeCallback {
+        void onQRCodeFetched(String qrCodeData);
     }
 }
