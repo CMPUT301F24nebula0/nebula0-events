@@ -1,6 +1,8 @@
 package com.example.pickme_nebula0.admin.activities;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -44,6 +46,7 @@ import org.checkerframework.framework.qual.DefaultQualifier;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -152,6 +155,8 @@ public class AdminHomeActivity extends AppCompatActivity {
             viewFlipper.setDisplayedChild(0);
             updateEvents();
 
+            updateButtonAppearanceOnClick(btnManageEvents);
+
             // On click, show event details an allow admin to delete
             eventsList.setOnItemClickListener((adapterView, view, pos, id) -> {
                 Event clickedEvent = (Event) adapterView.getItemAtPosition(pos);
@@ -161,9 +166,8 @@ public class AdminHomeActivity extends AppCompatActivity {
                 intent.putExtra("isEvent", true);
                 startActivity(intent);
             });
-
             // Confirmation message for debugging and UI verification
-            Toast.makeText(AdminHomeActivity.this, "Switched to Manage Events layout", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(AdminHomeActivity.this, "Switched to Manage Events layout", Toast.LENGTH_SHORT).show();
         });
 
         // sets up interaction with first visible layout, ie. the manage events layout
@@ -172,6 +176,8 @@ public class AdminHomeActivity extends AppCompatActivity {
         btnManageUsers.setOnClickListener(v -> {
             viewFlipper.setDisplayedChild(1); // Show Manage Profile layout
             updateProfiles();
+
+            updateButtonAppearanceOnClick(btnManageUsers);
 
             // On click, show user details an allow admin to delete
             usersList.setOnItemClickListener((adapterView, view, pos, id) -> {
@@ -186,16 +192,19 @@ public class AdminHomeActivity extends AppCompatActivity {
                 startActivity(intent);
             });
 
-            Toast.makeText(AdminHomeActivity.this, "Switched to Manage Users layout", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(AdminHomeActivity.this, "Switched to Manage Users layout", Toast.LENGTH_SHORT).show();
         });
 
         //TODO;
         btnManageImages.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
                 viewFlipper.setDisplayedChild(2); // Show Manage QR Code layout
                 updateImages();
-                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Image layout", Toast.LENGTH_SHORT).show();
+
+                updateButtonAppearanceOnClick(btnManageImages);
+//                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Image layout", Toast.LENGTH_SHORT).show();
                 // On click, show event details an allow admin to delete
                 imagesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
@@ -209,7 +218,7 @@ public class AdminHomeActivity extends AppCompatActivity {
                     }
                 });
                 // Confirmation message for debugging and UI verification
-                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Events layout", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Events layout", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -218,7 +227,10 @@ public class AdminHomeActivity extends AppCompatActivity {
             public void onClick(View v) {
                 viewFlipper.setDisplayedChild(3); // Show Manage QR Code layout
                 updateQRCodes();
-                Toast.makeText(AdminHomeActivity.this, "Switched to Manage QR Code layout", Toast.LENGTH_SHORT).show();
+
+                updateButtonAppearanceOnClick(btnManageQR);
+
+//                Toast.makeText(AdminHomeActivity.this, "Switched to Manage QR Code layout", Toast.LENGTH_SHORT).show();
                 // On click, show event details an allow admin to delete
                 QRcodesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
@@ -232,7 +244,7 @@ public class AdminHomeActivity extends AppCompatActivity {
                     }
                 });
                 // Confirmation message for debugging and UI verification
-                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Events layout", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Events layout", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -241,6 +253,8 @@ public class AdminHomeActivity extends AppCompatActivity {
             public void onClick(View v) {
                 viewFlipper.setDisplayedChild(4); // Show Manage Facilities layout
                 updateFacilities();
+
+                updateButtonAppearanceOnClick(btnManageFacilities);
 
                 // On click, show user details an allow admin to delete
                 facilitiesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -254,7 +268,7 @@ public class AdminHomeActivity extends AppCompatActivity {
                     }
                 });
 
-                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Facilities layout", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Facilities layout", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -277,19 +291,6 @@ public class AdminHomeActivity extends AppCompatActivity {
                 eventAdapter.notifyDataSetChanged();
             });
         }, () -> {});
-//        events.clear();
-//        eventAdapter.notifyDataSetChanged();
-//        db.collection("Events")
-//                .get()
-//                .addOnCompleteListener(task -> {
-//                    if (task.isSuccessful()) {
-//                        for (QueryDocumentSnapshot document : task.getResult()) {
-//                            Event e = document.toObject(Event.class);
-//                            events.add(e);
-//                        }
-//                        eventAdapter.notifyDataSetChanged();
-//                    }
-//                });
     }
 
     private void updateProfiles(){
@@ -369,5 +370,21 @@ as a QR code doesn't exist on its own  aslo a change made to the QR code
                        facilityAdapter.notifyDataSetChanged();
                     }
                 });
+    }
+
+    private void updateButtonAppearanceOnClick(Button clickedButton) {
+        ArrayList<Button> buttonArrayList = new ArrayList<>(
+                Arrays.asList(btnManageEvents, btnManageUsers, btnManageImages, btnManageFacilities, btnManageQR)
+        );
+
+        for (Button button: buttonArrayList) {
+            if (button == clickedButton) {
+                button.setTypeface(null, Typeface.BOLD_ITALIC);
+                button.setTextColor(Color.BLACK);
+            } else {
+                button.setTypeface(null, Typeface.NORMAL);
+                button.setTextColor(Color.GRAY);
+            }
+        }
     }
 }
