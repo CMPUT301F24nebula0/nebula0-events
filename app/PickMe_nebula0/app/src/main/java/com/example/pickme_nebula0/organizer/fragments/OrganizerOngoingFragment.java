@@ -1,5 +1,7 @@
 package com.example.pickme_nebula0.organizer.fragments;
 
+import static androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread;
+
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
@@ -58,9 +60,11 @@ public class OrganizerOngoingFragment extends Fragment {
         OrganizerRole.get_event_by_status(DeviceManager.getDeviceId(), EventManager.EventStatus.ONGOING, (ongoingEventsObj) -> {
             ArrayList<Event> events = (ArrayList<Event>) ongoingEventsObj;
 
-            ongoingEvents.clear();
-            ongoingEvents.addAll(events);
-            adapter.notifyDataSetChanged();
+            getActivity().runOnUiThread(() -> {
+                ongoingEvents.clear();
+                ongoingEvents.addAll(events);
+                adapter.notifyDataSetChanged();
+            });
         }, () -> Log.d(this.getClass().getSimpleName(), "Could not load ongoing events"));
 //        ongoingEvents.clear();
 //        db.collection("Events")
