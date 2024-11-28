@@ -57,9 +57,11 @@ public class OrganizerPastFragment extends Fragment {
         OrganizerRole.get_event_by_status(DeviceManager.getDeviceId(), EventManager.EventStatus.PAST, (pastEventsObj) -> {
             ArrayList<Event> events = (ArrayList<Event>) pastEventsObj;
 
-            pastEvents.clear();
-            pastEvents.addAll(events);
-            adapter.notifyDataSetChanged();
+            getActivity().runOnUiThread(() -> {
+                pastEvents.clear();
+                pastEvents.addAll(events);
+                adapter.notifyDataSetChanged();
+            });
         }, () -> Log.d(this.getClass().getSimpleName(), "Could not load past events"));
 
 
