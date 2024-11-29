@@ -12,10 +12,12 @@ import androidx.annotation.Nullable;
 
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.event.Event;
-import com.example.pickme_nebula0.user.User;
 
 import java.util.ArrayList;
 
+/**
+ * Array adapter for displaying QR code
+ */
 public class QRcodeAdapter extends ArrayAdapter<Event> {
 
     public QRcodeAdapter(Context context, int textViewResourceId, ArrayList<Event> events){

@@ -13,6 +13,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * Class that handles QR code generation
+ */
 public class QRCodeGenerator {
     public QRCodeGenerator() {
     }
@@ -66,6 +69,11 @@ public class QRCodeGenerator {
         return Base64.encodeToString(byteArray, Base64.NO_WRAP);
     }
 
+    /**
+     * Generates the SHA256 hash as a string
+     * @param QRCodeURI uri of QR code
+     * @return SHA256 hash as string
+     */
     public String generateSHA256Hash(String QRCodeURI) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");

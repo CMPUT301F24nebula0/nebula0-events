@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.Button;
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,6 +17,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+/**
+ * Activity for scanning a QR code
+ */
 public class QRCodeActivity extends AppCompatActivity {
     
     // QR code scanner
