@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,6 +21,9 @@ import com.example.pickme_nebula0.user.User;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 /**
  * Activity for admin or organizer to view details about a user
@@ -28,6 +32,8 @@ public class UserDetailActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private TextView userDetailsTextView;
     private DBManager dbManager;
+    private ImageView profileImage;
+    private StorageReference storageRef;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,11 +47,12 @@ public class UserDetailActivity extends AppCompatActivity {
         final Button delButton = findViewById(R.id.button_ud_delete);
         final Button cancelEntrantButton = findViewById(R.id.button_cancel_selected_entrant);
         final Button mapButton = findViewById(R.id.button_map);
+        profileImage = findViewById(R.id.profile_image);
+        String userID = getIntent().getStringExtra("userID");
 
         if(!getIntent().getBooleanExtra("admin",false)){
             delButton.setVisibility(View.GONE);
         }
-        String userID = getIntent().getStringExtra("userID");
         boolean isAdmin = getIntent().getBooleanExtra("admin", false);
         if (userID == null || userID.isEmpty()) {
             Toast.makeText(this, "Invalid User ID.", Toast.LENGTH_SHORT).show();
@@ -73,7 +80,7 @@ public class UserDetailActivity extends AppCompatActivity {
         }
 
         // check if userID and eventID got passed from the intent
-        Log.d("UserDetailActivity", "userID: " + userID + ", eventID: " + eventID);
+//        Log.d("UserDetailActivity", "userID: " + userID + ", eventID: " + eventID);
 
         if(!getIntent().getBooleanExtra("organizer", true)){
             mapButton.setVisibility(View.GONE);
@@ -129,8 +136,11 @@ public class UserDetailActivity extends AppCompatActivity {
 
         if (isAdmin) {
             mapButton.setVisibility(View.GONE);
+            profileImage.setVisibility(View.VISIBLE);
+            loadProfileImageFromFirebase(userID);
         } else {
             mapButton.setVisibility(View.VISIBLE);
+            profileImage.setVisibility(View.GONE);
         }
 
     }
@@ -157,5 +167,21 @@ public class UserDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "Failed to retrieve user data.", Toast.LENGTH_SHORT).show();
             finish();
         }));
+    }
+
+    private void loadProfileImageFromFirebase(String userID) {
+        FirebaseStorage storage = FirebaseStorage.getInstance("gs://pickme-c2fb3.firebasestorage.app");
+        storageRef = storage.getReference();
+
+        StorageReference imageRef = storageRef.child("profilePics/" + userID);
+        imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+            Picasso.get()
+                    .load(uri)
+                    .placeholder(R.drawable.ic_profile_placeholder)
+                    .error(R.drawable.ic_profile_placeholder)
+                    .into(profileImage);
+        }).addOnFailureListener(exception -> {
+            profileImage.setVisibility(View.GONE);
+        });
     }
 }

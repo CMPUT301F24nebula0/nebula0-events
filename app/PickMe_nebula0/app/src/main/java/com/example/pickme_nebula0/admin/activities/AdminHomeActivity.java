@@ -183,7 +183,7 @@ public class AdminHomeActivity extends AppCompatActivity {
             usersList.setOnItemClickListener((adapterView, view, pos, id) -> {
                 User clickedUser = (User) adapterView.getItemAtPosition(pos);
 
-                Toast.makeText(AdminHomeActivity.this, clickedUser.getUserID(), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(AdminHomeActivity.this, clickedUser.getUserID(), Toast.LENGTH_SHORT).show();
 
 
                 Intent intent = new Intent(AdminHomeActivity.this, UserDetailActivity.class);
