@@ -1,18 +1,15 @@
 package com.example.pickme_nebula0;
 
-import android.Manifest;
-import android.app.Activity;
 import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.content.pm.PackageManager;
 import android.os.Build;
-
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.google.firebase.FirebaseApp;
 
+/**
+ * Application class, sets up notification channels, and allows retrieval of application instance
+ */
 public class PickMeApplication extends Application {
     private static PickMeApplication instance;
 
@@ -40,6 +37,10 @@ public class PickMeApplication extends Application {
 
     }
 
+    /**
+     * Gets application instance
+     * @return instance of PickMeApplication
+     */
     public static PickMeApplication getInstance(){
         return instance;
     }
