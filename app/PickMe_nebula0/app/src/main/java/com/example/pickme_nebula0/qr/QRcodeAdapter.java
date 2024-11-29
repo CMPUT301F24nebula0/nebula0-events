@@ -35,12 +35,13 @@ public class QRcodeAdapter extends ArrayAdapter<Event> {
         }
         Event event= getItem(position);
         String hashcode=event.getQrCodeData();
+        String eventName = event.getEventName();
         TextView QRcode = view.findViewById(R.id.qrcodehash_text_view);
         if (hashcode=="null"){
             QRcode.setText("null");
         }
         else {
-            QRcode.setText(hashcode);
+            QRcode.setText(eventName);
         }
         return view;
     };

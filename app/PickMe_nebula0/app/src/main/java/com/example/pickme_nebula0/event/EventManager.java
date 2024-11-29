@@ -1,13 +1,19 @@
 package com.example.pickme_nebula0.event;
 
+import static com.example.pickme_nebula0.db.FBStorageManager.eventPosterFieldName;
+
+import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.db.FBStorageManager;
 import com.example.pickme_nebula0.user.User;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -16,6 +22,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -307,6 +315,7 @@ public class EventManager {
 
 
     /**
+     * Searches event poster attribute.
      * Passes the poster URI to callback if it exists for a given event.
      * Otherwise, runs posterNotFound callback.
      * Use for admin poster viewing.
@@ -320,7 +329,7 @@ public class EventManager {
      */
     public static void event_has_poster(String eventID, String2VoidCallback posterFoundCallback, String2VoidCallback posterNotFoundCallback) {
         DocumentReference eventDoc = db.collection(dbm.eventsCollection).document(eventID);
-        String event_poster_field = "poster";   // TODO: add this as static attribute for FBManager
+        String event_poster_field = eventPosterFieldName;
 
         eventDoc.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -344,5 +353,17 @@ public class EventManager {
         });
 
     }
+
+
+    public static void removePoster(String eventID, DBManager.Void2VoidCallback onSuccessCallback, DBManager.Void2VoidCallback onFailureCallback) {
+        FBStorageManager.deleteEventPosterFromStorage(eventID, () -> {
+            // removed poster from storage
+            // update event docs
+            DocumentReference eventDocRef = db.collection(dbm.eventsCollection).document(eventID);
+            dbm.updateField(eventDocRef, eventPosterFieldName, null);
+
+        }, onFailureCallback);
+    }
+
 }
 
