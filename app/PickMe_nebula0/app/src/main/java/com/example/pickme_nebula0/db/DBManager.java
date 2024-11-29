@@ -227,6 +227,8 @@ public class DBManager {
                         if (document.exists()) {
                             String status = document.getString("status");
                             onSuccessCallback.run(status);
+                        } else{
+                            onFailureCallback.run();
                         }
                     }
                     else{

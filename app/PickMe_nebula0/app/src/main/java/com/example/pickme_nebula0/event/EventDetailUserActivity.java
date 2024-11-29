@@ -2,7 +2,6 @@ package com.example.pickme_nebula0.event;
 
 import android.Manifest;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -18,7 +17,6 @@ import com.example.pickme_nebula0.GeolocationManager;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.SharedDialogue;
 import com.example.pickme_nebula0.db.DBManager;
-import com.example.pickme_nebula0.start.activities.HomePageActivity;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -243,10 +241,13 @@ public class EventDetailUserActivity extends AppCompatActivity {
     }
 
     // START TY
-    private void saveGeolocationData(String userID, String eventID) {
-//        String userID = "c5e9e56f41572d06"; // Replace with actual userID
-//        String eventID = "ouyj7XRzfSIqFRAXqnQ5"; // Replace with actual eventID
 
+    /**
+     * Save's user's geolocation data
+     * @param userID ID of user of interest
+     * @param eventID ID of event of interest
+     */
+    private void saveGeolocationData(String userID, String eventID) {
         try {
             gm.saveGeolocation(userID, eventID, success -> {
                 if (success) {
@@ -281,6 +282,11 @@ public class EventDetailUserActivity extends AppCompatActivity {
         }));
     }
 
+    /**
+     * Builds string detailing event info
+     * @param event
+     * @return
+     */
     private StringBuilder generateEventDetails(Event event) {
         StringBuilder details = new StringBuilder();
         details.append("Event Name: ").append(event.getEventName()).append("\n\n");
@@ -296,11 +302,12 @@ public class EventDetailUserActivity extends AppCompatActivity {
     private void renderAll(){
         renderEventInfo();
         if(fromQR){
-            registerButton.setVisibility(View.VISIBLE);
-            userStatusTextView.setText("Unregistered");
-            // TODO - we should check if the user has already registered
+            dbManager.getUserStatusString(userID,eventID,
+                    (status)->{renderBasedOnUserStatus(status.toString());},
+                    ()->{registerButton.setVisibility(View.VISIBLE);
+                userStatusTextView.setText("Unregistered");});
         } else {
-            dbManager.getUserStatusString(userID,eventID,(status)->{renderBasedOnUserStatus(status.toString());},()->{});
+            renderUserStatus();
         }
     }
 

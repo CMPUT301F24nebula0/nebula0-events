@@ -107,8 +107,6 @@ public class QRCodeActivity extends AppCompatActivity {
             if (result.getContents() == null) {
                 Toast.makeText(this, "Scan cancelled", Toast.LENGTH_LONG).show();
             } else {
-                Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
-
                 // Extract the event URI from the QR code
                 String eventURI = result.getContents();
                 // Extract the event ID from the URI
