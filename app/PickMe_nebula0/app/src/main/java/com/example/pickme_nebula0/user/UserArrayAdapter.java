@@ -11,10 +11,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.pickme_nebula0.R;
-import com.example.pickme_nebula0.event.Event;
 
 import java.util.ArrayList;
 
+/**
+ * Array adapter for displaying list of users
+ */
 public class UserArrayAdapter extends ArrayAdapter<User> {
 
     public UserArrayAdapter(Context context, int textViewResourceId, ArrayList<User> events){
