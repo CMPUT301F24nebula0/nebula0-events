@@ -18,6 +18,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
+import com.google.android.gms.location.Priority;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -70,48 +71,45 @@ public class GeolocationManager {
         }
 
         try {
-            fusedLocationClient.getLastLocation()
-                    .addOnCompleteListener(new OnCompleteListener<Location>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Location> task) {
-                            if (task.isSuccessful() && task.getResult() != null) {
-                                Location location = task.getResult();
-                                double latitude = location.getLatitude();
-                                double longitude = location.getLongitude();
+            fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            Location location = task.getResult();
+                            double latitude = location.getLatitude();
+                            double longitude = location.getLongitude();
 
-                                GeoPoint geoPoint = new GeoPoint(latitude, longitude);
-                                Map<String, Object> data = new HashMap<>();
-                                data.put("geolocation", geoPoint);
+                            GeoPoint geoPoint = new GeoPoint(latitude, longitude);
+                            Map<String, Object> data = new HashMap<>();
+                            data.put("geolocation", geoPoint);
 
-                                DocumentReference docRefUsers = firestore.collection("Users")
-                                        .document(userID)
-                                        .collection("RegisteredEvents")
-                                        .document(eventID);
+                            DocumentReference docRefUsers = firestore.collection("Users")
+                                    .document(userID)
+                                    .collection("RegisteredEvents")
+                                    .document(eventID);
 
-                                DocumentReference docRefEvents = firestore.collection("Events")
-                                        .document(eventID)
-                                        .collection("EventRegistrants")
-                                        .document(userID);
+                            DocumentReference docRefEvents = firestore.collection("Events")
+                                    .document(eventID)
+                                    .collection("EventRegistrants")
+                                    .document(userID);
 
-                                docRefUsers.set(data, SetOptions.merge())
-                                        .addOnSuccessListener(aVoid -> {
-                                            callback.onGeolocationSaved(true);
-                                        })
-                                        .addOnFailureListener(e -> {
-                                            callback.onGeolocationSaved(false);
-                                        });
+                            docRefUsers.set(data, SetOptions.merge())
+                                    .addOnSuccessListener(aVoid -> {
+                                        callback.onGeolocationSaved(true);
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        callback.onGeolocationSaved(false);
+                                    });
 
-                                docRefEvents.set(data, SetOptions.merge())
-                                        .addOnSuccessListener(aVoid -> {
-                                            callback.onGeolocationSaved(true);
-                                        })
-                                        .addOnFailureListener(e -> {
-                                            callback.onGeolocationSaved(false);
-                                        });
-                            } else {
-                                Toast.makeText(context, "Failed to retrieve location", Toast.LENGTH_SHORT).show();
-                                callback.onGeolocationSaved(false);
-                            }
+                            docRefEvents.set(data, SetOptions.merge())
+                                    .addOnSuccessListener(aVoid -> {
+                                        callback.onGeolocationSaved(true);
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        callback.onGeolocationSaved(false);
+                                    });
+                        } else {
+                            Toast.makeText(context, "Failed to retrieve location", Toast.LENGTH_SHORT).show();
+                            callback.onGeolocationSaved(false);
                         }
                     });
         } catch (SecurityException e) {
