@@ -260,7 +260,7 @@ public class AdminHomeActivity extends AppCompatActivity {
      * Updates information contained in events tab to match the database
      */
     private void updateEvents(){
-        EventManager.get_all_events((eventsObj) -> {
+        EventManager.getAllEvents((eventsObj) -> {
             ArrayList<Event> fetched_events = (ArrayList<Event>) eventsObj;
 
             runOnUiThread(() -> {
@@ -326,7 +326,7 @@ public class AdminHomeActivity extends AppCompatActivity {
      */
     private void updateQRCodes(){
 
-        EventManager.get_all_events((eventsObj) -> {
+        EventManager.getAllEvents((eventsObj) -> {
             ArrayList<Event> fetched_events = (ArrayList<Event>) eventsObj;
             eventsWithQR.clear();
 

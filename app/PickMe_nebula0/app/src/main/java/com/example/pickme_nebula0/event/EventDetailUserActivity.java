@@ -117,7 +117,7 @@ public class EventDetailUserActivity extends AppCompatActivity {
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EventManager.check_waitlist_full(eventID, (eventDocSnapshotObj) -> {
+                EventManager.checkWaitlistFull(eventID, (eventDocSnapshotObj) -> {
                     DocumentSnapshot eventDocSnapshot = (DocumentSnapshot) eventDocSnapshotObj;
 
                 // waitlist not full

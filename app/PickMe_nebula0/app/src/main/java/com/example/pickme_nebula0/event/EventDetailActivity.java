@@ -1,6 +1,5 @@
 package com.example.pickme_nebula0.event;
 
-import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -29,10 +28,10 @@ import com.example.pickme_nebula0.organizer.OrganizerRole;
 import com.example.pickme_nebula0.user.User;
 import com.example.pickme_nebula0.notification.NotificationCreationActivity;
 import com.example.pickme_nebula0.organizer.activities.OrganizerEventParticipantsActivity;
-import com.example.pickme_nebula0.DeviceManager;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.squareup.picasso.Picasso;
 
+/**
+ * Activity for viewing details of an event from an organizer perspective
+ */
 public class EventDetailActivity extends AppCompatActivity {
 
     // Initialize UI components
@@ -74,8 +73,6 @@ public class EventDetailActivity extends AppCompatActivity {
         newPosterButton = findViewById(R.id.buttonNewPosterEventDetail);
 
         hideAllPosterButtons(); // generate these conditionally based on if there is a poster or not
-
-
 
         dbManager = new DBManager();
 
@@ -174,6 +171,9 @@ public class EventDetailActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Opens media picker
+     */
     private void openImagePicker() {
         pickMedia.launch(new PickVisualMediaRequest.Builder()
                 .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
@@ -273,21 +273,34 @@ public class EventDetailActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Conditionally renders buttons on detail activity screen depending on whether there is a poster or not
+     */
     private void renderPosterButtons(){
         FBStorageManager.retrievePosterUri(eventID,this::showButtonsIfPoster,this::showButtonsIfNoPoster);
     }
 
+    /**
+     * Hides all poster related buttons
+     */
     private void hideAllPosterButtons(){
         viewPosterButton.setVisibility(View.GONE);
         newPosterButton.setVisibility(View.GONE);
 
     }
 
+    /**
+     * Renders button configuration for when a poster has yet to be added
+     */
     private void showButtonsIfNoPoster(){
         viewPosterButton.setVisibility(View.GONE);
         newPosterButton.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Renders button configuration for what a poster has already been added
+     * @param uri uri of poster
+     */
     private void showButtonsIfPoster(Uri uri){
         viewPosterButton.setVisibility(View.VISIBLE);
         newPosterButton.setVisibility(View.VISIBLE);
