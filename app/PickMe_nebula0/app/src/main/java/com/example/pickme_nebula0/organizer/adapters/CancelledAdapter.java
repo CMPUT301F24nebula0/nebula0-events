@@ -16,6 +16,9 @@ import com.example.pickme_nebula0.user.activities.UserDetailActivity;
 
 import java.util.ArrayList;
 
+/**
+ * Array Adapter for viewing cancelled entrants
+ */
 public class CancelledAdapter extends RecyclerView.Adapter<CancelledAdapter.CancelledViewHolder> {
     private ArrayList<User> cancelledUsers;
     private Context context;

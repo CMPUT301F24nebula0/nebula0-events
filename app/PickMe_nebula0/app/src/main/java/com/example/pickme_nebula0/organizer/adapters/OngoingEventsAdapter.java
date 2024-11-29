@@ -16,6 +16,9 @@ import com.example.pickme_nebula0.event.EventDetailActivity;
 
 import java.util.ArrayList;
 
+/**
+ * Array adapter for viewing ongoing events
+ */
 public class OngoingEventsAdapter extends RecyclerView.Adapter<OngoingEventsAdapter.OngoingEventViewHolder> {
     private ArrayList<Event> ongoingEvents;
     private Context context;

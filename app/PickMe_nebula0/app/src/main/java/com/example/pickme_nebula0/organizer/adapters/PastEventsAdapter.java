@@ -16,6 +16,9 @@ import com.example.pickme_nebula0.event.EventDetailActivity;
 
 import java.util.ArrayList;
 
+/**
+ * Array Adapter for viewing past events
+ */
 public class PastEventsAdapter extends RecyclerView.Adapter<PastEventsAdapter.PastEventViewHolder> {
     private ArrayList<Event> pastEvents;
     private Context context;
