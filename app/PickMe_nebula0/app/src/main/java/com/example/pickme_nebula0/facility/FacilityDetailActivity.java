@@ -9,20 +9,14 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
-import com.example.pickme_nebula0.admin.activities.AdminHomeActivity;
 import com.example.pickme_nebula0.db.DBManager;
-import com.example.pickme_nebula0.event.Event;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-
-import java.util.Date;
 
 public class FacilityDetailActivity extends AppCompatActivity {
 
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private DBManager dbManager = new DBManager();
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final DBManager dbManager = new DBManager();
 
     private TextView facilityDetails;
 
@@ -62,6 +56,10 @@ public class FacilityDetailActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Retrieves facility details from DB and sets info on screen
+     * @param facilityID ID of facility to fetch details of
+     */
     private void fetchFacilityDetails(String facilityID) {
         db.collection("Facilities").document(facilityID)
                 .get()
