@@ -413,33 +413,6 @@ public class Event {
         return entrantRemoved;
     }
 
-    /**
-     * Enrolls all entrants currently in chosen list.
-     * Assumes that organizer doesn't want to enroll each entrant
-     * one by one.
-     */
-    public void enrollEntrants() {
-        // fetch chosen entrants from DB and update DB
-        this.entrantsEnrolled = new ArrayList<>(this.entrantsChosen);
-    }
-
-    /**
-     * Enrolls an entrant.
-     * Called by entrant when they accept the invite and sign up for the event.
-     * Note: no way to remove entrants, as this functionality is not required
-     * for any of the user requirements.
-     */
-    public boolean enrollEntrant(EntrantRole entrant) {
-        if (entrantEnrolled(entrant)) { return false; }
-        this.entrantsEnrolled.add(entrant);
-
-        // update DB with following:
-        // entrant status
-        // event list of chosen entrants
-
-        return true;
-    }
-
     //-------------- UTILITY FUNCTIONS
     public boolean entrantInWaitlist(EntrantRole entrant) {
         return entrantInList(entrant, this.entrantsInWaitlist);
@@ -447,18 +420,6 @@ public class Event {
 
     public boolean entrantChosen(EntrantRole entrant) {
         return entrantInList(entrant, this.entrantsChosen);
-    }
-
-    public boolean entrantCanBeResampled(EntrantRole entrant) {
-        return entrantInList(entrant, this.entrantsToResample);
-    }
-
-    public boolean entrantCancelled(EntrantRole entrant) {
-        return entrantInList(entrant, this.entrantsCancelled);
-    }
-
-    public boolean entrantEnrolled(EntrantRole entrant) {
-        return entrantInList(entrant, this.entrantsEnrolled);
     }
 
     private boolean entrantInList(EntrantRole entrant, ArrayList<EntrantRole> entrantList) {
