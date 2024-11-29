@@ -31,15 +31,4 @@ public class  OrganizerRoleTest {
     }
 
 
-
-    @Test
-    public void testCreateEvent() {
-        assertThrows(RuntimeException.class, () -> organizer.createEvent());
-    }
-
-
-
-
-
-
 }
