@@ -96,7 +96,6 @@ public class MessageViewActivity extends AppCompatActivity {
                                     () -> {
                                         // if it should exist, add it
                                         notifs.add(n);
-                                        notifAdapter.notifyDataSetChanged();
                                         // show notifications from newest to oldest
                                         notifs.sort(new Comparator<Notification>() {
                                             @Override
@@ -104,6 +103,7 @@ public class MessageViewActivity extends AppCompatActivity {
                                                 return n2.getTimestamp().compareTo(n1.getTimestamp());
                                             }
                                         });
+                                        notifAdapter.notifyDataSetChanged();
                                     },
                                     () -> {
                                         // else delete it
