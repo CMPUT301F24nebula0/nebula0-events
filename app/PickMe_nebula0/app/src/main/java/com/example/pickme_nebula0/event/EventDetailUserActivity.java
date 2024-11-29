@@ -155,6 +155,8 @@ public class EventDetailUserActivity extends AppCompatActivity {
                                                         Manifest.permission.ACCESS_FINE_LOCATION,
                                                         Manifest.permission.ACCESS_COARSE_LOCATION
                                                 });
+                                                saveGeolocationData(userID, eventID);
+
                                             }
                                         });
                                     } else {
