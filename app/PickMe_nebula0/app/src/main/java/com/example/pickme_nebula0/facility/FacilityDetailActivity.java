@@ -13,6 +13,9 @@ import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.db.DBManager;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+/**
+ * Activity for viewing facility detail and deleting the facility for admin
+ */
 public class FacilityDetailActivity extends AppCompatActivity {
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
