@@ -348,8 +348,8 @@ as a QR code doesn't exist on its own  aslo a change made to the QR code
 
             // only add qr code to list if its data exists
             for (Event event: fetched_events) {
-                String qr_code_data = event.getQrCodeData();
-                if (qr_code_data == null || qr_code_data.equals("null")) { continue; }
+                String hashedQRCode = event.getHashedQRCode();
+                if (hashedQRCode == null || hashedQRCode.equals("null")) { continue; }
                 eventsWithQR.add(event);
             }
             QRAdapter.notifyDataSetChanged();

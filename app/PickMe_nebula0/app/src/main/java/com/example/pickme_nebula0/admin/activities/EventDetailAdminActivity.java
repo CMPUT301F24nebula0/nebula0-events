@@ -3,7 +3,6 @@ package com.example.pickme_nebula0.admin.activities;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.Base64;
 
 import android.view.View;
@@ -17,7 +16,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.db.DBManager;
-import com.example.pickme_nebula0.db.FBStorageManager;
 import com.example.pickme_nebula0.event.Event;
 
 import com.example.pickme_nebula0.event.EventManager;
@@ -29,8 +27,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
@@ -193,11 +189,11 @@ public class EventDetailAdminActivity extends AppCompatActivity {
                runOnUiThread(() -> {
                     StringBuilder details = new StringBuilder();
                     details.append("QRcodeHash: ");
-                    if (event.getHashedQRcode()==null){
+                    if (event.getHashedQRCode()==null){
                         details.append("null").append("\n\n");
                     }
                     else{
-                        details.append(event.getHashedQRcode()).append("\n\n");
+                        details.append(event.getHashedQRCode()).append("\n\n");
                         //issue need to learn where the QR code data is held within events
                     }
                     QRcodeHashTextVeiw.setText(details.toString());

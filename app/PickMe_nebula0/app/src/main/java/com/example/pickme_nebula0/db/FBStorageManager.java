@@ -30,7 +30,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 
-public class FBStorageManager {
+public class  FBStorageManager {
 
     public static final String firebaseStorageImageBucket = "gs://pickme-c2fb3.firebasestorage.app";
     public static final String eventPosterFieldName = "poster";

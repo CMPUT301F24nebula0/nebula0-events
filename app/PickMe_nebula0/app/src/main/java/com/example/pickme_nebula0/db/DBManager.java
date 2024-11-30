@@ -39,7 +39,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Class encompassing database access and modification
@@ -511,7 +510,7 @@ public class DBManager {
         updateField(eventDocRef,"waitlistCapacity", event.getWaitlistCapacity());
         updateField(eventDocRef,"numberOfAttendees", event.getEventCapacity());
         updateField(eventDocRef,"qrCodeData", event.getQrCodeData());
-        updateField(eventDocRef,"hashedQRCode", event.getHashedQRcode());
+        updateField(eventDocRef,"hashedQRCode", event.getHashedQRCode());
     }
 
     /**
@@ -525,7 +524,7 @@ public class DBManager {
      */
     public void getEvent(String eventID,Obj2VoidCallback onSuccessCallback,
                          Void2VoidCallback onFailureCallback){
-        getDocumentAsObject(eventsCollection,eventID,this::eventConverter,onSuccessCallback,onFailureCallback);
+        //getDocumentAsObject(eventsCollection,eventID,this::eventConverter,onSuccessCallback,onFailureCallback);
         DocumentReference eventDocRef = db.collection(eventsCollection).document(eventID);
         eventDocRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -640,7 +639,7 @@ public class DBManager {
         String hashcode=document.getString("hashedQRCode");
         Event event = new Event(eventID, organizerID, name, desc, date, geolocationRequired, geolocRequirement, waitistCapcityReq , waitlistCapacity, numberOfAttendees);
         event.setQrCodeData(qrCodeData);
-        event.setHashedQRcode(hashcode);
+        event.setHashedQRCode(hashcode);
         return event;
     }
 

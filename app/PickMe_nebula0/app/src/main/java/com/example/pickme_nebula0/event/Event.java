@@ -15,7 +15,7 @@ import java.util.Date;
  */
 public class Event {
     private String qrCodeData;
-    private String HashedQRcode;
+    private String hashedQRCode;
     private DBManager dbManager;
 
     private String eventID;
@@ -93,11 +93,11 @@ public class Event {
         return this.eventID;
     }
 
-    public String getHashedQRcode(){
-        return this.HashedQRcode;
+    public String getHashedQRCode(){
+        return this.hashedQRCode;
     }
-    public void setHashedQRcode(String hashcode){
-        this.HashedQRcode=hashcode;
+    public void setHashedQRCode(String hashcode){
+        this.hashedQRCode =hashcode;
     }
     /**
      * Returns the event name.
