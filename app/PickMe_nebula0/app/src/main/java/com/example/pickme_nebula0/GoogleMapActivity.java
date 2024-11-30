@@ -35,9 +35,9 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map_fragment);
 
-        displayMap(mapFragment); // display map
-
         setLatLngFromIntent(); // set latitude and longitude from intent
+
+        displayMap(mapFragment); // display map
 
         backButton(); // back button
     }
@@ -49,11 +49,22 @@ public class GoogleMapActivity extends FragmentActivity implements OnMapReadyCal
      */
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
+        Log.d("MapActivity", "onMapReady called");
+
         LatLng location = new LatLng(latitude, longitude);
-        // add marker to selected location
-        googleMap.addMarker(new MarkerOptions().position(location).title("Selected Location"));
-        // move camera to selected location
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
+
+        googleMap.getUiSettings().setZoomControlsEnabled(true);
+
+        String label = "Lat: " + latitude + ", Lng: " + longitude;
+
+        placeMarker(googleMap, location, label);
+
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 10));
+
+    }
+
+    public void placeMarker(GoogleMap googleMap, LatLng location, String label) {
+        googleMap.addMarker(new MarkerOptions().position(location).title(label));
     }
 
     /**
