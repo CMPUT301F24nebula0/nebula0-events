@@ -10,6 +10,8 @@
         android:id="@+id/button_admin_back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@drawable/rounded_button"
+
         android:layout_alignParentTop="true"
         android:layout_marginTop="16dp"
         android:text="Back" />
@@ -84,9 +86,10 @@
         android:id="@+id/view_flipper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/Admin"
         android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:layout_below="@id/Admin">
+        android:orientation="horizontal">
+
         <ViewFlipper
             android:id="@+id/admin_view_flipper"
             android:layout_width="match_parent"
@@ -108,7 +111,7 @@
                     <ListView
                         android:id="@+id/eventListView"
                         android:layout_width="match_parent"
-                        android:layout_height="537dp"
+                        android:layout_height="match_parent"
                         android:background="#FFFFFF"
 
                         android:divider="@color/black"
@@ -129,22 +132,22 @@
                 android:padding="16dp">
                 <!-- Content for Manage Profile -->
                 <LinearLayout
-                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-                <!-- ListView to display events -->
-                <ListView
-                    android:id="@+id/ProfileListView"
-                    android:layout_width="match_parent"
-                    android:layout_height="537dp"
-                    android:background="#FFFFFF"
+                    <!-- ListView to display events -->
+                    <ListView
+                        android:id="@+id/ProfileListView"
+                        android:layout_width="match_parent"
+                        android:layout_height="537dp"
+                        android:background="#FFFFFF"
 
-                    android:divider="@color/black"
-                    android:dividerHeight="1dp"
-                    android:textColor="#000000" />
+                        android:divider="@color/black"
+                        android:dividerHeight="1dp"
+                        android:textColor="#000000" />
 
-                <!-- Search Bar for filtering events -->
+                    <!-- Search Bar for filtering events -->
                 </LinearLayout>
 
             </ScrollView>
@@ -157,9 +160,9 @@
                 android:padding="16dp">
                 <!-- Content for Manage Image -->
                 <LinearLayout
-                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
                     <!-- ListView to display events -->
                     <ListView
@@ -184,9 +187,9 @@
                 android:padding="16dp">
                 <!-- Content for Manage QR Code -->
                 <LinearLayout
-                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
                     <!-- ListView to display events -->
                     <ListView
@@ -211,9 +214,9 @@
                 android:padding="16dp">
                 <!-- Content for Manage Facilities -->
                 <LinearLayout
-                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
                     <!-- ListView to display events -->
                     <ListView
@@ -231,8 +234,6 @@
             </ScrollView>
 
         </ViewFlipper>
-
-
 
 
     </LinearLayout>

@@ -11,6 +11,8 @@
         android:text="Back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@drawable/rounded_button"
+
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -29,6 +31,8 @@
         android:id="@+id/button_ud_delete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@drawable/rounded_button"
+
         android:layout_marginBottom="32dp"
         android:text="Delete User"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -40,6 +44,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Cancel Entrant"
+        android:background="@drawable/rounded_button"
+
         app:layout_constraintBottom_toTopOf="@+id/button_ud_delete"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -49,6 +55,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Map"
+        android:background="@drawable/rounded_button"
+
+
         app:layout_constraintBottom_toTopOf="@+id/button_cancel_selected_entrant"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

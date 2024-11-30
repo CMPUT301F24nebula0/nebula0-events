@@ -189,6 +189,8 @@
         android:layout_height="wrap_content"
         android:text="Submit"
         app:layout_constraintBottom_toBottomOf="parent"
+        android:background="@drawable/rounded_button"
+
         app:layout_constraintEnd_toStartOf="@+id/event_creation_cancel_button"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent" />
@@ -199,6 +201,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Cancel"
+        android:background="@drawable/rounded_button"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/event_creation_submit_button" />
@@ -209,6 +213,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="Select Poster"
+        android:background="@drawable/rounded_button"
+
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/required_field_text" />
 
@@ -218,6 +224,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="76dp"
         android:text="Preview Poster"
+        android:background="@drawable/rounded_button"
+
         app:layout_constraintBottom_toBottomOf="@+id/buttonSelectPoster"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/buttonSelectPoster"
