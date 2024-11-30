@@ -1,11 +1,10 @@
 package com.example.pickme_nebula0.facility;
 
-
 import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.db.DBManager;
 
 /**
- * Facility
+ * Facility represents an organizer's facility
  */
 public class Facility {
     private DBManager dbManager;
@@ -25,7 +24,7 @@ public class Facility {
     }
 
     /**
-     * Unparameterized constructor for firebase toObject
+     * Un-parameterized constructor for firebase toObject
      */
     public Facility(){
 

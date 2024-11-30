@@ -1,9 +1,9 @@
 package com.example.pickme_nebula0.admin.activities;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.Base64;
 
 import android.view.View;
@@ -17,7 +17,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.db.DBManager;
-import com.example.pickme_nebula0.db.FBStorageManager;
 import com.example.pickme_nebula0.event.Event;
 
 import com.example.pickme_nebula0.event.EventManager;
@@ -30,24 +29,30 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
-import java.util.concurrent.atomic.AtomicReference;
-
 
 /**
  * Activity for displaying details of an event to an admin and to allow them to delete the activity
  *
  * @author Stephine
+ * @author Evan
  */
 public class EventDetailAdminActivity extends AppCompatActivity {
     private TextView eventDetailsTextView;
-    private TextView QRcodeHashTextVeiw;
+    private TextView QRCodeHashTextView;
     private DBManager dbManager;
     private ImageView imageView;
     private StorageReference storageRef;
     private ImageView qrCode;
     Button delImageBtn;
-    Button delQRcodeBtn;
+    Button delQRCodeBtn;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    /**
+     * Interface for QRCode Callback functions
+     */
+    public interface QRCodeCallback {
+        void onQRCodeFetched(String qrCodeData);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +80,7 @@ public class EventDetailAdminActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 dbManager.deleteEvent(eventID);
-                Toast.makeText(EventDetailAdminActivity.this, "Event Deleted", Toast.LENGTH_SHORT);
+                Toast.makeText(EventDetailAdminActivity.this, "Event Deleted", Toast.LENGTH_SHORT).show();
                 finish();
             }
         });
@@ -96,16 +101,15 @@ public class EventDetailAdminActivity extends AppCompatActivity {
                     delImageBtn.setVisibility(View.GONE);
                 });
 
-//                deleteImageFromFirebase(eventID);
                 finish();
             }
         });
 
-        delQRcodeBtn = findViewById(R.id.button_delete_qr);
-        delQRcodeBtn.setOnClickListener(new View.OnClickListener() {
+        delQRCodeBtn = findViewById(R.id.button_delete_qr);
+        delQRCodeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DeleteQRcode(eventID);
+                deleteQRCode(eventID);
                 finish();
             }
         });
@@ -119,14 +123,15 @@ public class EventDetailAdminActivity extends AppCompatActivity {
         });
 
         fetchEventDetails(eventID);
-        fetchQRcodehash(eventID);
-        QRcodeHashTextVeiw = findViewById(R.id.eventqrcodehash);
+        fetchQRCodeHash(eventID);
+        QRCodeHashTextView = findViewById(R.id.eventqrcodehash);
 
-        QRcodeHashTextVeiw.setOnClickListener(new View.OnClickListener() {
+        QRCodeHashTextView.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View v) {
-                DeleteQRcode(eventID);
-                QRcodeHashTextVeiw.setText("QRcodeHash: Null");
+                deleteQRCode(eventID);
+                QRCodeHashTextView.setText("QRCodeHash: Null");
             }
         });
 
@@ -141,7 +146,7 @@ public class EventDetailAdminActivity extends AppCompatActivity {
         }
 
         if (isQRcode) {
-            delQRcodeBtn.setVisibility(View.VISIBLE);
+            delQRCodeBtn.setVisibility(View.VISIBLE);
             qrCode.setVisibility(View.VISIBLE);
 
             getQRCodeData(eventID, qrBase64 -> {
@@ -153,7 +158,7 @@ public class EventDetailAdminActivity extends AppCompatActivity {
                 }
             });
         } else {
-            delQRcodeBtn.setVisibility(View.GONE);
+            delQRCodeBtn.setVisibility(View.GONE);
             qrCode.setVisibility(View.GONE);
         }
 
@@ -166,7 +171,11 @@ public class EventDetailAdminActivity extends AppCompatActivity {
 
     }
 
-    public void DeleteQRcode(String eventID){
+    /**
+     * Deletes QR code for given event from Database
+     * @param eventID ID of event we want to delete the QR code for
+     */
+    private void deleteQRCode(String eventID){
         dbManager.getEvent(eventID, eventObj -> {
             if (eventObj instanceof Event) {
                 Event event = (Event) eventObj;
@@ -186,13 +195,18 @@ public class EventDetailAdminActivity extends AppCompatActivity {
 
         }));
     }
-    private void fetchQRcodehash(String eventID) {
+
+    /**
+     * Gets QR code string for display
+     * @param eventID eventID for the event we want to display QR code for
+     */
+    private void fetchQRCodeHash(String eventID) {
         dbManager.getEvent(eventID, eventObj -> {
             if (eventObj instanceof Event) {
                 Event event = (Event) eventObj;
                runOnUiThread(() -> {
                     StringBuilder details = new StringBuilder();
-                    details.append("QRcodeHash: ");
+                    details.append("QRCodeHash: ");
                     if (event.getQrCodeData()==null){
                         details.append("null").append("\n\n");
                     }
@@ -200,7 +214,7 @@ public class EventDetailAdminActivity extends AppCompatActivity {
                         details.append(event.getQrCodeData()).append("\n\n");
                         //issue need to learn where the QR code data is held within events
                     }
-                    QRcodeHashTextVeiw.setText(details.toString());
+                    QRCodeHashTextView.setText(details.toString());
                 });
             } else {
                 runOnUiThread(() -> {
@@ -215,6 +229,10 @@ public class EventDetailAdminActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Gets event details for given event
+     * @param eventID ID of event we want to retrieve information for
+     */
     private void fetchEventDetails(String eventID) {
         // TODO this code is duplicated we should refactor to avoid this later
         dbManager.getEvent(eventID, eventObj -> {
@@ -249,11 +267,15 @@ public class EventDetailAdminActivity extends AppCompatActivity {
         }));
     }
 
+    /**
+     * Loads an image of event poster into view
+     * @param eventID ID of event we are retrieving image for
+     */
     private void loadImageFromFirebase(String eventID) {
         // Initialize FirebaseStorage with the correct bucket URL
         FirebaseStorage storage = FirebaseStorage.getInstance("gs://pickme-c2fb3.firebasestorage.app");
         storageRef = storage.getReference();
-        // TODO: FIX THE PATH ACCORDINGLY
+
         StorageReference imageRef = storageRef.child("eventPosters/" + eventID);
         imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
             // Load the image using Picasso
@@ -269,21 +291,10 @@ public class EventDetailAdminActivity extends AppCompatActivity {
         });
     }
 
-    private void deleteImageFromFirebase(String eventID) {
-        FirebaseStorage storage = FirebaseStorage.getInstance("gs://pickme-c2fb3.firebasestorage.app");
-        StorageReference storageRef = storage.getReference();
-        // TODO: FIX THE PATH ACCORDINGLY
-        StorageReference imageRef = storageRef.child("eventPosters/" + eventID + ".jpg");
-
-        imageRef.delete().addOnSuccessListener(aVoid -> {
-            Toast.makeText(EventDetailAdminActivity.this, "Image Deleted", Toast.LENGTH_SHORT).show();
-            imageView.setVisibility(View.GONE);
-            delImageBtn.setVisibility(View.GONE);
-        }).addOnFailureListener(exception -> {
-            Toast.makeText(EventDetailAdminActivity.this, "Failed to delete image: " + exception.getMessage(), Toast.LENGTH_LONG).show();
-        });
-    }
-
+    /**
+     * Display bitmap image of QR code
+     * @param qrBase64 QR code
+     */
     private void displayQRCode(String qrBase64) {
         if (qrBase64 == null || qrBase64.trim().isEmpty()) {
 
@@ -306,6 +317,11 @@ public class EventDetailAdminActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Fetches QR code data from database, performs callback on data if successful or on null if unsuccessful
+     * @param eventID ID of event we want to retrieve QR code data for
+     * @param callback function taking a QR code data/null to be called
+     */
     public void getQRCodeData(String eventID, QRCodeCallback callback) {
         DocumentReference docRef = db.collection("Events").document(eventID);
 
@@ -324,7 +340,5 @@ public class EventDetailAdminActivity extends AppCompatActivity {
         });
     }
 
-    public interface QRCodeCallback {
-        void onQRCodeFetched(String qrCodeData);
-    }
+
 }
