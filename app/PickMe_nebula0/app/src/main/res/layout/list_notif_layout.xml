@@ -1,26 +1,51 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/element_list_notif"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:visibility="visible"
+    tools:visibility="visible">
+
+    <!-- Message Subject -->
+    <!-- Subject Text (dynamic) -->
+    <TextView
+        android:id="@+id/textView_subject"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="8dp"
+        android:text="Message Subject:"
+        android:textColor="@color/black"
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/textView_notif_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:text="placeholder_title"
-        android:textSize="20sp"></TextView>
+        android:paddingBottom="4dp"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold" />
 
+
+    <!-- Message Label -->
+    <TextView
+        android:id="@+id/textView_notif_body_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="4dp"
+        android:text="Message: "
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <!-- Message Text (dynamic) -->
     <TextView
         android:id="@+id/textView_notif_body"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="3dp"
-        android:text="placeholder_message"
-        android:textSize="15sp"></TextView>
+        android:textColor="@color/black"
+        android:textSize="16sp" />
 </LinearLayout>
-
-
