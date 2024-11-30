@@ -18,8 +18,12 @@ import com.example.pickme_nebula0.db.FBStorageManager;
 import com.example.pickme_nebula0.event.Event;
 import com.squareup.picasso.Picasso;
 
+
 import java.util.ArrayList;
 
+/**
+ * Array adapter for displaying list of users
+ */
 public class UserArrayAdapter extends ArrayAdapter<User> {
 
     private ImageView profilePicImgView;

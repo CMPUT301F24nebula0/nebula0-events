@@ -12,13 +12,14 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.pickme_nebula0.GoogleMapActivity;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.db.DBManager;
+
 import com.example.pickme_nebula0.db.FBStorageManager;
 import com.example.pickme_nebula0.organizer.fragments.OrganizerSelectedFragment;
+
 import com.example.pickme_nebula0.user.User;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -78,7 +79,6 @@ public class UserDetailActivity extends AppCompatActivity {
                 db.collection("Users").document(userID)
                         .collection("RegisteredEvents")
                         .document(eventID).update("status", "CANCELLED");
-                //TODO: Add a notification logic here for the cancelled entrant
 
                 finish();
             });

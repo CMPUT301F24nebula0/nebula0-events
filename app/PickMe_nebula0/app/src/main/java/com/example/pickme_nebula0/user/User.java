@@ -1,33 +1,9 @@
 package com.example.pickme_nebula0.user;
 
-import static java.lang.System.in;
-
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.os.Build;
-
 import androidx.annotation.NonNull;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import com.example.pickme_nebula0.qr.QRCodeGenerator;
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.WriterException;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
-import com.squareup.picasso.Picasso;
-import java.util.Random;
-
-
-
 /**
- * User class
+ * User class. Represents profile informations for entrants, organizers, and admin
  */
 public class User {
     protected String userID;
@@ -38,13 +14,11 @@ public class User {
     boolean notificationsEnabled = true;
     protected String profilePic;
 
-    // todo - start as entrant only then add organizer, admin role conditionally
     protected String role;
-    private final ArrayList<String> roles = new ArrayList<String>(Arrays.asList("admin", "entrant", "organizer"));
     protected String status;
     boolean admin;
 
-
+    // un-parameterized constructor required for document toObject firestore function
     public User(){
 
     }
@@ -100,125 +74,56 @@ public class User {
         this.phone = phoneNumber;
     }
 
+    // Note that even though some getters and setters seem unused, they are required for Firebase to/from Object method
 
-    /**
-     * Returns the user ID
-     *
-     * @return  userID  the userID of the user
-     */
+    // getters
     public String getUserID() {
         return this.userID;
     }
-
-    /**
-     * Sets the user ID
-     *
-     * @param  userID  the userID of the user
-     */
-    public void setUserID(String userID) {
-        this.userID = userID;
-    }
-
-    /**
-     * Returns the first name of the user
-     *
-     * @return  firstName  the first name of the user
-     */
     public String getName() {
         return this.name;
     }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public boolean getAdmin() {
         return this.admin;
     }
-    public void setAdmin(boolean admin) {
-        this.admin = admin;
-    }
-
     public boolean getNotificationsEnabled() {
         return this.notificationsEnabled;
-    }
-    public void setNotificationsEnabled(boolean notificationsEnabled) {
-        this.notificationsEnabled = notificationsEnabled;
     }
     public String getPhone() {
         return this.phone;
     }
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    /**
-     * correct version
-     * @return
-     */
     public String getProfilePic() {
         return this.profilePic;
     }
-
-
-
-    public void setProfilePic(String profilePic) {
-        this.profilePic = profilePic;
-    }
-
-
-
-    /**
-     * Returns the email of the user
-     *
-     * @return  email  the email of the user
-     */
     public String getEmail() {
         return this.email;
     }
+    public String getStatus() { return this.status; }
 
-    /**
-     * Sets the email of the user
-     *
-     * @param  email  the email of the user
-     */
+    // setters
+    public void setUserID(String userID) {
+        this.userID = userID;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
+    }
+    public void setNotificationsEnabled(boolean notificationsEnabled) {
+        this.notificationsEnabled = notificationsEnabled;
+    }
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+    public void setProfilePic(String profilePic) {
+        this.profilePic = profilePic;
+    }
     public void setEmail(String email) {
         this.email = email;
     }
-
-
-    public String getStatus() { return this.status; }
     public void setStatus(String status) { this.status = status;}
 
-    /**
-     * Returns the role of the user
-     *
-     * @return  role  the role of the user
-     */
-    public String getRole() {
-        // check if role is valid
-        if (this.roles.contains(this.role)) {
-            return this.role;
-        } else {
-            // in future, throw an exception or return an error message in UI
-            return "Invalid role";
-        }
-    }
-
-    /**
-     * Sets the role of the user
-     *
-     * @param  role  the role of the user
-     */
-    public void setRole(String role) {
-        // check if role is valid
-        if (this.roles.contains(role)) {
-            this.role = role;
-        } else {
-            // in future, throw an exception or return an error message in UI
-            System.out.println("Invalid role");
-        }
-    }
 
     @NonNull
     @Override

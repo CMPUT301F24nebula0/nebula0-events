@@ -2,7 +2,6 @@ package com.example.pickme_nebula0.organizer.fragments;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +18,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 
+/**
+ * Fragment for viewing cancelled entrants
+ */
 public class OrganizerCancelledFragment extends Fragment {
     private final DBManager dbManager = new DBManager();
     ArrayList<User> cancelledUsers = new ArrayList<User>();

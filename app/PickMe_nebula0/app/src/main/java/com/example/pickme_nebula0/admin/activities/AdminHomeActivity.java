@@ -4,14 +4,10 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
@@ -19,18 +15,13 @@ import android.widget.ViewFlipper;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.event.Event;
-import com.example.pickme_nebula0.event.EventDetailUserActivity;
 import com.example.pickme_nebula0.event.EventManager;
 import com.example.pickme_nebula0.event.EventsArrayAdapter;
 import com.example.pickme_nebula0.facility.Facility;
 import com.example.pickme_nebula0.facility.FacilityArrayAdapter;
 import com.example.pickme_nebula0.facility.FacilityDetailActivity;
-import com.example.pickme_nebula0.notification.MessageViewActivity;
-import com.example.pickme_nebula0.notification.Notification;
-import com.example.pickme_nebula0.notification.NotificationArrayAdapter;
 import com.example.pickme_nebula0.qr.ImageAdapter;
 import com.example.pickme_nebula0.qr.QRcodeAdapter;
 import com.example.pickme_nebula0.user.User;
@@ -42,13 +33,8 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import org.checkerframework.framework.qual.DefaultQualifier;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Allows admin to browse and delete items.
@@ -68,22 +54,21 @@ public class AdminHomeActivity extends AppCompatActivity {
     // Profiles
     private ArrayList<User> users;
     private ListView usersList;
+    private UserArrayAdapter userAdapter;
 
+    // Event Images
     private ArrayList<Event> eventsWithImage;
     private ListView imagesList;
     private ImageAdapter imageAdapter;
 
+    // Event QR Codes
     private ArrayList<Event> eventsWithQR;
-    private ListView QRcodesList;
+    private ListView QRCodesList;
     private QRcodeAdapter QRAdapter;
-
-
-    private UserArrayAdapter userAdapter;
 
     // Facilities
     private ArrayList<Facility> facilities;
     private ListView facilitiesList;
-
     private FacilityArrayAdapter facilityAdapter;
 
     // UI Elements
@@ -142,9 +127,9 @@ public class AdminHomeActivity extends AppCompatActivity {
 
        // for QR codes
         eventsWithQR = new ArrayList<>();
-        QRcodesList=findViewById(R.id.QRcodeListView);
+        QRCodesList =findViewById(R.id.QRcodeListView);
         QRAdapter=new QRcodeAdapter(AdminHomeActivity.this,R.id.item_qrcode, eventsWithQR);
-        QRcodesList.setAdapter(QRAdapter);
+        QRCodesList.setAdapter(QRAdapter);
 
         btnBack.setOnClickListener(v -> finish());
 
@@ -166,8 +151,6 @@ public class AdminHomeActivity extends AppCompatActivity {
                 intent.putExtra("isEvent", true);
                 startActivity(intent);
             });
-            // Confirmation message for debugging and UI verification
-//            Toast.makeText(AdminHomeActivity.this, "Switched to Manage Events layout", Toast.LENGTH_SHORT).show();
         });
 
         // sets up interaction with first visible layout, ie. the manage events layout
@@ -192,19 +175,15 @@ public class AdminHomeActivity extends AppCompatActivity {
                 startActivity(intent);
             });
 
-//            Toast.makeText(AdminHomeActivity.this, "Switched to Manage Users layout", Toast.LENGTH_SHORT).show();
         });
 
-        //TODO;
         btnManageImages.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 viewFlipper.setDisplayedChild(2); // Show Manage QR Code layout
                 updateImages();
 
                 updateButtonAppearanceOnClick(btnManageImages);
-//                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Image layout", Toast.LENGTH_SHORT).show();
                 // On click, show event details an allow admin to delete
                 imagesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
@@ -217,8 +196,6 @@ public class AdminHomeActivity extends AppCompatActivity {
                         startActivity(intent);
                     }
                 });
-                // Confirmation message for debugging and UI verification
-//                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Events layout", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -230,9 +207,8 @@ public class AdminHomeActivity extends AppCompatActivity {
 
                 updateButtonAppearanceOnClick(btnManageQR);
 
-//                Toast.makeText(AdminHomeActivity.this, "Switched to Manage QR Code layout", Toast.LENGTH_SHORT).show();
                 // On click, show event details an allow admin to delete
-                QRcodesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                QRCodesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
                         Event clickedEvent = (Event) adapterView.getItemAtPosition(pos);
@@ -243,8 +219,6 @@ public class AdminHomeActivity extends AppCompatActivity {
                         startActivity(intent);
                     }
                 });
-                // Confirmation message for debugging and UI verification
-//                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Events layout", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -267,12 +241,13 @@ public class AdminHomeActivity extends AppCompatActivity {
                         startActivity(intent);
                     }
                 });
-
-//                Toast.makeText(AdminHomeActivity.this, "Switched to Manage Facilities layout", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
+    /**
+     * Updates information contained in all tabs
+     */
     private void updateAll(){
         updateEvents();
         updateProfiles();
@@ -281,8 +256,11 @@ public class AdminHomeActivity extends AppCompatActivity {
         updateFacilities();
     }
 
+    /**
+     * Updates information contained in events tab to match the database
+     */
     private void updateEvents(){
-        EventManager.get_all_events((eventsObj) -> {
+        EventManager.getAllEvents((eventsObj) -> {
             ArrayList<Event> fetched_events = (ArrayList<Event>) eventsObj;
 
             runOnUiThread(() -> {
@@ -293,6 +271,9 @@ public class AdminHomeActivity extends AppCompatActivity {
         }, () -> {});
     }
 
+    /**
+     * Updates information contained in profiles tab to match the database
+     */
     private void updateProfiles(){
         users.clear();
         userAdapter.notifyDataSetChanged();
@@ -309,6 +290,9 @@ public class AdminHomeActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Updates information contained in images tab to match the database
+     */
     private void updateImages() {
         eventsWithImage.clear();
         imageAdapter.notifyDataSetChanged();
@@ -336,13 +320,13 @@ public class AdminHomeActivity extends AppCompatActivity {
                 }
             });
     }
-/*
-there is no reason to separate the QR codes from their respective event
-as a QR code doesn't exist on its own  aslo a change made to the QR code
- */
+
+    /**
+     * Updates information contained in QR tab to match the database
+     */
     private void updateQRCodes(){
 
-        EventManager.get_all_events((eventsObj) -> {
+        EventManager.getAllEvents((eventsObj) -> {
             ArrayList<Event> fetched_events = (ArrayList<Event>) eventsObj;
             eventsWithQR.clear();
 
@@ -356,6 +340,9 @@ as a QR code doesn't exist on its own  aslo a change made to the QR code
         }, () -> Log.d(this.getClass().getSimpleName(), "Failed to update QR code list"));
     }
 
+    /**
+     * Updates information contained in facilities tab to match the database
+     */
     private void updateFacilities(){
         facilities.clear();
         facilityAdapter.notifyDataSetChanged();
@@ -372,6 +359,9 @@ as a QR code doesn't exist on its own  aslo a change made to the QR code
                 });
     }
 
+    /**
+     * Updates header bar to show what tab is active
+     */
     private void updateButtonAppearanceOnClick(Button clickedButton) {
         ArrayList<Button> buttonArrayList = new ArrayList<>(
                 Arrays.asList(btnManageEvents, btnManageUsers, btnManageImages, btnManageFacilities, btnManageQR)
