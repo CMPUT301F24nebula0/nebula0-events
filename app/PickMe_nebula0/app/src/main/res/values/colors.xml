@@ -2,4 +2,15 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <!-- New Colors -->
+    <color name="background_color">#F5F5F5</color> <!-- Light grey for background -->
+    <color name="button_color">#4CAF50</color> <!-- Green for buttons -->
+    <color name="button_text_color">#FFFFFF</color> <!-- White for button text -->
+    <color name="button_stroke">#388E3C</color> <!-- Darker green for button border -->
+    <color name="title_color">#212121</color> <!-- Dark grey for title -->
+    <color name="text_primary">#757575</color> <!-- Medium grey for primary text -->
+    <color name="text_secondary">#BDBDBD</color> <!-- Light grey for secondary text -->
+    <color name="icon_color">#3F51B5</color> <!-- Blue for icons -->
+    <color name="error_color">#D32F2F</color> <!-- Red for errors -->
+
 </resources>

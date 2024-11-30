@@ -11,6 +11,8 @@
         android:id="@+id/backButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@drawable/rounded_button"
+
         android:text="Back"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -19,6 +21,8 @@
         android:id="@+id/participantsButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@drawable/rounded_button"
+
         android:text="Participants"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -58,6 +62,8 @@
             android:id="@+id/button_ed_msgEntrants"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/rounded_button"
+
             android:layout_marginRight="10dp"
             android:text="Message Entrants" />
 
@@ -65,6 +71,8 @@
             android:id="@+id/button_sample_entrants"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/rounded_button"
+
             android:layout_marginLeft="10dp"
             android:layout_weight="1"
             android:text="Sample Entrants" />
@@ -75,6 +83,8 @@
         android:layout_width="220dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:background="@drawable/rounded_button"
+
         android:text="Select New Poster"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -84,6 +94,8 @@
         android:id="@+id/buttonViewPosterEventDetail"
         android:layout_width="220dp"
         android:layout_height="wrap_content"
+        android:background="@drawable/rounded_button"
+
         android:layout_marginTop="32dp"
         android:text="View Poster"
         app:layout_constraintEnd_toEndOf="parent"
