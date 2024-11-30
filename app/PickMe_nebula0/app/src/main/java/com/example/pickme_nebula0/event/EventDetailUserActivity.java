@@ -119,6 +119,12 @@ public class EventDetailUserActivity extends AppCompatActivity {
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                EventManager.check_waitlist_full(eventID, (eventDocSnapshotObj) -> {
+                    DocumentSnapshot eventDocSnapshot = (DocumentSnapshot) eventDocSnapshotObj;
+
+                // waitlist not full
+                // TODO: refactor this
+
                 // Check if the event requires geolocation
                 db.collection("Events")
                         .document(eventID)
@@ -149,6 +155,8 @@ public class EventDetailUserActivity extends AppCompatActivity {
                                                         Manifest.permission.ACCESS_FINE_LOCATION,
                                                         Manifest.permission.ACCESS_COARSE_LOCATION
                                                 });
+                                                saveGeolocationData(userID, eventID);
+
                                             }
                                         });
                                     } else {
@@ -168,6 +176,12 @@ public class EventDetailUserActivity extends AppCompatActivity {
                                 Toast.makeText(EventDetailUserActivity.this, "Failed to fetch event details: " + (e != null ? e.getMessage() : "Unknown error"), Toast.LENGTH_LONG).show();
                             }
                         });
+
+                // waitlist capacity full
+                }, () -> {
+                    Toast.makeText(EventDetailUserActivity.this, "Waitlist is full.", Toast.LENGTH_SHORT).show();
+                });
+
             }
         });
 

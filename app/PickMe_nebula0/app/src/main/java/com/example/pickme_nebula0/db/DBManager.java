@@ -8,7 +8,6 @@ import android.util.Base64;
 import android.util.Log;
 import android.os.Handler;
 import android.os.Looper;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -28,12 +27,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -45,6 +39,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Class encompassing database access and modification
@@ -158,6 +153,11 @@ public class DBManager {
         checkExistenceOfDocument(usersCollection,user.getUserID(),()->updateUser(user),()->createNewUser(user));
     }
 
+    public void addUpdateUserProfile(User user, Void2VoidCallback onSuccess) {
+        checkExistenceOfDocument(usersCollection,user.getUserID(),()->updateUser(user,onSuccess),()->createNewUser(user,onSuccess));
+    }
+
+
     /**
      * Adds a given user to the database.
      * If this user (same user.deviceID) already exists, their data will be overwritten.
@@ -177,6 +177,19 @@ public class DBManager {
         addUpdateDocument(usersCollection,user.getUserID(),userData);
     }
 
+    private void createNewUser(User user, Void2VoidCallback onSuccess){
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("userID",user.getUserID());
+        userData.put("name", user.getName());
+        userData.put("email", user.getEmail());
+        userData.put("phone", user.getPhone());
+        userData.put("profilePic", user.getProfilePic());
+        userData.put("notificationsEnabled", user.getNotificationsEnabled());
+        userData.put("admin", false);
+
+        addUpdateDocument(db.collection(usersCollection),user.getUserID(),userData,onSuccess);
+    }
+
     /**
      * Updates a user's profile in the database.
      *
@@ -187,8 +200,16 @@ public class DBManager {
         updateField(docRef,"name",user.getName());
         updateField(docRef,"email",user.getEmail());
         updateField(docRef,"phone",user.getPhone());
-        updateField(docRef,"profilePic",user.getProfilePic());
         updateField(docRef,"notificationsEnabled",user.getNotificationsEnabled());
+    }
+
+    private void updateUser(User user, Void2VoidCallback onSuccess){
+        DocumentReference docRef = db.collection(usersCollection).document(user.getUserID());
+        updateField(docRef,"name",user.getName());
+        updateField(docRef,"email",user.getEmail());
+        updateField(docRef,"phone",user.getPhone());
+        updateField(docRef,"notificationsEnabled",user.getNotificationsEnabled());
+        onSuccess.run();
     }
 
     /**
@@ -490,6 +511,7 @@ public class DBManager {
         updateField(eventDocRef,"waitlistCapacity", event.getWaitlistCapacity());
         updateField(eventDocRef,"numberOfAttendees", event.getEventCapacity());
         updateField(eventDocRef,"qrCodeData", event.getQrCodeData());
+        updateField(eventDocRef,"hashedQRCode", event.getHashedQRcode());
     }
 
     /**
@@ -503,7 +525,7 @@ public class DBManager {
      */
     public void getEvent(String eventID,Obj2VoidCallback onSuccessCallback,
                          Void2VoidCallback onFailureCallback){
-//        getDocumentAsObject(eventsCollection,eventID,this::eventConverter,onSuccessCallback,onFailureCallback);
+        getDocumentAsObject(eventsCollection,eventID,this::eventConverter,onSuccessCallback,onFailureCallback);
         DocumentReference eventDocRef = db.collection(eventsCollection).document(eventID);
         eventDocRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -541,7 +563,7 @@ public class DBManager {
                         // Remove Event from organizer
                         removeEventFromOrganizer(e.getOrganizerID(),eventID);
 
-                        // Remove Event from all users who signed up
+                        // Remove Event from all users who signed up, including removing notifications
                         iterateOverCollection(collectionOfEventRegistrants, (regDoc)->{removeEventFromRegistrant(regDoc.getId(),eventID);});
 
                         // Remove Event from Events
@@ -564,7 +586,30 @@ public class DBManager {
      * @param eventID eventID of event we are removing the registrant from
      */
     private void removeEventFromRegistrant(String registrantID,String eventID){
+        removeEventNotificationsFromRegistrant(registrantID,eventID);
         removeDocument(getDocOfEventInRegistrant(eventID,registrantID));
+    }
+
+    private void removeEventNotificationsFromRegistrant(String registrantID, String eventID){
+        CollectionReference allUserNotifs =  db.collection(notificationCollection).document(registrantID).collection("userNotifs");
+        allUserNotifs.whereEqualTo("eventID",eventID)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        // Loop through the results and delete each document
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            allUserNotifs.document(document.getId()).delete()
+                                    .addOnSuccessListener(aVoid ->
+                                            Log.d("Firestore", "Document successfully deleted!")
+                                    )
+                                    .addOnFailureListener(e ->
+                                            Log.w("Firestore", "Error deleting document", e)
+                                    );
+                        }
+                    } else {
+                        Log.w("Firestore", "Error getting documents", task.getException());
+                    }
+                });
     }
 
     /**
@@ -592,9 +637,10 @@ public class DBManager {
         Integer waitlistCapacity = (waitlistCapacityLong != null) ? waitlistCapacityLong.intValue() : null;
 
         String qrCodeData = document.getString("qrCodeData");
-
+        String hashcode=document.getString("hashedQRCode");
         Event event = new Event(eventID, organizerID, name, desc, date, geolocationRequired, geolocRequirement, waitistCapcityReq , waitlistCapacity, numberOfAttendees);
         event.setQrCodeData(qrCodeData);
+        event.setHashedQRcode(hashcode);
         return event;
     }
 
@@ -968,6 +1014,28 @@ public class DBManager {
         });
     }
 
+    public void doIfAdmin(String userID, Void2VoidCallback callback){
+        DocumentReference userDoc = db.collection(usersCollection).document(userID);
+        performIfFieldPopulated(userDoc,"admin",(fieldVal)->
+        {Boolean isAdmin = (Boolean) fieldVal;
+            if(isAdmin){
+            callback.run();}
+        }, ()->{});
+    }
+
+    public void doIfOrganizer(String userID, Void2VoidCallback callback){
+        DocumentReference userDoc = db.collection(usersCollection).document(userID);
+        performIfFieldPopulated(userDoc,"facilityID",(fieldVal)->{
+            if(fieldVal == null){
+                return;
+            }
+            if(fieldVal.toString().isBlank()){
+                return;
+            }
+            callback.run();
+            }, ()->{});
+    }
+
     /**
      * Attempts to perform given function on field value if that field is populated
      *
@@ -1010,12 +1078,7 @@ public class DBManager {
      * @param data hashmap of data to be added or used to overwrite old data
      */
     private void addUpdateDocument(CollectionReference colRef, String documentID,
-                                   Map<String, Object> data){
-        addUpdateDocument(colRef,documentID,data,()->{});
-    }
-
-    private void addUpdateDocument(CollectionReference colRef, String documentID,
-                                   Map<String, Object> data,Void2VoidCallback onSuccessCallback){
+                                   Map<String, Object> data,Void2VoidCallback onSuccess){
         String operationDescription = String.format("addUpdateDocument for [%s,%s]", colRef.getId(), documentID);
 
         DocumentReference docRef = colRef.document(documentID);
@@ -1026,9 +1089,9 @@ public class DBManager {
                 docRef.set(data)
                         .addOnSuccessListener(aVoid -> {
                             Log.d("Firestore", operationDescription + " succeeded");
+                            onSuccess.run();
                             // Toast.makeText(OrganizerCreateEventActivity.this, "Event data saved successfully", Toast.LENGTH_SHORT).show())
                             // TODO add these toast messages to key operations
-                            onSuccessCallback.run();
                         })
                         .addOnFailureListener(e -> {
                             Log.d("Firestore", operationDescription + "found/created doc but failed to set with error:" + e.getMessage());
@@ -1048,7 +1111,11 @@ public class DBManager {
      * @param data hashmap of data to be added or used to overwrite old data
      */
     private void addUpdateDocument(String collectionName, String documentID, Map<String,Object> data){
-        addUpdateDocument(db.collection(collectionName),documentID,data);
+        addUpdateDocument(db.collection(collectionName),documentID,data,()->{});
+    }
+
+    private void addUpdateDocument(CollectionReference collection,String docID,Map<String,Object> data){
+        addUpdateDocument(collection,docID,data,()->{});
     }
 
     /**

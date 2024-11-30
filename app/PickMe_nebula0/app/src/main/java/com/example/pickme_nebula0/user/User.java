@@ -1,9 +1,29 @@
 package com.example.pickme_nebula0.user;
 
+import static java.lang.System.in;
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.os.Build;
+
 import androidx.annotation.NonNull;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import com.example.pickme_nebula0.qr.QRCodeGenerator;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import com.squareup.picasso.Picasso;
+import java.util.Random;
+
 
 
 /**
@@ -13,6 +33,7 @@ public class User {
     protected String userID;
     protected String name;
     protected String email;
+
     protected String phone;
     boolean notificationsEnabled = true;
     protected String profilePic;
@@ -77,7 +98,6 @@ public class User {
         this.name = name;
         this.email = email;
         this.phone = phoneNumber;
-        this.profilePic = profilePicture;
     }
 
 
@@ -139,11 +159,9 @@ public class User {
     public String getProfilePic() {
         return this.profilePic;
     }
-    public void genProfilePic(){
-        char Firstletter=this.getName().charAt(0);
-        
 
-    }
+
+
     public void setProfilePic(String profilePic) {
         this.profilePic = profilePic;
     }

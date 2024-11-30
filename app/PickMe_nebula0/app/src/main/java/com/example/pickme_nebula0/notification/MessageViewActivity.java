@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -17,6 +16,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 /**
  * Activity that lets all users view the messages they've received.
@@ -86,6 +86,14 @@ public class MessageViewActivity extends AppCompatActivity {
 
                             notifs.add(n);
                         }
+                        // show notifications from newest to oldest
+                        notifs.sort(new Comparator<Notification>() {
+                            @Override
+                            public int compare(Notification n1, Notification n2) {
+                                return n2.getTimestamp().compareTo(n1.getTimestamp());
+                            }
+                        });
+
                         notifAdapter.notifyDataSetChanged();
                     }
                 });
