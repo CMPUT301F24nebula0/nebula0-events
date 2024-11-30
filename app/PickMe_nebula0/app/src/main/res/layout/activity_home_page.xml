@@ -23,16 +23,20 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:text="Go To Profile"
+        android:background="@drawable/rounded_button"
+
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
     <Button
         android:id="@+id/entrantButton"
-        android:layout_width="260sp"
+        android:layout_width="260dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
+        android:background="@drawable/rounded_button"
         android:text="Registered Activities"
+
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button_messages" />
@@ -43,6 +47,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="Organized Activities"
+        android:background="@drawable/rounded_button"
+
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/entrantButton" />
@@ -52,7 +58,9 @@
         android:layout_width="260dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:background="@drawable/rounded_button"
         android:text="Admin Controls"
+
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/organizerButton" />
@@ -63,8 +71,22 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="View Messages"
+        android:background="@drawable/rounded_button"
+
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profile_button" />
+
+    <Button
+        android:id="@+id/buttonRefreshHome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/rounded_button"
+
+        android:text="Refresh"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

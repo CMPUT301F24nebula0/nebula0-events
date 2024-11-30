@@ -2,18 +2,12 @@ package com.example.pickme_nebula0.event;
 
 import static com.example.pickme_nebula0.db.FBStorageManager.eventPosterFieldName;
 
-import android.net.Uri;
 import android.util.Log;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.db.FBStorageManager;
-import com.example.pickme_nebula0.user.User;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -22,14 +16,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
-// static class for Event-related DB functionality
+/**
+ * static class for Event-related DB functionality
+ */
 public class EventManager {
     private static DBManager dbm = new DBManager();
     private static FirebaseFirestore db = dbm.db;
@@ -47,34 +39,32 @@ public class EventManager {
         void run(String event);
     }
 
-
     /**
      * Checks if the waitlist of a given event is full.
      * Runs a success callback if not full, and a failure callback if full.
      * Use this when a user attempts to register for an event.
-     *
      * Passes event as DocumentSnapshot to success callback.
      *
-     * @param eventID
-     * @param waitlistNotFullCallback
-     * @param waitlistFullCallback
+     * @param eventID ID of event we are checking the waitlist for
+     * @param waitlistNotFullCallback function to run if waitlist is not full
+     * @param waitlistFullCallback function to run if waitlist is full
      */
 
-    public static void check_waitlist_full(String eventID,
-                                     DBManager.Obj2VoidCallback waitlistNotFullCallback,
-                                     DBManager.Void2VoidCallback waitlistFullCallback) {
-        check_waitlist_full(eventID, waitlistNotFullCallback, waitlistFullCallback, (error_message) -> {});
+    public static void checkWaitlistFull(String eventID,
+                                         DBManager.Obj2VoidCallback waitlistNotFullCallback,
+                                         DBManager.Void2VoidCallback waitlistFullCallback) {
+        checkWaitlistFull(eventID, waitlistNotFullCallback, waitlistFullCallback, (error_message) -> {});
     }
 
-    public static void check_waitlist_full(String eventID,
-                                     DBManager.Obj2VoidCallback waitlistNotFullCallback,
-                                     DBManager.Void2VoidCallback waitlistFullCallback,
-                                     String2VoidCallback onFailureCallback) {
+    public static void checkWaitlistFull(String eventID,
+                                         DBManager.Obj2VoidCallback waitlistNotFullCallback,
+                                         DBManager.Void2VoidCallback waitlistFullCallback,
+                                         String2VoidCallback onFailureCallback) {
 
-        get_event_doc(eventID, (eventDocSnapshotObj) -> {
+        getEventDoc(eventID, (eventDocSnapshotObj) -> {
             DocumentSnapshot eventDocSnapshot = (DocumentSnapshot) eventDocSnapshotObj;
 
-            get_event_from_doc_snapshot(eventDocSnapshot, (event) -> {
+            getEventFromDocSnapshot(eventDocSnapshot, (event) -> {
                 int waitlist_capacity = event.getWaitlistCapacity();
                 if (waitlist_capacity == -1) {
                     // unlimited capacity
@@ -135,10 +125,10 @@ public class EventManager {
      * to callback if successful,
      * otherwise runs failure callback.
      *
-     * @param onSuccessCallback
-     * @param onFailureCallback
+     * @param onSuccessCallback function called if we succeeded retrieving events
+     * @param onFailureCallback function called if we failed retrieving events
      */
-    public static void get_all_events(DBManager.Obj2VoidCallback onSuccessCallback, DBManager.Void2VoidCallback onFailureCallback) {
+    public static void getAllEvents(DBManager.Obj2VoidCallback onSuccessCallback, DBManager.Void2VoidCallback onFailureCallback) {
         db.collection(dbm.eventsCollection)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
@@ -164,38 +154,13 @@ public class EventManager {
 
 
     /**
-     * Gets event associated with a given eventID as an Event object.
-     * If successful in retrieving event, performs onSuccessCallback on event object.
-     * If unsuccessful, perform onFailureCallback, which occurs under the following conditions:
-     *      fetching event is unsuccessful
-     *      event does not exist in database
-     *      event loaded as Object is null
-     * and passes the error message as a String.
-     *
-     * To be used within EventManager, but this can still be used for new code if necessary.
-     *
-     * @param eventID eventID of event to retrieve and perform onSuccessCallback on
-     * @param onSuccessCallback operation to perform on retrieved Event object
-     * @param onFailureCallback operation to perform if event cannot be retrieved
+     * using a document snapshot, load an event obj, has error handling
+     * @param eventDocSnapshot Document Snapshot of event document
+     * @param onSuccessCallback function called if successful
+     * @param onFailureCallback function called if we fail
      */
-    public static void get_event(String eventID, Event2VoidCallback onSuccessCallback,
-                                 String2VoidCallback onFailureCallback){
-        get_event_doc(eventID, (eventDocSnapshot) -> {
-
-            // convert to Event obj
-            get_event_from_doc_snapshot((DocumentSnapshot) eventDocSnapshot, (event) -> {
-                // converted DocumentSnapshot to Event object
-                onSuccessCallback.run(event);
-            }, (error_message) -> {onFailureCallback.run(error_message);});
-
-        }, (docSnapshotError) -> {onFailureCallback.run(docSnapshotError);});
-
-    }
-
-    // using a document snapshot, load an event obj
-    // has error handling
-    public static void get_event_from_doc_snapshot(DocumentSnapshot eventDocSnapshot, Event2VoidCallback onSuccessCallback,
-                                 String2VoidCallback onFailureCallback){
+    public static void getEventFromDocSnapshot(DocumentSnapshot eventDocSnapshot, Event2VoidCallback onSuccessCallback,
+                                               String2VoidCallback onFailureCallback){
 
         Event event = null;
         try { event = eventDocSnapshot.toObject(Event.class); }
@@ -215,12 +180,11 @@ public class EventManager {
     /**
      * Utility function. Some calling functions need the document snapshot itself
      * rather than the event object.
-     *
-     * @param eventID
-     * @param onSuccessCallback
-     * @param onFailureCallback
+     * @param eventID ID of event of interest
+     * @param onSuccessCallback function called if we succeed in getting event doc
+     * @param onFailureCallback function called if we fail to get event doc
      */
-    public static void get_event_doc(String eventID, DBManager.Obj2VoidCallback onSuccessCallback, String2VoidCallback onFailureCallback) {
+    public static void getEventDoc(String eventID, DBManager.Obj2VoidCallback onSuccessCallback, String2VoidCallback onFailureCallback) {
         // copied from DBManager
         DocumentReference eventDocRef = db.collection(dbm.eventsCollection).document(eventID);
         eventDocRef.get().addOnCompleteListener(task -> {
@@ -240,127 +204,20 @@ public class EventManager {
     //----------------ADMIN FUNCTIONALITY
     // event-related functionality used by the admin
 
-    public static void fetch_qr_code_hash(String eventID, String2VoidCallback onSuccessCallback, String2VoidCallback onFailureCallback) {
-        get_event(eventID, (event) -> {
-            String qr_code_data = event.getQrCodeData();
-            if (qr_code_data == null || qr_code_data.equals("null")) {
-                onFailureCallback.run("QR code data is null");
-            } else {
-                onSuccessCallback.run(qr_code_data);
-            }
-        }, (error_message) -> {
-
-        });
-    }
-
-
     /**
-     * Fetches event details that are to be displayed to the admin view,
-     * and formats them as strings.
+     * Removes poster from backend and display
      *
-     * @param eventID
-     * @param onSuccessCallback
-     * @param onFailureCallback
+     * @param eventID ID of event we want to remove poster for
+     * @param onSuccessCallback function to call if successful
+     * @param onFailureCallback function to call on failure
      */
-    public static void delete_qr_code(String eventID, Event2VoidCallback onSuccessCallback, String2VoidCallback onFailureCallback) {
-        get_event(eventID, (event) -> {
-            event.setQrCodeData("null");
-            dbm.updateEvent(event);
-            onSuccessCallback.run(event);
-
-        }, (error_message) -> {onFailureCallback.run(error_message);});
-    }
-
-
-    /**
-     * Fetches event details that are to be displayed to the admin view,
-     * and formats them as strings.
-     *
-     * On success, passes a HashMap with the following keys:
-     *      "Event Name"
-     *      "Description"
-     *      "Date"
-     *      "Geolocation Required"
-     *      "Geolocation Max Distance"
-     *      "Waitlist Capacity"
-     *
-     *
-     * @param eventID
-     * @param onSuccessCallback
-     * @param onFailureCallback
-     */
-    public static void admin_view_event_details(String eventID, DBManager.Obj2VoidCallback onSuccessCallback, String2VoidCallback onFailureCallback) {
-        HashMap<String, String> event_details = new HashMap<>();
-
-        get_event(eventID, (event) -> {
-            try {
-                event_details.put("Event Name", event.getEventName());
-                event_details.put("Event Description", event.getEventDescription());
-                event_details.put("Date", event.getEventDate().toString());
-                event_details.put("Waitlist Capacity", String.valueOf(event.getWaitlistCapacity()));
-                event_details.put("Geolocation Max Distance", String.valueOf(event.getGeolocationMaxDistance()));
-
-                // these may not be necessary
-                event_details.put("Waitlist Capacity Required", event.getWaitlistCapacityRequired() ? "Yes" : "No");
-                event_details.put("Geolocation Required", event.getGeolocationRequired() ? "Yes" : "No");
-
-                onSuccessCallback.run(event_details);
-            } catch (Exception e) {
-                onFailureCallback.run("Failed to format event details:" + e.getMessage());
-            }
-
-        }, (error_message) -> onFailureCallback.run(error_message));
-
-    }
-
-
-    /**
-     * Searches event poster attribute.
-     * Passes the poster URI to callback if it exists for a given event.
-     * Otherwise, runs posterNotFound callback.
-     * Use for admin poster viewing.
-     *
-     * Feels safer to fetch directly from database instead of using getter
-     * from event object.
-     *
-     * @param eventID
-     * @param posterFoundCallback
-     * @param posterNotFoundCallback
-     */
-    public static void event_has_poster(String eventID, String2VoidCallback posterFoundCallback, String2VoidCallback posterNotFoundCallback) {
-        DocumentReference eventDoc = db.collection(dbm.eventsCollection).document(eventID);
-        String event_poster_field = eventPosterFieldName;
-
-        eventDoc.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
-                if (document.exists()) {
-                    // Check if the field exists and is non-null
-                    if (document.contains(event_poster_field) && document.get(event_poster_field) != null) {
-                        String poster_uri = (String) document.get(event_poster_field);
-                        posterFoundCallback.run(poster_uri);
-                        Log.d(event_manager_tag, "poster found: " + poster_uri);
-                    } else {
-                        posterNotFoundCallback.run("Event poster is not defined");
-                        Log.d(event_manager_tag, "no poster found");
-                    }
-                } else {
-                    posterNotFoundCallback.run("Event does not exist");
-                }
-            } else {
-                posterNotFoundCallback.run("Error fetching event:" + task.getException().toString());
-            }
-        });
-
-    }
-
-
     public static void removePoster(String eventID, DBManager.Void2VoidCallback onSuccessCallback, DBManager.Void2VoidCallback onFailureCallback) {
         FBStorageManager.deleteEventPosterFromStorage(eventID, () -> {
             // removed poster from storage
             // update event docs
             DocumentReference eventDocRef = db.collection(dbm.eventsCollection).document(eventID);
             dbm.updateField(eventDocRef, eventPosterFieldName, null);
+            onSuccessCallback.run();
 
         }, onFailureCallback);
     }

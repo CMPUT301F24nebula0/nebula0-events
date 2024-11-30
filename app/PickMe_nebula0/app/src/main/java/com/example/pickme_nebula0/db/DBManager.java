@@ -34,6 +34,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -53,19 +54,20 @@ public class DBManager {
     // Sub-collections of Users
     public String registeredEventsCollection = "RegisteredEvents";
     public String organizerEventsCollection = "OrganizerEvents";
-
     // EVENTS COLLECTION
     public String eventsCollection = "Events";
     // Sub-collections of Event
     public String eventRegistrantsCollection = "EventRegistrants";
     public String eventStatusKey = "status";
-
     // FACILITIES COLLECTION
     public String facilitiesCollection = "Facilities";
-
+    // NOTIFICATIONS COLLECTION
     public String notificationCollection = "Notifications";
+    // Sub-collection of Notifications
+    public String userNotifsCollection = "userNotifs";
 
-    private QRCodeGenerator qrCodeManager;
+    private final QRCodeGenerator qrCodeManager;
+    public final FirebaseFirestore db;
 
 
     /**
@@ -75,12 +77,10 @@ public class DBManager {
      * Confirmed = user has "won the lottery" and has accepted the invite
      * Cancelled = user "won the lottery" but took too long to accept, got cancelled by organizer
      */
-
     public enum RegistrantStatus{
         WAITLISTED, SELECTED, CONFIRMED, CANCELLED;
     }
 
-    public final FirebaseFirestore db;
 
     /**
      * Constructor, instantiates the default FirebaseFirestore instance
@@ -144,39 +144,21 @@ public class DBManager {
     }
 
     /**
-     * If user not in database, adds an entry to Users collection with user info
-     * If user already in database, updates the document for the given user
-     *
-     * @param user instance of User containing data to add or update User collection entry with
+     * Checks if user is already in db, if yes update their profile, if not, create new
+     * @param user User object describing user
+     * @param onSuccess function to run if successful
      */
-    public void addUpdateUserProfile(User user) {
-        checkExistenceOfDocument(usersCollection,user.getUserID(),()->updateUser(user),()->createNewUser(user));
-    }
-
     public void addUpdateUserProfile(User user, Void2VoidCallback onSuccess) {
         checkExistenceOfDocument(usersCollection,user.getUserID(),()->updateUser(user,onSuccess),()->createNewUser(user,onSuccess));
     }
-
 
     /**
      * Adds a given user to the database.
      * If this user (same user.deviceID) already exists, their data will be overwritten.
      *
      * @param user instance of User to be added to the Users collection of the database
+     * @param onSuccess Callback called when user successfully added
      */
-    private void createNewUser(User user){
-        Map<String, Object> userData = new HashMap<>();
-        userData.put("userID",user.getUserID());
-        userData.put("name", user.getName());
-        userData.put("email", user.getEmail());
-        userData.put("phone", user.getPhone());
-        userData.put("profilePic", user.getProfilePic());
-        userData.put("notificationsEnabled", user.getNotificationsEnabled());
-        userData.put("admin", false);
-
-        addUpdateDocument(usersCollection,user.getUserID(),userData);
-    }
-
     private void createNewUser(User user, Void2VoidCallback onSuccess){
         Map<String, Object> userData = new HashMap<>();
         userData.put("userID",user.getUserID());
@@ -193,16 +175,9 @@ public class DBManager {
     /**
      * Updates a user's profile in the database.
      *
-     * @param user instance of
+     * @param user user we are updating, holds new info
+     * @param onSuccess callback to run if we updated profile successfully
      */
-    private void updateUser(User user){
-        DocumentReference docRef = db.collection(usersCollection).document(user.getUserID());
-        updateField(docRef,"name",user.getName());
-        updateField(docRef,"email",user.getEmail());
-        updateField(docRef,"phone",user.getPhone());
-        updateField(docRef,"notificationsEnabled",user.getNotificationsEnabled());
-    }
-
     private void updateUser(User user, Void2VoidCallback onSuccess){
         DocumentReference docRef = db.collection(usersCollection).document(user.getUserID());
         updateField(docRef,"name",user.getName());
@@ -220,7 +195,6 @@ public class DBManager {
      * @param onFailureCallback action performed if user not found in database
      */
     public void getUser(String deviceID, Obj2VoidCallback onSuccessCallback,Void2VoidCallback onFailureCallback) {
-//        getDocumentAsObject(usersCollection,deviceID,this::userConverter,onSuccessCallback,onFailureCallback);
         DocumentReference userDocRef = db.collection(usersCollection).document(deviceID);
         userDocRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -254,27 +228,14 @@ public class DBManager {
                         if (document.exists()) {
                             String status = document.getString("status");
                             onSuccessCallback.run(status);
+                        } else{
+                            onFailureCallback.run();
                         }
                     }
                     else{
                         onFailureCallback.run();
                     }
                 });
-    }
-
-    /**
-     * Returns an instance of user by extracting data about user from given userDocument
-     *
-     * @param userDocument instance of DocumentSnapshot for document associated with this user in Users collection
-     * @return an instance of User representing the information held in this document
-     */
-    private Object userConverter(DocumentSnapshot userDocument){
-        String name = userDocument.getString("name");
-        String email = userDocument.getString("email");
-        String phone = userDocument.getString("phone");
-        Boolean notifEnabled = userDocument.getBoolean("notificationsEnabled");
-
-        return new User(userDocument.getId(), name, email, phone, notifEnabled);
     }
 
     /**
@@ -314,6 +275,7 @@ public class DBManager {
 
                                         // Remove User from Users
                                         removeDocument(userDoc);
+                                        onSuccess.run();
                                     });
                         });
     }
@@ -360,7 +322,7 @@ public class DBManager {
      * @param eventID ID of event associated with notification
      */
     public void createNotification(String title, String message, String userID, String eventID){
-        CollectionReference userNotifCollection = db.collection(notificationCollection).document(userID).collection("userNotifs");
+        CollectionReference userNotifCollection = db.collection(notificationCollection).document(userID).collection(userNotifsCollection);
         String notifID = createIDForDocumentIn(userNotifCollection);
         Timestamp timestamp = new Timestamp(new Date());
 
@@ -501,27 +463,6 @@ public class DBManager {
     }
 
     /**
-     * Adds a given registrant to a given event.
-     * Updates the list of registrants in the event document's sub-collection
-     * Updates the user's list of registered events in the user document's sub-collection
-     *
-     * @param eventID      eventID of event to register in
-     * @param registrantID userID of user registering in event
-     */
-    public void addRegistrantToWaitlist(String eventID, String registrantID){
-        Map<String, Object> data = new HashMap<>();
-        data.put("status", RegistrantStatus.WAITLISTED);
-
-        // In Events, update event to have waitlisted registrant
-        CollectionReference eventRegColRef = db.collection(eventsCollection).document(eventID).collection(eventRegistrantsCollection);
-        createDocument(eventRegColRef,registrantID,data);
-
-        // In Users, update user to have waitlisted event
-        CollectionReference userEventsColRef = db.collection(usersCollection).document(registrantID).collection(registeredEventsCollection);
-        createDocument(userEventsColRef,eventID,data);
-    }
-
-    /**
      * Removes a given registrant from a given event.
      * Updates event document in Events collection
      * Updates user document in Users collection
@@ -589,7 +530,6 @@ public class DBManager {
      */
     public void getEvent(String eventID,Obj2VoidCallback onSuccessCallback,
                          Void2VoidCallback onFailureCallback){
-//        getDocumentAsObject(eventsCollection,eventID,this::eventConverter,onSuccessCallback,onFailureCallback);
         DocumentReference eventDocRef = db.collection(eventsCollection).document(eventID);
         eventDocRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -638,6 +578,11 @@ public class DBManager {
 
     }
 
+    /**
+     * Removes a given event from a given organizer's list of organized events
+     * @param organizerID ID of organizer of interest
+     * @param eventID ID of event of interest
+     */
     private void removeEventFromOrganizer(String organizerID, String eventID){
         DocumentReference documentReference = db.collection(usersCollection).document(organizerID).collection(organizerEventsCollection).document(eventID);
         removeDocument(documentReference);
@@ -655,7 +600,7 @@ public class DBManager {
     }
 
     private void removeEventNotificationsFromRegistrant(String registrantID, String eventID){
-        CollectionReference allUserNotifs =  db.collection(notificationCollection).document(registrantID).collection("userNotifs");
+        CollectionReference allUserNotifs =  db.collection(notificationCollection).document(registrantID).collection(userNotifsCollection);
         allUserNotifs.whereEqualTo("eventID",eventID)
                 .get()
                 .addOnCompleteListener(task -> {
@@ -674,56 +619,6 @@ public class DBManager {
                         Log.w("Firestore", "Error getting documents", task.getException());
                     }
                 });
-    }
-
-    /**
-     * Creates an instance of Event class populated with values from the given event document
-     *
-     * @param document snapshot of event document from the Events collection of database
-     * @return an instance of Event populated with data from the document
-     */
-    private Object eventConverter(DocumentSnapshot document){
-        String eventID = document.getId();
-        String organizerID = document.getString("organizerID");
-        String name = document.getString("eventName");
-        String desc = document.getString("eventDescription");
-        Date date = document.getDate("eventDate");
-        Boolean geolocationRequired = document.getBoolean("geolocationRequired");
-        // Retrieve numeric fields as Long and convert to Integer
-        Long geolocRequirementLong = document.getLong("geolocationRequirement");
-        Integer geolocRequirement = (geolocRequirementLong != null) ? geolocRequirementLong.intValue() : null;
-
-        Long numberOfAttendeesLong = document.getLong("numberOfAttendees");
-        Integer numberOfAttendees = (numberOfAttendeesLong != null) ? numberOfAttendeesLong.intValue() : null;
-
-        Boolean waitistCapcityReq = document.getBoolean("waitlistCapacityRequired");
-        Long waitlistCapacityLong = document.getLong("waitlistCapacity");
-        Integer waitlistCapacity = (waitlistCapacityLong != null) ? waitlistCapacityLong.intValue() : null;
-
-        String qrCodeData = document.getString("qrCodeData");
-
-        Event event = new Event(eventID, organizerID, name, desc, date, geolocationRequired, geolocRequirement, waitistCapcityReq , waitlistCapacity, numberOfAttendees);
-        event.setQrCodeData(qrCodeData);
-        return event;
-    }
-
-    public Bitmap getQRCodeBitmap(String eventID) {
-        DocumentReference docRef = db.collection(eventsCollection).document(eventID);
-        final Bitmap[] qrBitmap = {null};
-
-        docRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
-                if (document.exists()) {
-                        String qrBase64 = document.getString("qrCodeData");
-                        if (qrBase64 != null) {
-                            byte[] decodedBytes = Base64.decode(qrBase64, Base64.DEFAULT);
-                            qrBitmap[0] = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
-                    }
-                }
-            }
-        });
-        return qrBitmap[0];
     }
 
 // -------------------- / Events \ -----------------------------------------------------------------
@@ -806,10 +701,10 @@ public class DBManager {
      * Fetches all registered users of an Event who match the given status.
      * Note that onSuccessCallback is run for every user fetched.
      * This was adapted from Organizer Fragments.
-     * @param eventID
-     * @param status    One of the statuses in RegistrantStatus. Stored in the DB as a string.
+     * @param eventID ID of event of interest
+     * @param status  Status of interest
      * @param onSuccessCallback The loaded user object is passed as a parameter to this callback function.
-     *                          Example usage: dataList.add(user); adapter.NotifyDatasetChanged
+     *
      */
     public void loadUsersRegisteredInEvent(String eventID, RegistrantStatus status, Obj2VoidCallback onSuccessCallback) {
         loadUsersRegisteredInEvent(eventID, status, "Firestore", onSuccessCallback);
@@ -818,10 +713,10 @@ public class DBManager {
     /**
      * Runs a callback function on each user loaded for an event's registered user list.
      * Used for loading users to display in fragment.
-     * @param eventID
-     * @param status
-     * @param loggingTag
-     * @param onSuccessCallback
+     * @param eventID ID of event of interest
+     * @param status Status of interest, only users of this status are loaded
+     * @param loggingTag Tag used for logging
+     * @param onSuccessCallback Function called on each user registered in the event
      */
     public void loadUsersRegisteredInEvent(String eventID, RegistrantStatus status, String loggingTag, Obj2VoidCallback onSuccessCallback) {
 
@@ -848,10 +743,6 @@ public class DBManager {
                                 getUser(registrantID, (userObj) -> {
                                     User user = (User) userObj;
                                     user.setStatus(registrantStatus); // Set the status from EventRegistrants
-
-                                    // example success callback:
-//                                                    enrolledUsers.add(user);
-//                                                    adapter.notifyDataSetChanged();
 
                                     onSuccessCallback.run(user);
 
@@ -917,7 +808,7 @@ public class DBManager {
      * Attempts to retrieve an instance of Facility class for a given organizer's userID.
      * If the user is not an organizer (i.e. does not have a facilityID), does nothing.
      * If the organizer has an invalid facilityID, runs onFailureCallback.
-     * If facility was successfuly retrieved, runs onSuccessCallback.
+     * If facility was successfully retrieved, runs onSuccessCallback.
      *
      * @param organizerID deviceID (aka userID) of organizer we are trying to retrieve facility info for
      * @param onSuccessCallback function to run on Facility instance if we successfully retrieve it
@@ -964,12 +855,14 @@ public class DBManager {
     public void deleteFacility(String facilityID,Void2VoidCallback onSuccess){
         DocumentReference facilityDocRef = db.collection(facilitiesCollection).document(facilityID);
 
-
-
         facilityDocRef.get()
                 .addOnCompleteListener(task -> {
                     if(task.isSuccessful()){
                         String organizerID = task.getResult().getString("organizerID");
+
+                        if (organizerID == null){
+                            return;
+                        }
 
                         // delete all events at this facility
                         db.collection("Users").document(organizerID).collection(organizerEventsCollection).get()
@@ -991,6 +884,10 @@ public class DBManager {
                 );
     }
 
+    /**
+     * Given the facility ID as a string delete the facility
+     * @param facilityID ID of facility to be deleted
+     */
     public void deleteFacility(String facilityID){
         deleteFacility(facilityID, ()->{});
     }
@@ -1004,39 +901,7 @@ public class DBManager {
         deleteFacility(facilityID.toString());
     }
 
-    /**
-     * Deletes all events that occur at a given facility and removes this facility from the organizer's profile
-     *
-     * @param facility Object castable to Facility that we want to remove events and organizer from
-     */
-    private void removeEventsAtFacilityAndRemoveFromOrganizer(Object facility){
-        Facility castedFacility = (Facility) facility;
-        String organizerID = castedFacility.getOrganizerID();
-        CollectionReference createdEventsCol = db.collection(usersCollection).document(organizerID).collection(organizerEventsCollection);
-        iterateOverCollection(createdEventsCol,(qds)->{deleteEvent(qds.getId());});
-
-        updateField(db.collection(usersCollection).document(organizerID),"facilityID",null);
-    }
-
 // -------------------- / Facilities \ -----------------------------------------------------------------
-
-// ----------------- \ TODO / --------------------------------------------------------
-
-    /**
-     * NOT IMPLEMENTED
-     */
-    public void deleteQRCode(){
-        throw new RuntimeException("NOT IMPLEMENTED");
-    }
-
-    /**
-     * NOT IMPLEMENTED
-     */
-    public void deleteImage(){
-        throw new RuntimeException("NOT IMPLEMENTED");
-    }
-
-// ----------------- / TODO \ --------------------------------------------------------
 
 
 // ----------------- \ Abstracted Helpers / --------------------------------------------------------
@@ -1059,7 +924,7 @@ public class DBManager {
 
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
-            public void onComplete(Task<DocumentSnapshot> task) {
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
@@ -1147,21 +1012,17 @@ public class DBManager {
         DocumentReference docRef = colRef.document(documentID);
         docRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) { // we can retrieve (or create) the document
-                DocumentSnapshot document = task.getResult();
-
                 docRef.set(data)
                         .addOnSuccessListener(aVoid -> {
                             Log.d("Firestore", operationDescription + " succeeded");
                             onSuccess.run();
-                            // Toast.makeText(OrganizerCreateEventActivity.this, "Event data saved successfully", Toast.LENGTH_SHORT).show())
-                            // TODO add these toast messages to key operations
                         })
                         .addOnFailureListener(e -> {
                             Log.d("Firestore", operationDescription + "found/created doc but failed to set with error:" + e.getMessage());
                         });
             } else {
                 // Failed to check document existence
-                Log.d("Firestore", operationDescription + "failed with error: " + task.getException().getMessage());
+                Log.d("Firestore", operationDescription + "failed with error: " + Objects.requireNonNull(task.getException()).getMessage());
             }
         });
     }
@@ -1169,7 +1030,7 @@ public class DBManager {
     /**
      * Attempts to add/update via overwrite a document with given ID in a given collection with given data
      *
-     * @param collectionName name ofcollection where we want to add or update the document
+     * @param collectionName name of collection where we want to add or update the document
      * @param documentID ID of document we want to add or update
      * @param data hashmap of data to be added or used to overwrite old data
      */
@@ -1312,29 +1173,6 @@ public class DBManager {
     }
 
     /**
-     * Creates or overwrites a document in a given collection with a given document ID with given data
-     *
-     * @param colRef reference to collection to create new document
-     * @param docID ID string for document within the collection, if this matches an existing document, the old document will be overwritten
-     * @param data data to put in the new document
-     */
-    private void createDocument(CollectionReference colRef, String docID, Map<String, Object> data){
-        String operationDescription = String.format("createDocument [C-%s, D-%s]",colRef.getId(), docID);
-
-        colRef.document(docID).set(data)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Log.d("Firestore", operationDescription + " succeeded");
-                        } else {
-                            Log.d("Firestore", operationDescription + " failed: " + task.getException());
-                        }
-                    }
-                });
-    }
-
-    /**
      * Returns the DocumentReference for a registrant in the event's list of registered users
      *
      * @param eventID eventID of desired event
@@ -1355,7 +1193,6 @@ public class DBManager {
     private DocumentReference getDocOfEventInRegistrant(String eventID, String registrantID){
         return db.collection(usersCollection).document(registrantID).collection(registeredEventsCollection).document(eventID);
     }
-
 
 // ----------------- \ Abstracted Helpers / --------------------------------------------------------
 }

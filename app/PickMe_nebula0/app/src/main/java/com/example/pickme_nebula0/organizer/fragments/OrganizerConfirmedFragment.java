@@ -2,7 +2,6 @@ package com.example.pickme_nebula0.organizer.fragments;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +14,13 @@ import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.organizer.adapters.EnrolledAdapter;
 import com.example.pickme_nebula0.user.User;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
-import java.util.List;
 
+/**
+ * Fragment for viewing confirmed entrants
+ */
 public class OrganizerConfirmedFragment extends Fragment {
     private DBManager dbManager = new DBManager();
     ArrayList<User> enrolledUsers = new ArrayList<User>();

@@ -37,8 +37,6 @@ public class EntrantEventsFragment extends Fragment {
     private EventsArrayAdapter eventAdapter;
     private String status;
 
-    private final DBManager dbManager = new DBManager();
-
     /**
      * Constructor takes status of event types to display
      * @param status only events where user has this registration status will be shown

@@ -45,6 +45,7 @@ public class HomePageActivity extends AppCompatActivity {
     Button entrantButton;
     Button organizerButton;
     Button messagesButton;
+    Button refreshButton;
 
     @Override
     protected void onResume(){
@@ -65,6 +66,7 @@ public class HomePageActivity extends AppCompatActivity {
         entrantButton = findViewById(R.id.entrantButton);
         organizerButton = findViewById(R.id.organizerButton);
         messagesButton = findViewById(R.id.button_messages);
+        refreshButton = findViewById(R.id.buttonRefreshHome);
 
         // admin and organizer button rendered conditionally if user is admin/organizer
         adminButton.setVisibility(View.GONE);
@@ -76,6 +78,7 @@ public class HomePageActivity extends AppCompatActivity {
         entrantButton.setOnClickListener(view -> navigateTo(EntrantHomeActivity.class));
         organizerButton.setOnClickListener(view -> navigateTo(OrganizerHomeActivity.class));
         messagesButton.setOnClickListener(view -> navigateTo(MessageViewActivity.class));
+        refreshButton.setOnClickListener(view -> updateButtonVisibility());
 
         // Check if notification permission is granted
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

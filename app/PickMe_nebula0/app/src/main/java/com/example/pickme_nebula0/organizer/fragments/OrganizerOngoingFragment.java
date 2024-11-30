@@ -1,6 +1,5 @@
 package com.example.pickme_nebula0.organizer.fragments;
 
-import static androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -20,12 +19,12 @@ import com.example.pickme_nebula0.event.EventManager;
 import com.example.pickme_nebula0.organizer.OrganizerRole;
 import com.example.pickme_nebula0.organizer.adapters.OngoingEventsAdapter;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Date;
 
+/**
+ * Frament for viewing ongoing events
+ */
 public class OrganizerOngoingFragment extends Fragment {
     private FirebaseFirestore db;
     ArrayList<Event> ongoingEvents = new ArrayList<Event>();

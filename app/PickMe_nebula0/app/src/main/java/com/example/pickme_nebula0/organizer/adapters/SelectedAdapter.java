@@ -16,6 +16,9 @@ import com.example.pickme_nebula0.user.activities.UserDetailActivity;
 
 import java.util.ArrayList;
 
+/**
+ * Array adapter for viewing Selected Entrants
+ */
 public class SelectedAdapter extends RecyclerView.Adapter<SelectedAdapter.SelectedViewHolder> {
     private final ArrayList<User> selectedUsers;
     private final Context context;

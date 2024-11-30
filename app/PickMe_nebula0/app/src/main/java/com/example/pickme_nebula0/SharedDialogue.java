@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.pickme_nebula0.db.FBStorageManager;
 import com.squareup.picasso.Picasso;

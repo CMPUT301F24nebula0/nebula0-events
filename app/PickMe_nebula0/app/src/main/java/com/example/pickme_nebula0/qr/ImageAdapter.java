@@ -14,12 +14,14 @@ import androidx.annotation.Nullable;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.event.Event;
-import com.example.pickme_nebula0.user.User;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
+/**
+ * Array adapter for displaying images
+ */
 public class ImageAdapter extends ArrayAdapter<Event> {
 
     public ImageAdapter (Context context, int textViewResourceId, ArrayList<Event> events){
@@ -57,6 +59,13 @@ public class ImageAdapter extends ArrayAdapter<Event> {
     };
 
 
+    /**
+     * Loads an image into the view
+     * @param img_uri the uri for the image we want to load
+     * @param imgView image view we want to load the image into
+     * @param onSuccessCallback function to call if successful
+     * @param onFailureCallback function to call if unsuccessful
+     */
     private void loadImage(String img_uri, ImageView imgView, DBManager.Void2VoidCallback onSuccessCallback, DBManager.Void2VoidCallback onFailureCallback) {
         if (img_uri != null && !img_uri.isEmpty()) {
             Picasso.get()

@@ -14,6 +14,9 @@ import com.example.pickme_nebula0.R;
 
 import java.util.ArrayList;
 
+/**
+ * Array adapter for displaying facilities in list view
+ */
 public class FacilityArrayAdapter extends ArrayAdapter<Facility> {
 
     public FacilityArrayAdapter(Context context,int i ,ArrayList<Facility> facilities){

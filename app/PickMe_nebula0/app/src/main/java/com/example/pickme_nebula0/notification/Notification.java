@@ -8,12 +8,11 @@ import java.sql.Time;
  * Notification class, represents notification messages.
  * Notifications are used to create android notifications and messages viewable in app
  *
- * @see com.example.pickme_nebula0.NotificationService
  * @see NotificationCreationActivity
  * @see MessageViewActivity
  */
 public class Notification {
-    // In order to use firestore's toObject function, these attribute names must match the fields of
+    // In order to use Firestore's toObject function, these attribute names must match the fields of
     // Notifications.<userID>.userNotifs.<notifID>, and have an appropriately named getter and setter
     private String notificationID;
     private String title;
