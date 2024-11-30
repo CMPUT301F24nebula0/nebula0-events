@@ -16,6 +16,9 @@ import com.example.pickme_nebula0.user.activities.UserDetailActivity;
 
 import java.util.ArrayList;
 
+/**
+ * Array adapter for viewing enrolled entrants
+ */
 public class EnrolledAdapter extends RecyclerView.Adapter<EnrolledAdapter.EnrolledViewHolder>{
     private ArrayList<User> enrolledUsers;
     private Context context;

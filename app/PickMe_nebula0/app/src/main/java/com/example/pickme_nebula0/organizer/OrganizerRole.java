@@ -4,9 +4,7 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.db.DBManager;
-import com.example.pickme_nebula0.entrant.EntrantRole;
 import com.example.pickme_nebula0.event.Event;
 import com.example.pickme_nebula0.event.EventManager;
 import com.example.pickme_nebula0.user.User;
@@ -31,7 +29,6 @@ import java.util.List;
  */
 public class OrganizerRole extends User {
     private String organizerID;
-    private ArrayList<Event> events = new ArrayList<Event>();
 
     private static String usersSelectedKey = "selected";
     private static String usersNotSelectedKey = "not selected";
@@ -47,14 +44,6 @@ public class OrganizerRole extends User {
     }
 
     /**
-     * Get organizerID
-     * @return organizerID organizerID
-     */
-    public String getOrganizerID() {
-        return this.organizerID;
-    }
-
-    /**
      * Set organizerID
      * @param organizerID organizerID
      */
@@ -62,70 +51,14 @@ public class OrganizerRole extends User {
         this.organizerID = organizerID;
     }
 
-    public boolean createEvent() {
-//        boolean eventCreated = false;
-//        // Create event
-//        Event event = new Event();
-//        events.add(event);
-//        //
-//        return false;
-        throw new RuntimeException("NOT IMPLEMENTED");
-    }
-
-    public boolean generateQRCode() {
-        boolean QRCodeGenerated = false;
-        // Generate QR code
-        return false;
-    }
-
-    public boolean storeHashDataQRCode() {
-        boolean hashDataStored = false;
-        // Store hash data
-        return false;
-    }
-
-    public boolean deleteHashDataQRCode() {
-        boolean hashDataDeleted = false;
-        // Delete hash data
-        return false;
-    }
-
-    public ArrayList<EntrantRole> viewWaitlist(Event event) {
-        ArrayList<EntrantRole> entrantsInWaitlist = new ArrayList<EntrantRole>();
-
-        // in future, get the list of entrants who joined the event waiting list
-        return entrantsInWaitlist;
-    }
-
-    public void viewMapOfWaitlist(Event event) {
-        // in future, show the map of entrants who joined the event waiting list
-    }
-
-    public int getWaitlistCapacity(Event event) {
-        return event.getWaitlistCapacity();
-    }
-
-    public void setWaitlistCapacity(Event event, int capacity) {
-        event.setWaitlistCapacity(capacity);
-    }
-
-    public String getEventPoster(Event event) {
-        return event.getPoster();
-    }
-
-    public void setEventPoster(Event event, String eventPoster) {
-        event.setPoster(eventPoster);
-    }
-
-
     //--------------- EVENT MANAGEMENT
 
     /**
      * Use to fetch past or ongoing events for organizer home activity.
-     * @param organizerID
-     * @param event_status
-     * @param onSuccessCallback
-     * @param onFailureCallback
+     * @param organizerID ID of organizer
+     * @param event_status status of interests for events we are retrieving
+     * @param onSuccessCallback function to call on success
+     * @param onFailureCallback function to call on failure
      */
     public static void get_event_by_status(String organizerID, EventManager.EventStatus event_status, DBManager.Obj2VoidCallback onSuccessCallback, DBManager.Void2VoidCallback onFailureCallback) {
         db.collection(dbm.eventsCollection)
@@ -169,15 +102,12 @@ public class OrganizerRole extends User {
 
 
     /**
-     * US 02.05.02
-     * As an organizer I want to set the system to sample a specified number of attendees to register for the event
-     *
      * Samples all users in the waitlist, based on the event capacity of the given event,
      * or samples all if event capacity is none.
      * Sets their status to SELECTED and updates the corresponding EventRegistrants status.
      * Passes the list of selected users to onSuccessCallback (as an Object.)
-     * @param eventID
-     * @param onSuccessCallback
+     * @param eventID ID of event of interest
+     * @param onSuccessCallback function run if successful
      */
     public static void sampleAndSelectUsers(String eventID, DBManager.Obj2VoidCallback onSuccessCallback) {
         DBManager dbManager = new DBManager();
@@ -215,16 +145,12 @@ public class OrganizerRole extends User {
     }
 
     /**
-     * US 02.05.03
-     * As an organizer I want to be able to draw a replacement applicant from the pooling system
-     * when a previously selected applicant cancels or rejects the invitation.
-     *
      * Resample users whose status remains waitlisted by the number of free spots,
      * which is the difference between the event capacity and number of selected users (if any.)
      * Sets their status to SELECTED.
      * Passes the list of resampled users to onSuccessCallback (as an Object.)
-     * @param eventID
-     * @param onSuccessCallback
+     * @param eventID ID of event of interest
+     * @param onSuccessCallback function run on success
      */
     public static void resampleAndSelectUsers(String eventID, DBManager.Obj2VoidCallback onSuccessCallback) {
         // assumes that event capacity is defined, otherwise there would be no one to resample
@@ -236,7 +162,6 @@ public class OrganizerRole extends User {
         dbManager.getEvent(eventID, (eventObj) -> {
             Event event = (Event) eventObj;
             int eventCapacity = event.getEventCapacity();
-//            assert(eventCapacity != -1);
             if (eventCapacity == -1) {return;}
 
             // get number of entrants who are selected and confirmed
@@ -321,42 +246,12 @@ public class OrganizerRole extends User {
     }
 
 
-    public ArrayList<EntrantRole> getInvitedEntrants(Event event) {
-        return event.getEntrantsChosen();
-    }
-
-    // US 02.06.02 As an organizer I want to see a list of all the cancelled entrants
-    public ArrayList<EntrantRole> getCancelledEntrants(Event event) {
-        return event.getEntrantsCancelled();
-    }
-
-    // US 02.06.03 As an organizer I want to see a final list of entrants who enrolled for the event
-    public ArrayList<EntrantRole> getEnrolledEntrants(Event event) {
-        return event.getEntrantsEnrolled();
-    }
-
-    // US 02.06.05 As an organizer I want to cancel entrants that declined signing up for the event
-    public void cancelEntrants(Event event, EntrantRole entrant) {
-        // cancelEntrant performs error checking
-        event.cancelEntrant(entrant);
-    }
-
-    //---------- NOTIFICATIONS
-    // the following user stories are covered by notifyEntrantsByStatus in DBManager:
-    // US 02.07.01 As an organizer I want to send notifications to all entrants on the waiting list
-    // US 02.07.02 As an organizer I want to send notifications to all selected entrants
-    // US 02.07.03 As an organizer I want to send a notification to all canceled entrants
-
-    public boolean notifyEntrantsByStatus(String eventID, String title, String message, DBManager.RegistrantStatus status) {
-        dbm.notifyEntrantsOfStatus(title, message, eventID, status);
-        return true;
-    }
-
-    // US 02.05.01 As an organizer I want to send a notification to chosen entrants to sign up for events
-    // called for each selected entrant (sampled or resampled)
-    // defines title, message, and updates Notification documents
-    // function is for individual entrants because functions that list
-    // all users are callback functions and this makes the most sense
+    /**
+     * Notifies users they have been selected for an event
+     * @param event event of interest
+     * @param user user to notify
+     * @return true if that user had notifications enabled, else false
+     */
     public static boolean notifyEntrantChosen(Event event, User user) {
         if (!user.getNotificationsEnabled()) {return false;}
         String title = "Selected For Event";
@@ -365,6 +260,12 @@ public class OrganizerRole extends User {
         return true;
     }
 
+    /**
+     * Notifies entrant they have been selected for an event due to resampling
+     * @param event event of interest
+     * @param user user to notify
+     * @return true if that user had notifications enabled, else false
+     */
     public static boolean notifyEntrantResampled(Event event, User user) {
         if (!user.getNotificationsEnabled()) {return false;}
         String title = "Selected For Event";
@@ -373,6 +274,12 @@ public class OrganizerRole extends User {
         return true;
     }
 
+    /**
+     * Notifies entrant that they have not been chosen for an event
+     * @param event event of interest
+     * @param user user to notify
+     * @return true if that user had notifications enabled, else false
+     */
     public static boolean notifyEntrantNotChosen(Event event, User user) {
         if (!user.getNotificationsEnabled()) {return false;}
         String title = "Not Selected For Event";
@@ -381,6 +288,12 @@ public class OrganizerRole extends User {
         return true;
     }
 
+    /**
+     * Notifies entrant that they're invitation had been canceled
+     * @param event event of interest
+     * @param user user to notify
+     * @return true if that user had notifications enabled, else false
+     */
     public static boolean notifyEntrantCancelled(Event event, User user) {
         if (!user.getNotificationsEnabled()) {return false;}
         String title = "Cancelled Event Invite";
@@ -390,6 +303,13 @@ public class OrganizerRole extends User {
     }
 
     // -------------- UTILITY FUNCTIONS
+
+    /**
+     * Checks if the event has entrants who have accepted but have yet to accept/decline
+     * @param eventID ID of event of interest
+     * @param entrantsExistCallback function to run if SELECTED entrants exist for this event
+     * @param entrantsNotExistCallback function to run if no SELECTED entrants exist for this event
+     */
     public static void sampledEntrantsExist(String eventID, DBManager.Void2VoidCallback entrantsExistCallback, DBManager.Void2VoidCallback entrantsNotExistCallback) {
         CollectionReference eventRegistrantsRef = dbm.db.collection(dbm.eventsCollection)
                 .document(eventID)

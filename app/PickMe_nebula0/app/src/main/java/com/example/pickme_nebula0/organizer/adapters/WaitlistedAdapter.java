@@ -19,6 +19,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 
+/**
+ * Array adapter for viewing waitlisted entrants
+ */
 public class WaitlistedAdapter extends RecyclerView.Adapter<WaitlistedAdapter.WaitlistedViewHolder> {
     private final ArrayList<User> waitlistedUsers;
     private final Context context;

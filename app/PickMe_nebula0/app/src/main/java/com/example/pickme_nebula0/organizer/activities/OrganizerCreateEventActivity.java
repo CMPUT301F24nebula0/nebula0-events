@@ -19,14 +19,10 @@ import com.example.pickme_nebula0.DeviceManager;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.SharedDialogue;
 import com.example.pickme_nebula0.db.DBManager;
-import com.example.pickme_nebula0.db.FBStorageManager;
 import com.example.pickme_nebula0.event.Event;
 import com.example.pickme_nebula0.organizer.exceptions.OrganizerExceptions;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -96,8 +92,6 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         // Initialize database manager
         dbManager = new DBManager();
 
-
-
         // attach to screen component xml
         setContentView(R.layout.activity_organizer_create_event);
 
@@ -122,13 +116,6 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         organizerExceptions = new OrganizerExceptions();
 
         db = FirebaseFirestore.getInstance();
-
-        /* TODO:
-        @Author: Sina Shaban
-        I just made a bit change in the way that we select the date there was a problem regarding dependency of Espresso picker
-        and the firebase ; Therefore I made a changes for the half way summation that lets as write the date in the format
-        (YYYY-MM-DD) instead of picking from a calender , I will also put a note so we should modify it for our final submission
-         */
 
         // DatePicker logic
         eventDateField.setFocusable(false);

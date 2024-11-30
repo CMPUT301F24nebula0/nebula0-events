@@ -1,8 +1,6 @@
 package com.example.pickme_nebula0;
 
 import android.annotation.SuppressLint;
-import android.app.Application;
-import android.content.Context;
 import android.provider.Settings;
 
 /**

@@ -18,11 +18,12 @@ import com.example.pickme_nebula0.event.EventManager;
 import com.example.pickme_nebula0.organizer.OrganizerRole;
 import com.example.pickme_nebula0.organizer.adapters.PastEventsAdapter;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
-import java.util.Date;
 
+/**
+ * Fragments for viewing past events
+ */
 public class OrganizerPastFragment extends Fragment {
     private FirebaseFirestore db;
     ArrayList<Event> pastEvents = new ArrayList<Event>();
