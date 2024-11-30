@@ -20,6 +20,7 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
+import org.checkerframework.common.returnsreceiver.qual.This;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Rule;
@@ -154,5 +155,160 @@ public class EntrantTest {
                 .perform(click());
         Thread.sleep(1000);
     }
+
+
+
+    /**
+     * Test case to verify the functionality of viewing a poster and then unregistering from an event.
+     * The test navigates to the first event in the waiting list, views the event poster, navigates back,
+     * and then unregisters from the event.
+     */
+    @Test
+    public void testWaitingListViewPosterAndUnregisterFromEvent() throws InterruptedException {
+        // Step 1: Navigate to the first event in the waiting list
+        Thread.sleep(2000); // Allow UI to load
+
+        Espresso.onData(Matchers.anything())
+                .inAdapterView(withId(R.id.entrant_waitlisted_events_listview))
+                .atPosition(0)
+                .perform(ViewActions.click());
+        Thread.sleep(1000); // Wait for the event details page to load
+
+        // Step 2: Click the "View Poster" button
+        onView(withText("View Poster"))
+                .perform(click());
+        Thread.sleep(2000); // Wait for the poster to be displayed
+
+        // Step 3: Navigate back to the event details page
+        onView(withText("Back"))
+                .perform(click());
+        Thread.sleep(1000);
+
+        // Step 4: Click the "Unregister" button
+        onView(withText("Unregister"))
+                .perform(click());
+        Thread.sleep(1000);
+        onView(withText("Back"))  // navagate back to the main page after unregistering
+                .perform(click());
+        Thread.sleep(1000);
+        System.out.println("Event unregistered successfully.");
+
+    }
+    /**
+     * Test case to verify the functionality of viewing a poster and then unregistering from an event.
+     * The test navigates to the first event in the Confirmed list, views the event poster, navigates back,
+     * and then unregisters from the event.
+     */
+    @Test
+    public void testConfirmedEventViewPosterAndUnregisterFromEvent() throws InterruptedException {
+        // Step 1: Navigate to the Confirmed event
+
+        Thread.sleep(2000); // Allow UI to load
+        // Swape left to the Confirmed tab
+        onView(withId(R.id.view_pager))
+                .perform(swipeLeft());
+        onView(withId(R.id.view_pager))
+                .perform(swipeLeft());
+        Thread.sleep(1000); // Wait for the event details page to load
+
+        Espresso.onData(Matchers.anything())
+
+                .inAdapterView(withId(R.id.entrant_waitlisted_events_listview))  // TODO find the right id
+                .atPosition(0)
+                .perform(ViewActions.click());
+        Thread.sleep(1000); // Wait for the event details page to load
+
+        // Step 2: Click the "View Poster" button
+        onView(withText("View Poster"))
+                .perform(click());
+        Thread.sleep(2000); // Wait for the poster to be displayed
+
+        // Step 3: Navigate back to the event details page
+        onView(withText("Back"))
+                .perform(click());
+        Thread.sleep(1000);
+
+        // Step 4: Click the "Unregister" button
+        onView(withText("Unregister"))
+                .perform(click());
+        Thread.sleep(1000);
+        onView(withText("Back"))  // navagate back to the main page after unregistering
+                .perform(click());
+        Thread.sleep(1000);
+        System.out.println("Event unregistered successfully.");
+
+    }
+    /**
+     * Test case to verify the functionality of viewing a poster and then accept the invatation to an event.
+     * The test navigates to the first event in the Confirmed list, views the event poster, navigates back,
+     * and then unregisters from the event.
+     */
+    @Test
+    public void testSelecetedEventViewPosterAndRegesterToTheEvent() throws InterruptedException {
+        // Step 1: Navigate to the first event in the waiting list
+        Thread.sleep(1000); // Allow UI to load
+        // Swape left to the Confirmed tab
+        onView(withId(R.id.view_pager))
+                .perform(swipeLeft());
+
+        Thread.sleep(2000); // Allow UI to load
+        Espresso.onData(Matchers.anything())
+
+                .inAdapterView(withId(R.id.entrant_waitlisted_events_listview))  // TODO find the right id
+                .atPosition(0)
+                .perform(ViewActions.click());
+        Thread.sleep(1000); // Wait for the event details page to load
+
+        // Step 2: Click the "View Poster" button
+        onView(withText("View Poster"))
+                .perform(click());
+        Thread.sleep(2000); // Wait for the poster to be displayed
+
+        // Step 3: Navigate back to the event details page
+        onView(withText("Back"))
+                .perform(click());
+        Thread.sleep(1000);
+
+        // Step 4: Click the "Unregister" button
+        onView(withText("Accept"))
+                .perform(click());
+        Thread.sleep(1000);
+        onView(withText("Back"))  // navagate back to the main page after unregistering
+                .perform(click());
+        Thread.sleep(1000);
+        System.out.println("Event unregistered successfully.");
+
+    }
+    /**
+     * Test case to verify the functionality Declining an offer from a selected event.
+     * The test navigates to the first event in the selected list, preform decline , navigates back,
+     * and then unregisters from the event.
+     */
+    @Test
+    public void testSelecetedEventDeclineFromTheEvent() throws InterruptedException {
+        // Step 1: Navigate to the first event in the Selected list
+        Thread.sleep(1000); // Allow UI to load
+        // Swape left to the Confirmed tab
+        onView(withId(R.id.view_pager))
+                .perform(swipeLeft());
+        // Step 1: Navigate to the first event in the Selected list
+        Thread.sleep(2000); // Allow UI to load
+        Espresso.onData(Matchers.anything())
+                .inAdapterView(withId(R.id.entrant_waitlisted_events_listview))  // TODO find the right id
+                .atPosition(0)
+                .perform(ViewActions.click());
+        Thread.sleep(1000); // Wait for the event details page to load
+
+        onView(withText("Decline"))
+                .perform(click());
+        Thread.sleep(1000);
+        onView(withText("Back"))  // navagate back to the main page after unregistering
+                .perform(click());
+
+
+    }
+
+
+
 
 }

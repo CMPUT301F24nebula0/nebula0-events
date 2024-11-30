@@ -30,6 +30,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="30dp"
+            android:background="@drawable/rounded_button"
+
             android:text="Accept"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
@@ -38,6 +40,8 @@
             android:id="@+id/entrant_event_notification_decline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/rounded_button"
+
             android:layout_marginStart="30dp"
             android:text="Decline"
             app:layout_constraintEnd_toEndOf="parent"
