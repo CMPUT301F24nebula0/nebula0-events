@@ -1,5 +1,6 @@
 package com.example.pickme_nebula0.user.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -69,7 +70,7 @@ public class UserInfoActivity extends AppCompatActivity {
         if (profilePicUri != null){
             FBStorageManager.uploadProfilePic(profilePicUri,deviceID,UserInfoActivity.this);
         } else if (newUser) {
-            FBStorageManager.uploadProfilePic(genProfilePic(name),deviceID,UserInfoActivity.this);
+            FBStorageManager.uploadProfilePic(genProfilePic(this,name),deviceID,UserInfoActivity.this);
         }
     }
 
@@ -263,7 +264,7 @@ public class UserInfoActivity extends AppCompatActivity {
     private void setAutoProfilePic(){
         Toast.makeText(this,"Replacing image with auto",Toast.LENGTH_LONG).show();
 
-        Uri generatedImageUri = genProfilePic(nameField.getText().toString());
+        Uri generatedImageUri = genProfilePic(this,nameField.getText().toString());
         if (generatedImageUri == null){
             Toast.makeText(this,"Failed to auto generate profile picture",Toast.LENGTH_SHORT).show();
             return;
@@ -273,14 +274,14 @@ public class UserInfoActivity extends AppCompatActivity {
     }
 
     // based on code from: https://stackoverflow.com/a/26060004
-    public Uri getImageUri(Bitmap inImage) {
+    public static Uri getImageUri(Context context, Bitmap inImage) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(this.getContentResolver(), inImage, "Title", null);
+        String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), inImage, "Title", null);
         return Uri.parse(path);
     }
 
-    private ArrayList<Integer> colors = new ArrayList<>(Arrays.asList(
+    private static ArrayList<Integer> colors = new ArrayList<>(Arrays.asList(
             Color.RED,
             Color.GREEN,
             Color.BLUE,
@@ -290,7 +291,7 @@ public class UserInfoActivity extends AppCompatActivity {
             Color.MAGENTA
     ));
     // based on code generated from OpenAI's chatGPT4 based on prompt "in android studio using java, I want to create a bitmap image of the first letter of a given string on a background of a random color"
-    private Uri genProfilePic(String name){
+    public static Uri genProfilePic(Context context,String name){
         if (name == null || name.isEmpty()) return null;
 
         String firstLetter = name.substring(0, 1).toUpperCase();
@@ -317,7 +318,7 @@ public class UserInfoActivity extends AppCompatActivity {
         canvas.drawColor(color); // Fill the background with the random color
         canvas.drawText(firstLetter, size / 2f, (size / 2f) - bounds.exactCenterY(), paint);
 
-        return getImageUri(bitmap);
+        return getImageUri(context,bitmap);
     }
 
 

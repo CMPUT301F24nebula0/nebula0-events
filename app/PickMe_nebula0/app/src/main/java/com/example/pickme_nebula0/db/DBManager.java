@@ -314,6 +314,7 @@ public class DBManager {
 
                                         // Remove User from Users
                                         removeDocument(userDoc);
+                                        onSuccess.run();
                                     });
                         });
     }
