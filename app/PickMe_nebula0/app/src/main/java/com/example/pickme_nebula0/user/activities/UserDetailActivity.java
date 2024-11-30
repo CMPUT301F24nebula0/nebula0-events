@@ -1,10 +1,12 @@
 package com.example.pickme_nebula0.user.activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -15,11 +17,15 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.example.pickme_nebula0.GoogleMapActivity;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.db.DBManager;
+import com.example.pickme_nebula0.db.FBStorageManager;
 import com.example.pickme_nebula0.organizer.fragments.OrganizerSelectedFragment;
 import com.example.pickme_nebula0.user.User;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 /**
  * Activity for admin or organizer to view details about a user
@@ -28,6 +34,10 @@ public class UserDetailActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private TextView userDetailsTextView;
     private DBManager dbManager;
+    private ImageView profileImage;
+    private StorageReference storageRef;
+    private String userName;
+    private String userID;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,11 +51,13 @@ public class UserDetailActivity extends AppCompatActivity {
         final Button delButton = findViewById(R.id.button_ud_delete);
         final Button cancelEntrantButton = findViewById(R.id.button_cancel_selected_entrant);
         final Button mapButton = findViewById(R.id.button_map);
+        final Button delImgButton = findViewById(R.id.button_ud_delete_image);
+        profileImage = findViewById(R.id.profile_image);
+        userID = getIntent().getStringExtra("userID");
 
         if(!getIntent().getBooleanExtra("admin",false)){
             delButton.setVisibility(View.GONE);
         }
-        String userID = getIntent().getStringExtra("userID");
         boolean isAdmin = getIntent().getBooleanExtra("admin", false);
         if (userID == null || userID.isEmpty()) {
             Toast.makeText(this, "Invalid User ID.", Toast.LENGTH_SHORT).show();
@@ -73,7 +85,7 @@ public class UserDetailActivity extends AppCompatActivity {
         }
 
         // check if userID and eventID got passed from the intent
-        Log.d("UserDetailActivity", "userID: " + userID + ", eventID: " + eventID);
+//        Log.d("UserDetailActivity", "userID: " + userID + ", eventID: " + eventID);
 
         if(!getIntent().getBooleanExtra("organizer", true)){
             mapButton.setVisibility(View.GONE);
@@ -109,7 +121,13 @@ public class UserDetailActivity extends AppCompatActivity {
             });
         }
 
-
+        delImgButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                if(userName != null){
+                    deleteAndReplaceProfileImage(userName); }
+                }
+        });
 
         backButton.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -119,7 +137,9 @@ public class UserDetailActivity extends AppCompatActivity {
         delButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dbManager.deleteUser(userID,()->{finish();});
+                dbManager.deleteUser(userID,()->{
+                    Toast.makeText(UserDetailActivity.this,"User Deleted",Toast.LENGTH_SHORT).show();
+                    finish();});
             }
         });
 
@@ -129,8 +149,13 @@ public class UserDetailActivity extends AppCompatActivity {
 
         if (isAdmin) {
             mapButton.setVisibility(View.GONE);
+            profileImage.setVisibility(View.VISIBLE);
+            loadProfileImageFromFirebase(userID);
+            delImgButton.setVisibility(View.VISIBLE);
         } else {
             mapButton.setVisibility(View.VISIBLE);
+            profileImage.setVisibility(View.GONE);
+            delImgButton.setVisibility(View.GONE);
         }
 
     }
@@ -143,6 +168,7 @@ public class UserDetailActivity extends AppCompatActivity {
                     StringBuilder details = new StringBuilder();
                     details.append("UserID: ").append(user.getUserID()).append("\n\n");
                     details.append("User Name: ").append(user.getName()).append("\n\n");
+                    userName = user.getName();
                     details.append("User Email: ").append(user.getEmail()).append("\n\n");
                     // Append other user details as needed
                     userDetailsTextView.setText(details.toString());
@@ -157,5 +183,32 @@ public class UserDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "Failed to retrieve user data.", Toast.LENGTH_SHORT).show();
             finish();
         }));
+    }
+
+    private void loadProfileImageFromFirebase(String userID) {
+        FirebaseStorage storage = FirebaseStorage.getInstance("gs://pickme-c2fb3.firebasestorage.app");
+        storageRef = storage.getReference();
+
+        StorageReference imageRef = storageRef.child("profilePics/" + userID);
+        imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+            Picasso.get()
+                    .load(uri)
+                    .fit()
+                    .placeholder(R.drawable.ic_profile_placeholder)
+                    .error(R.drawable.ic_profile_placeholder)
+                    .into(profileImage);
+        }).addOnFailureListener(exception -> {
+            profileImage.setVisibility(View.GONE);
+        });
+    }
+
+    private void deleteAndReplaceProfileImage(String name){
+        Uri newPicUri = UserInfoActivity.genProfilePic(this,name);
+        Picasso.get()
+                .load(newPicUri)
+                .placeholder(R.drawable.ic_profile_placeholder)
+                .error(R.drawable.ic_profile_placeholder)
+                .into(profileImage);
+        FBStorageManager.uploadProfilePic(newPicUri,userID,UserDetailActivity.this);
     }
 }

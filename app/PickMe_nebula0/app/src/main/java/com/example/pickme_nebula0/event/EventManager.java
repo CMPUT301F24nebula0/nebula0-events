@@ -361,6 +361,7 @@ public class EventManager {
             // update event docs
             DocumentReference eventDocRef = db.collection(dbm.eventsCollection).document(eventID);
             dbm.updateField(eventDocRef, eventPosterFieldName, null);
+            onSuccessCallback.run();
 
         }, onFailureCallback);
     }
