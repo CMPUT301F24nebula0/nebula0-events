@@ -2,7 +2,6 @@ package com.example.pickme_nebula0.notification;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -19,7 +18,6 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 
 /**
  * Activity that lets all users view the messages they've received.
@@ -44,6 +42,7 @@ public class MessageViewActivity extends AppCompatActivity {
         dbManager = new DBManager();
 
         final Button backBtn = findViewById(R.id.button_mv_back);
+        final Button refreshBtn = findViewById(R.id.buttonRefreshMessages);
 
         notifs = new ArrayList<Notification>();
         notifsList = findViewById(R.id.listView_mv_messages);
@@ -66,6 +65,13 @@ public class MessageViewActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                     finish();
+            }
+        });
+
+        refreshBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onResume();
             }
         });
 
