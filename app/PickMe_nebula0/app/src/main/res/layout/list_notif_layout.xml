@@ -12,40 +12,25 @@
     <!-- Message Subject -->
     <!-- Subject Text (dynamic) -->
     <TextView
-        android:id="@+id/textView_subject"
+        android:id="@+id/textView_notif_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="8dp"
-        android:text="Message Subject:"
-        android:textColor="@color/black"
-        android:textSize="20sp" />
-
-    <TextView
-        android:id="@+id/textView_notif_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:paddingBottom="4dp"
+        android:text="Message Subject"
         android:textColor="@color/black"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+        android:textSize="18sp" />
 
 
     <!-- Message Label -->
     <TextView
-        android:id="@+id/textView_notif_body_label"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="4dp"
-        android:text="Message: "
-        android:textColor="@color/black"
-        android:textSize="20sp"
-        android:textStyle="bold" />
-
-    <!-- Message Text (dynamic) -->
-    <TextView
         android:id="@+id/textView_notif_body"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingTop="4dp"
+        android:text="Message"
         android:textColor="@color/black"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <!-- Message Text (dynamic) -->
 </LinearLayout>

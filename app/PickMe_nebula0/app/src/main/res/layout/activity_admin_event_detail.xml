@@ -23,6 +23,8 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="8dp"
         android:text="Back"
+        android:background="@drawable/rounded_button"
+
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -57,7 +59,11 @@
         android:id="@+id/button_aed_delete_event"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
         android:layout_marginBottom="8dp"
+
+        android:background="@drawable/rounded_button"
         android:text="Delete Event"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -67,7 +73,11 @@
         android:id="@+id/button_delete_image"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
         android:layout_marginBottom="8dp"
+
+        android:background="@drawable/rounded_button"
         android:text="Delete Image"
         app:layout_constraintBottom_toTopOf="@+id/button_delete_qr"
         app:layout_constraintEnd_toEndOf="parent"
@@ -77,7 +87,11 @@
         android:id="@+id/button_delete_qr"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
         android:layout_marginBottom="8dp"
+        android:background="@drawable/rounded_button"
+
         android:text="Delete QRCode"
         app:layout_constraintBottom_toTopOf="@+id/button_aed_delete_event"
         app:layout_constraintEnd_toEndOf="parent"
