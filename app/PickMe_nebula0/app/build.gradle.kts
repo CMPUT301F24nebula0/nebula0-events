@@ -6,9 +6,9 @@ fun getLocalProperty(key: String): String {
     val localPropertiesFile = rootProject.file("local.properties")
     return if (localPropertiesFile.exists()) {
         properties.load(localPropertiesFile.inputStream())
-        "\"${properties.getProperty(key) ?: ""}\""
+        properties.getProperty(key) ?: ""
     } else {
-        "\"\""
+        ""
     }
 }
 
