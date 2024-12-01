@@ -13,7 +13,14 @@ import com.example.pickme_nebula0.SharedDialogue;
 import com.example.pickme_nebula0.db.DBManager;
 
 /**
- * Activity allowing organizers to create and send notifications/messages to entrants in a given event
+ * Activity for organizers to create and send notifications/messages to entrants of a given event.
+ *
+ * This activity allows organizers to send messages to all entrants or filter them by specific statuses
+ * (e.g., waitlisted, confirmed). Includes input validation and user feedback via Toast messages.
+ *
+ * @see Notification
+ * @see MessageViewActivity
+ * @see SharedDialogue
  *
  * @author Stephine Yearley
  */
@@ -23,6 +30,15 @@ public class NotificationCreationActivity extends AppCompatActivity {
     EditText messageField;
     String eventID;
 
+    /**
+     * Initializes the activity, sets up input fields and buttons, and configures click listeners.
+     *
+     * Listens for button clicks to send notifications to entrants based on their registration status
+     * or to cancel and exit the activity. Retrieves the `eventID` from the intent and validates it.
+     *
+     * @param savedInstanceState the previously saved state of the activity, if any
+     */
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notif_create);
