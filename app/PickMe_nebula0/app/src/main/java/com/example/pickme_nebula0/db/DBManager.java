@@ -942,26 +942,30 @@ public class DBManager {
         });
     }
 
-    public void doIfAdmin(String userID, Void2VoidCallback callback){
+    public void doIfAdmin(String userID, Void2VoidCallback callback,Void2VoidCallback notAdminCallback){
         DocumentReference userDoc = db.collection(usersCollection).document(userID);
         performIfFieldPopulated(userDoc,"admin",(fieldVal)->
         {Boolean isAdmin = (Boolean) fieldVal;
             if(isAdmin){
             callback.run();}
-        }, ()->{});
+            else{
+                notAdminCallback.run();
+            }
+        }, notAdminCallback);
     }
 
-    public void doIfOrganizer(String userID, Void2VoidCallback callback){
+    public void doIfOrganizer(String userID, Void2VoidCallback callback, Void2VoidCallback noFacilityCallback){
         DocumentReference userDoc = db.collection(usersCollection).document(userID);
         performIfFieldPopulated(userDoc,"facilityID",(fieldVal)->{
             if(fieldVal == null){
+                noFacilityCallback.run();
                 return;
             }
             if(fieldVal.toString().isBlank()){
-                return;
+                noFacilityCallback.run();
             }
             callback.run();
-            }, ()->{});
+            }, noFacilityCallback);
     }
 
     /**
