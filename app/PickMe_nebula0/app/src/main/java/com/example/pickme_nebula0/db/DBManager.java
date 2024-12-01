@@ -40,6 +40,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Class encompassing database access and modification
@@ -338,7 +339,72 @@ public class DBManager {
                    // Handle failure
                    Log.w("Firestore", "Error writing document", e);
                });
-}
+    }
+
+    /**
+     * Delete a notification for a given user.
+     *
+     * @param notification Notification object to delete
+     */
+    public void deleteNotification(Notification notification) {
+        // get the userID for notifications
+        String userIDFromNote = notification.getUserID();
+        Log.d("delete", userIDFromNote);
+        // get the "userNotif" collection
+        CollectionReference userNotifCollection = db.collection(notificationCollection).document(userIDFromNote).collection("userNotifs");
+        // get the document of the notification
+        String docID = notification.getNotificationID();
+        DocumentReference docRef = userNotifCollection.document(docID);
+        // delete the document
+        docRef.delete();
+    }
+
+    /**
+     * Given a notification object, return true if it should exist within the database
+     * It should exist if
+     * - eventID exists in Events
+     * - userID exists in Users
+     */
+    public void notificationShouldExist(
+            Notification notification,
+            Void2VoidCallback onSuccessCallback,
+            Void2VoidCallback onFailureCallback
+    ) {
+        AtomicInteger successCount = new AtomicInteger(0);
+        int numChecks = 2;
+
+        // Check if the corresponding event exists
+        checkExistenceOfDocument(
+                eventsCollection,
+                notification.getEventID(),
+                // Event exists
+                () -> {
+                    if (successCount.incrementAndGet() == numChecks) {
+                        onSuccessCallback.run();
+                    }
+                },
+                // Event does not exist
+                () -> {
+                    onFailureCallback.run();
+                }
+        );
+
+        // Check if the corresponding user exists
+        checkExistenceOfDocument(
+                usersCollection,
+                notification.getUserID(),
+                // User exists
+                () -> {
+                    if (successCount.incrementAndGet() == numChecks) {
+                        onSuccessCallback.run();
+                    }
+                },
+                // User does not exist
+                () -> {
+                    onFailureCallback.run();
+                }
+        );
+    }
 
 // -------------------- / Notifications \ ---------------------------------------------------------
 
