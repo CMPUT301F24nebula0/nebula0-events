@@ -2,9 +2,11 @@ package com.example.pickme_nebula0.organizer.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -13,6 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.user.User;
 import com.example.pickme_nebula0.user.activities.UserDetailActivity;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -39,6 +44,21 @@ public class CancelledAdapter extends RecyclerView.Adapter<CancelledAdapter.Canc
     public void onBindViewHolder(@NonNull CancelledViewHolder holder, int position) {
         User user = cancelledUsers.get(position);
         holder.userNameTextView.setText(user.getName());
+        String userID = user.getUserID();
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+        StorageReference imageRef = storageRef.child("profilePics/" + userID);
+
+        imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+            Picasso.get()
+                    .load(uri)
+                    .placeholder(R.drawable.ic_profile_placeholder)
+                    .error(R.drawable.error_image)
+                    .into(holder.profileImageView);
+        }).addOnFailureListener(exception -> {
+            // Handle any errors
+            holder.profileImageView.setImageResource(R.drawable.error_image);
+            Log.e("ImageLoadError", "Failed to load image for userID: " + userID, exception);
+        });
 
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, UserDetailActivity.class);
@@ -54,10 +74,13 @@ public class CancelledAdapter extends RecyclerView.Adapter<CancelledAdapter.Canc
 
     static class CancelledViewHolder extends RecyclerView.ViewHolder {
         TextView userNameTextView;
+        ImageView profileImageView;
 
         public CancelledViewHolder(@NonNull View itemView) {
             super(itemView);
             userNameTextView = itemView.findViewById(R.id.user_name_text_view);
+            profileImageView = itemView.findViewById(R.id.imageView);
+
         }
     }
 }
