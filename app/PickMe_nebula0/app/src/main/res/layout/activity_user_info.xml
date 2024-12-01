@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="TextView"
+        android:textSize="22sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -124,7 +125,7 @@
         android:background="@drawable/rounded_button"
 
         android:text="Change Picture"
-        android:textSize="11sp"
+        android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imageViewProfilePic"
         app:layout_constraintTop_toBottomOf="@+id/divider" />
@@ -134,9 +135,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Remove Picture"
-        android:textSize="11sp"
         android:background="@drawable/rounded_button"
+        android:text="Remove Picture"
+        android:textSize="14sp"
 
         app:layout_constraintBottom_toBottomOf="@+id/imageViewProfilePic"
         app:layout_constraintEnd_toEndOf="@+id/buttonChangePicture"
