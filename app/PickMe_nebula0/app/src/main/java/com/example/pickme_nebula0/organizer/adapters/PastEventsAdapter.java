@@ -43,6 +43,7 @@ public class PastEventsAdapter extends RecyclerView.Adapter<PastEventsAdapter.Pa
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, EventDetailActivity.class);
             intent.putExtra("eventID", event.getEventID());
+            intent.putExtra("isPast", true);
             context.startActivity(intent);
         });
     }

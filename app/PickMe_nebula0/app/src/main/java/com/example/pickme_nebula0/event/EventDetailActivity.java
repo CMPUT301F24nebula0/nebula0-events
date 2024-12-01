@@ -44,6 +44,7 @@ public class EventDetailActivity extends AppCompatActivity {
     private Button viewPosterButton;
     private Button newPosterButton;
     ActivityResultLauncher<PickVisualMediaRequest> pickMedia;
+    private boolean isPast;
 
     private String eventID;
 
@@ -78,6 +79,9 @@ public class EventDetailActivity extends AppCompatActivity {
 
         // Retrieve eventID from intent
         eventID = getIntent().getStringExtra("eventID");
+        isPast = getIntent().getBooleanExtra("isPast", false);
+
+
 
         if (eventID == null || eventID.trim().isEmpty()) {
             Toast.makeText(this, "Invalid Event ID.", Toast.LENGTH_SHORT).show();
@@ -169,6 +173,14 @@ public class EventDetailActivity extends AppCompatActivity {
 
         renderPosterButtons();
 
+
+        if (isPast)
+        {
+            msgEntrantsButton.setVisibility(View.GONE);
+            sampleEntrantsButton.setVisibility(View.GONE);
+            newPosterButton.setVisibility(View.GONE);
+            viewPosterButton.setVisibility(View.GONE);
+        }
     }
 
     /**
@@ -294,7 +306,10 @@ public class EventDetailActivity extends AppCompatActivity {
      */
     private void showButtonsIfNoPoster(){
         viewPosterButton.setVisibility(View.GONE);
-        newPosterButton.setVisibility(View.VISIBLE);
+        if (!isPast)
+        {
+            newPosterButton.setVisibility(View.VISIBLE);
+        }
     }
 
     /**
@@ -303,7 +318,9 @@ public class EventDetailActivity extends AppCompatActivity {
      */
     private void showButtonsIfPoster(Uri uri){
         viewPosterButton.setVisibility(View.VISIBLE);
-        newPosterButton.setVisibility(View.VISIBLE);
+        if (!isPast) {
+            newPosterButton.setVisibility(View.VISIBLE);
+        }
     }
 
 }
