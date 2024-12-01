@@ -41,35 +41,104 @@ public class Notification {
     }
 
     /**
-     * Empty Constructor required for Firestore toObject function
+     * Default constructor required for Firestore's `toObject` function.
      */
     public Notification(){};
 
-    // getters
+    /**
+     * Returns the unique notification ID.
+     *
+     * @return the notification ID
+     */
     public String getNotificationID() {
         return this.notificationID;
     }
+
+    /**
+     * Returns the title or subject of the notification.
+     *
+     * @return the notification title
+     */
     public String getTitle() {
         return this.title;
     }
+
+    /**
+     * Returns the body of the notification.
+     *
+     * @return the notification message
+     */
     public String getMessage() {
         return this.message;
     }
+
+    /**
+     * Returns the timestamp indicating when the notification was created.
+     *
+     * @return the notification timestamp
+     */
     public Timestamp getTimestamp() {
         return this.timestamp;
     }
+
+    /**
+     * Returns the event ID associated with this notification.
+     *
+     * @return the event ID
+     */
     public String getEventID() {
         return this.eventID;
     }
+
+
+    /**
+     * Returns the user ID (or device ID) of the notification recipient.
+     *
+     * @return the user ID
+     */
     public String getUserID(){ return this.userID;}
 
-    // Setters
+    /**
+     * Sets the unique notification ID.
+     *
+     * @param notificationID the notification ID to set
+     */
     public void setNotificationID(String notificationID) {
         this.notificationID = notificationID;
     }
+
+    /**
+     * Sets the title or subject of the notification.
+     *
+     * @param title the title to set
+     */
     public void setTitle(String title){this.title = title;}
+
+    /**
+     * Sets the body of the notification.
+     *
+     * @param message the message to set
+     */
     public void setMessage(String message){this.message = message;}
+
+    /**
+     * Sets the timestamp indicating when the notification was created.
+     *
+     * @param timestamp the timestamp to set
+     */
     public void setTimestamp(Timestamp timestamp){this.timestamp = timestamp;}
+
+    /**
+     * Sets the event ID associated with this notification.
+     *
+     * @param eventID the event ID to set
+     */
     public void setEventID(String eventID){this.eventID = eventID;}
+
+    /**
+     * Sets the user ID (or device ID) of the notification recipient.
+     *
+     * @param userID the user ID to set
+     */
     public void setUserID(String userID){this.userID = userID;}
 }

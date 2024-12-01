@@ -28,7 +28,12 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 
 /**
- * Fragment for displaying a list of events of given status
+ * Fragment for displaying a list of events with a given registration status for the current user.
+ *
+ * This fragment fetches events from the database where the user's registration status matches the specified
+ * status and displays them in a list. Clicking on an event navigates to its detail page.
+ *
+ * @author Taekwan Yoon
  */
 public class EntrantEventsFragment extends Fragment {
     private FirebaseFirestore db;
@@ -74,7 +79,13 @@ public class EntrantEventsFragment extends Fragment {
 
 
     /**
-     * Updates the list of messages with all messages stored for this user in the data base
+     * Fetches events matching the given registration status from the Firestore database.
+     *
+     * Clears the current list of events and repopulates it with data from Firestore. Retrieves events
+     * where the user's registration status matches the specified status and updates the adapter for display.
+     *
+     * This method queries the "RegisteredEvents" subcollection under the user's document to filter events
+     * by status, then fetches the full details of each matching event from the "Events" collection.
      */
     public void loadEvents(){
         events.clear();
