@@ -17,6 +17,7 @@ import com.example.pickme_nebula0.GeolocationManager;
 import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.SharedDialogue;
 import com.example.pickme_nebula0.db.DBManager;
+import com.example.pickme_nebula0.facility.Facility;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -38,7 +39,7 @@ public class EventDetailUserActivity extends AppCompatActivity {
 
     // main UI components
     private Button unregisterButton, backButton, registerButton, posterViewButton;
-    private TextView eventDetailsTextView, userStatusTextView;
+    private TextView eventDetailsTextView, userStatusTextView, facilityDetailsTextView;
 
 
     // START TY
@@ -79,6 +80,7 @@ public class EventDetailUserActivity extends AppCompatActivity {
         backButton = findViewById(R.id.button_edu_back);
         unregisterButton = findViewById(R.id.button_edu_unregister);
         eventDetailsTextView = findViewById(R.id.textView_edu_details);
+        facilityDetailsTextView = findViewById(R.id.textFacilityDetails);
         userStatusTextView = findViewById(R.id.textView_edu_status);
         registerButton = findViewById(R.id.button_edu_reg);
         posterViewButton = findViewById(R.id.buttonPosterView);
@@ -98,6 +100,10 @@ public class EventDetailUserActivity extends AppCompatActivity {
         acceptButton.setVisibility(View.VISIBLE);
         declineButton.setVisibility(View.VISIBLE);
         notificationMessage.setVisibility(View.VISIBLE);
+
+        // this may take a split second to query db, so set invisible at first
+        facilityDetailsTextView.setVisibility(View.INVISIBLE); // show details or default (warning)
+
 
         posterViewButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -286,15 +292,38 @@ public class EventDetailUserActivity extends AppCompatActivity {
 
     /**
      * Builds string detailing event info
-     * @param event
-     * @return
+     * @param event event we are retrieving info for
+     * @return a string containing event details
      */
     private StringBuilder generateEventDetails(Event event) {
         StringBuilder details = new StringBuilder();
-        details.append("Event Name: ").append(event.getEventName()).append("\n\n");
-        details.append("Description: ").append(event.getEventDescription()).append("\n\n");
-        details.append("Date: ").append(event.getEventDate().toString()).append("\n\n");
+        String dateString = event.getEventDate().toString();
+        int firstColonLoc = dateString.indexOf(":");
+        String niceDate = dateString.substring(0,firstColonLoc-2);
+        details.append("Name: ").append(event.getEventName()).append("\n");
+        details.append("Description: ").append(event.getEventDescription()).append("\n");
+        details.append("Date: ").append(niceDate).append("\n");
+        renderFacilityInfo(event);
         return details;
+    }
+
+    /**
+     * Retrieves, formats, and displays facility info
+     * @param event event we are retrieving facility info for
+     */
+    private void renderFacilityInfo(Event event){
+        dbManager.getFacility(event.getOrganizerID(),(obj)->{
+            Facility f = (Facility) obj;
+            String name = f.getName();
+            String adr = f.getAddress();
+            if (name == null || adr == null){
+                return;
+            }
+            String facilityInfoString = String.format("Location:\n\t\t%s\n\t\t%s",name,adr);
+            facilityDetailsTextView.setText(facilityInfoString);}
+                ,()->{Toast.makeText(this,"Failed to get facility info",Toast.LENGTH_SHORT).show();});
+
+        facilityDetailsTextView.setVisibility(View.VISIBLE); // show details or default (warning)
     }
 
     /**
