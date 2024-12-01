@@ -107,8 +107,8 @@ public class HomePageActivity extends AppCompatActivity {
 
     private void updateButtonVisibility(){
         String userID = DeviceManager.getDeviceId();
-        dbManager.doIfAdmin(userID,()->{adminButton.setVisibility(View.VISIBLE);});
-        dbManager.doIfOrganizer(userID,()->{organizerButton.setVisibility(View.VISIBLE);});
+        dbManager.doIfAdmin(userID,()->{adminButton.setVisibility(View.VISIBLE);},()->{adminButton.setVisibility(View.GONE);});
+        dbManager.doIfOrganizer(userID,()->{organizerButton.setVisibility(View.VISIBLE);},()->{organizerButton.setVisibility(View.GONE);});
     }
 
     /**
