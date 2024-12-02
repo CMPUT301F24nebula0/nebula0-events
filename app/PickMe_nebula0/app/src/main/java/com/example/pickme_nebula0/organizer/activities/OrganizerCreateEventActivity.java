@@ -53,7 +53,6 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
     private EditText eventDescriptionField;
     private EditText eventDateField;
     private Switch geolocationRequirementSwitch;
-    private EditText geolocationRequirementField;
     private Switch waitlistCapacityRequiredSwitch;
     private EditText waitlistCapacityField;
     private EditText numberOfAttendeesField;
@@ -69,7 +68,6 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
     String eventDescription;
     String eventDate;
     boolean geolocationRequired;
-    String geolocationRequirement;
     boolean waitlistCapacityRequired;
     String waitlistCapacity;
     String numberOfAttendees;
@@ -117,7 +115,7 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         eventDescriptionField = findViewById(R.id.event_description_field);
         eventDateField = findViewById(R.id.event_date_field);
         geolocationRequirementSwitch = findViewById(R.id.geolocation_requirement_switch);
-        geolocationRequirementField = findViewById(R.id.geolocation_requirement_field);
+//        geolocationRequirementField = findViewById(R.id.geolocation_requirement_field);
         waitlistCapacityRequiredSwitch = findViewById(R.id.waitlist_capacity_required_switch);
         waitlistCapacityField = findViewById(R.id.waitlist_capacity_field);
         numberOfAttendeesField = findViewById(R.id.number_of_attendees_field);
@@ -141,16 +139,16 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         eventDateField.setOnClickListener(v -> showDatePickerDialog());
 
         // Switch logic to enable/disable fields
-        geolocationRequirementSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            SwitchToggleEditText(geolocationRequirementField, isChecked);
-        });
+//        geolocationRequirementSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+//            SwitchToggleEditText(geolocationRequirementField, isChecked);
+//        });
         waitlistCapacityRequiredSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             SwitchToggleEditText(waitlistCapacityField, isChecked);
         });
 
         // Initially disable fields since both switches are off at the beginning
         waitlistCapacityField.setEnabled(false);
-        geolocationRequirementField.setEnabled(false);
+//        geolocationRequirementField.setEnabled(false);
 
         // set up poster selection
         pickMedia =
@@ -180,21 +178,21 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
             eventDescription = eventDescriptionField.getText().toString();
             eventDate = eventDateField.getText().toString();
             geolocationRequired = geolocationRequirementSwitch.isChecked();
-            geolocationRequirement = geolocationRequirementField.getText().toString();
+//            geolocationRequirement = geolocationRequirementField.getText().toString();
             waitlistCapacityRequired = waitlistCapacityRequiredSwitch.isChecked();
             waitlistCapacity = waitlistCapacityField.getText().toString();
             numberOfAttendees = numberOfAttendeesField.getText().toString();
 
             // Validate user input
             if (!organizerExceptions.validateEventCreationUserInput(this, deviceID, eventName, eventDescription, eventDate,
-                    geolocationRequired, geolocationRequirement,
+                    geolocationRequired,
                     waitlistCapacityRequired, waitlistCapacity, numberOfAttendees)) {
                 // If user input is invalid, don't add event
                 return;
             }
 
             // switch & input logic
-            geolocationMaxDistance = geolocationRequired ? Integer.parseInt(geolocationRequirement) : -1;
+//            geolocationMaxDistance = geolocationRequired ? Integer.parseInt(geolocationRequirement) : -1;
             waitlistMaxCapacity = waitlistCapacityRequired ? Integer.parseInt(waitlistCapacity) : -1;
 
             // variables event creation
@@ -204,7 +202,7 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
             try {
                 // Try creating event object
                 event = new Event(eventName, eventDescription, eventDateObj,
-                        geolocationRequired, geolocationMaxDistance, waitlistCapacityRequired,
+                        geolocationRequired, waitlistCapacityRequired,
                         waitlistMaxCapacity, maxNumberOfAttendees);
                 eventCreated = true;
             } catch (Exception e) {
@@ -229,8 +227,8 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         // Check if any fields are filled before cancelling
         eventCreationCancelButton.setOnClickListener(v -> {
             v.startAnimation(buttonClickAnimation); // Start animation
+            if (isAnyFieldFilled(eventNameField, eventDescriptionField, eventDateField, waitlistCapacityField, numberOfAttendeesField)) {
 
-            if (isAnyFieldFilled(eventNameField, eventDescriptionField, eventDateField, geolocationRequirementField, waitlistCapacityField, numberOfAttendeesField)) {
                 new AlertDialog.Builder(OrganizerCreateEventActivity.this)
                         .setTitle("Cancel Event Creation")
                         .setMessage("Are you sure you want to cancel? All input will be lost.")

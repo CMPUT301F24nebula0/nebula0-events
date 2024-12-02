@@ -25,7 +25,7 @@ public class Event {
     private Date eventDate;
 
     private boolean geolocationRequired;
-    private int geolocationMaxDistance = -1; // -1 means no limit
+//    private int geolocationMaxDistance = -1; // -1 means no limit
     private boolean waitlistCapacityRequired;
     protected int waitlistCapacity = -1;
     protected int eventCapacity = -1;
@@ -56,12 +56,12 @@ public class Event {
      * @param eventDescription          the description of the event
      * @param eventDate                 the date of the event
      * @param geolocationRequired       whether geolocation is required
-     * @param geolocationMaxDistance    the maximum distance for geolocation (-1 if no limit)
+//     * @param geolocationMaxDistance    the maximum distance for geolocation (-1 if no limit)
      * @param waitlistCapacityRequired  whether a waitlist capacity is required
      * @param waitlistCapacity          the maximum capacity of the waitlist (-1 if no limit)
      * @param eventCapacity             the maximum capacity of the event (-1 if no limit)
      */
-    public Event(String eventName, String eventDescription, Date eventDate, boolean geolocationRequired, int geolocationMaxDistance,
+    public Event(String eventName, String eventDescription, Date eventDate, boolean geolocationRequired,
                  boolean waitlistCapacityRequired, int waitlistCapacity,
                  int eventCapacity) {
         dbManager = new DBManager();
@@ -72,7 +72,7 @@ public class Event {
         this.eventDescription = eventDescription;
         this.eventDate = eventDate;
         this.geolocationRequired = geolocationRequired;
-        this.geolocationMaxDistance = geolocationMaxDistance;
+//        this.geolocationMaxDistance = geolocationMaxDistance;
         this.waitlistCapacityRequired = waitlistCapacityRequired;
         this.waitlistCapacity = waitlistCapacity;
         this.eventCapacity = eventCapacity;
@@ -87,12 +87,12 @@ public class Event {
      * @param eventDescription          the description of the event
      * @param eventDate                 the date of the event
      * @param geolocationRequired       whether geolocation is required
-     * @param geolocationMaxDistance    the maximum distance for geolocation (-1 if no limit)
+//     * @param geolocationMaxDistance    the maximum distance for geolocation (-1 if no limit)
      * @param waitlistCapacityRequired  whether a waitlist capacity is required
      * @param waitlistCapacity          the maximum capacity of the waitlist (-1 if no limit)
      * @param eventCapacity             the maximum capacity of the event (-1 if no limit)
      */
-    public Event(String eventID,String organizerID, String eventName, String eventDescription, Date eventDate, boolean geolocationRequired, int geolocationMaxDistance,
+    public Event(String eventID,String organizerID, String eventName, String eventDescription, Date eventDate, boolean geolocationRequired,
                  boolean waitlistCapacityRequired, int waitlistCapacity,
                  int eventCapacity) {
         dbManager = new DBManager();
@@ -103,7 +103,7 @@ public class Event {
         this.eventDescription = eventDescription;
         this.eventDate = eventDate;
         this.geolocationRequired = geolocationRequired;
-        this.geolocationMaxDistance = geolocationMaxDistance;
+//        this.geolocationMaxDistance = geolocationMaxDistance;
         this.waitlistCapacityRequired = waitlistCapacityRequired;
         this.waitlistCapacity = waitlistCapacity;
         this.eventCapacity = eventCapacity;
@@ -151,7 +151,7 @@ public class Event {
      *
      * @return maximum distance for geolocation
      */
-    public int getGeolocationMaxDistance() { return this.geolocationMaxDistance; }
+//    public int getGeolocationMaxDistance() { return this.geolocationMaxDistance; }
     public boolean getWaitlistCapacityRequired() { return this.waitlistCapacityRequired; }
 
     /**
@@ -251,21 +251,105 @@ public class Event {
         return this.entrantsEnrolled;
     }
 
-    // setters
+    /**
+     * Updates the unique identifier for the event.
+     *
+     * @param eventID The new event ID to be set.
+     */
     public void setEventID(String eventID) { this.eventID = eventID; }
+
+
+    /**
+     * Updates the name of the event.
+     *
+     * @param eventName The new name of the event.
+     */
     public void setEventName(String eventName) { this.eventName = eventName; }
+
+    /**
+     * Updates the description of the event.
+     *
+     * @param eventDescription The new description of the event.
+     */
     public void setEventDescription(String eventDescription) { this.eventDescription = eventDescription; }
+
+    /**
+     * Updates the date and time of the event.
+     *
+     * @param eventDate The new date and time of the event.
+     */
     public void setEventDate(Date eventDate) { this.eventDate = eventDate; }
+
+    /**
+     * Specifies whether geolocation is required to participate in the event.
+     *
+     * @param geolocationRequired True if geolocation is required; otherwise, false.
+     */
     public void setGeolocationRequired(boolean geolocationRequired) { this.geolocationRequired = geolocationRequired; }
-    public void setGeolocationMaxDistance(int geolocationMaxDistance) { this.geolocationMaxDistance = geolocationMaxDistance; }
+
+    /**
+     * Specifies whether the event has a waitlist capacity requirement.
+     *
+     * @param waitlistCapacityRequired True if waitlist capacity is required; otherwise, false.
+     */
     public void setWaitlistCapacityRequired(boolean waitlistCapacityRequired) { this.waitlistCapacityRequired = waitlistCapacityRequired; }
+
+    /**
+     * Updates the maximum number of participants allowed on the waitlist.
+     *
+     * @param waitlistCapacity The new waitlist capacity for the event.
+     */
     public void setWaitlistCapacity(int waitlistCapacity) { this.waitlistCapacity = waitlistCapacity; }
+
+    /**
+     * Updates the maximum number of participants allowed for the event.
+     *
+     * @param eventCapacity The new event capacity.
+     */
     public void setEventCapacity(int eventCapacity) { this.eventCapacity = eventCapacity; }
+
+    /**
+     * Updates the ID of the organizer who created the event.
+     *
+     * @param organizerID The new organizer ID.
+     */
     public void setOrganizerID(String organizerID) { this.organizerID = organizerID; }
+
+    /**
+     * Updates the URI or path of the event poster.
+     *
+     * @param poster The new URI or path for the event poster.
+     */
     public void setPoster(String poster) { this.poster = poster; }
+
+    /**
+     * Updates the date and time when the event was created.
+     *
+     * @param createdDateTime The new creation date and time.
+     */
     public void setCreatedDateTime(Date createdDateTime) { this.createdDateTime = createdDateTime; }
+
+    /**
+     * Updates the number of attendees currently registered for the event.
+     *
+     * @param numberOfAttendees The new count of registered attendees.
+     */
     public void setNumberOfAttendees (int numberOfAttendees) { this.numberOfAttendees = numberOfAttendees; }
+
+
+    /**
+     * Updates the maximum distance allowed for geolocation-based participation in the event.
+     *
+     * @param geolocationRequirement The new geolocation distance requirement in kilometers.
+     */
     public void setGeolocationRequirement (int geolocationRequirement) { this.geolocationRequirement = geolocationRequirement; }
+
+
+    /**
+     * Updates the QR code data associated with the event.
+     *
+     * @param qrCodeData The new QR code data.
+     */
     public void setQrCodeData(String qrCodeData) { this.qrCodeData = qrCodeData; }
     //------------ WAITLIST LOGIC
 

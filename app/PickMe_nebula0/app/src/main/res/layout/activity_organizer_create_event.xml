@@ -119,15 +119,6 @@
     <!-- Waitlist Capacity Label -->
 
     <!-- Waitlist Capacity Switch -->
-    <EditText
-        android:id="@+id/geolocation_requirement_field"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Enter geolocation details"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/geolocation_requirement_text" />
 
     <TextView
         android:id="@+id/waitlist_capacity_required_text"
@@ -142,9 +133,8 @@
         android:id="@+id/waitlist_capacity_required_switch"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginTop="24dp"
         app:layout_constraintStart_toEndOf="@+id/waitlist_capacity_required_text"
-        app:layout_constraintTop_toBottomOf="@+id/geolocation_requirement_field" />
+        app:layout_constraintTop_toBottomOf="@+id/geolocation_requirement_switch" />
 
     <!-- Waitlist Capacity Field -->
     <EditText

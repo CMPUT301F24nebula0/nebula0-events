@@ -300,9 +300,9 @@ public class EventDetailActivity extends AppCompatActivity {
         details.append("Date: ").append(event.getEventDate().toString()).append("\n\n");
         details.append("Geolocation Required: ").append(event.getGeolocationRequired() ? "Yes" : "No").append("\n\n");
 
-        if (event.getGeolocationRequired()) {
-            details.append("Geolocation Max Distance: ").append(event.getGeolocationMaxDistance()).append(" km\n");
-        }
+//        if (event.getGeolocationRequired()) {
+//            details.append("Geolocation Max Distance: ").append(event.getGeolocationMaxDistance()).append(" km\n");
+//        }
 
         details.append("Waitlist Capacity Required: ").append(event.getWaitlistCapacityRequired() ? "Yes" : "No").append("\n");
 
