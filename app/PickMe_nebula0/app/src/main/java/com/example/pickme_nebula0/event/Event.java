@@ -25,7 +25,7 @@ public class Event {
     private Date eventDate;
 
     private boolean geolocationRequired;
-    private int geolocationMaxDistance = -1; // -1 means no limit
+//    private int geolocationMaxDistance = -1; // -1 means no limit
     private boolean waitlistCapacityRequired;
     protected int waitlistCapacity = -1;
     protected int eventCapacity = -1;
@@ -56,12 +56,12 @@ public class Event {
      * @param eventDescription          the description of the event
      * @param eventDate                 the date of the event
      * @param geolocationRequired       whether geolocation is required
-     * @param geolocationMaxDistance    the maximum distance for geolocation (-1 if no limit)
+//     * @param geolocationMaxDistance    the maximum distance for geolocation (-1 if no limit)
      * @param waitlistCapacityRequired  whether a waitlist capacity is required
      * @param waitlistCapacity          the maximum capacity of the waitlist (-1 if no limit)
      * @param eventCapacity             the maximum capacity of the event (-1 if no limit)
      */
-    public Event(String eventName, String eventDescription, Date eventDate, boolean geolocationRequired, int geolocationMaxDistance,
+    public Event(String eventName, String eventDescription, Date eventDate, boolean geolocationRequired,
                  boolean waitlistCapacityRequired, int waitlistCapacity,
                  int eventCapacity) {
         dbManager = new DBManager();
@@ -72,7 +72,7 @@ public class Event {
         this.eventDescription = eventDescription;
         this.eventDate = eventDate;
         this.geolocationRequired = geolocationRequired;
-        this.geolocationMaxDistance = geolocationMaxDistance;
+//        this.geolocationMaxDistance = geolocationMaxDistance;
         this.waitlistCapacityRequired = waitlistCapacityRequired;
         this.waitlistCapacity = waitlistCapacity;
         this.eventCapacity = eventCapacity;
@@ -87,12 +87,12 @@ public class Event {
      * @param eventDescription          the description of the event
      * @param eventDate                 the date of the event
      * @param geolocationRequired       whether geolocation is required
-     * @param geolocationMaxDistance    the maximum distance for geolocation (-1 if no limit)
+//     * @param geolocationMaxDistance    the maximum distance for geolocation (-1 if no limit)
      * @param waitlistCapacityRequired  whether a waitlist capacity is required
      * @param waitlistCapacity          the maximum capacity of the waitlist (-1 if no limit)
      * @param eventCapacity             the maximum capacity of the event (-1 if no limit)
      */
-    public Event(String eventID,String organizerID, String eventName, String eventDescription, Date eventDate, boolean geolocationRequired, int geolocationMaxDistance,
+    public Event(String eventID,String organizerID, String eventName, String eventDescription, Date eventDate, boolean geolocationRequired,
                  boolean waitlistCapacityRequired, int waitlistCapacity,
                  int eventCapacity) {
         dbManager = new DBManager();
@@ -103,7 +103,7 @@ public class Event {
         this.eventDescription = eventDescription;
         this.eventDate = eventDate;
         this.geolocationRequired = geolocationRequired;
-        this.geolocationMaxDistance = geolocationMaxDistance;
+//        this.geolocationMaxDistance = geolocationMaxDistance;
         this.waitlistCapacityRequired = waitlistCapacityRequired;
         this.waitlistCapacity = waitlistCapacity;
         this.eventCapacity = eventCapacity;
@@ -151,7 +151,7 @@ public class Event {
      *
      * @return maximum distance for geolocation
      */
-    public int getGeolocationMaxDistance() { return this.geolocationMaxDistance; }
+//    public int getGeolocationMaxDistance() { return this.geolocationMaxDistance; }
     public boolean getWaitlistCapacityRequired() { return this.waitlistCapacityRequired; }
 
     /**
@@ -257,7 +257,7 @@ public class Event {
     public void setEventDescription(String eventDescription) { this.eventDescription = eventDescription; }
     public void setEventDate(Date eventDate) { this.eventDate = eventDate; }
     public void setGeolocationRequired(boolean geolocationRequired) { this.geolocationRequired = geolocationRequired; }
-    public void setGeolocationMaxDistance(int geolocationMaxDistance) { this.geolocationMaxDistance = geolocationMaxDistance; }
+//    public void setGeolocationMaxDistance(int geolocationMaxDistance) { this.geolocationMaxDistance = geolocationMaxDistance; }
     public void setWaitlistCapacityRequired(boolean waitlistCapacityRequired) { this.waitlistCapacityRequired = waitlistCapacityRequired; }
     public void setWaitlistCapacity(int waitlistCapacity) { this.waitlistCapacity = waitlistCapacity; }
     public void setEventCapacity(int eventCapacity) { this.eventCapacity = eventCapacity; }

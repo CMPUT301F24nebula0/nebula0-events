@@ -34,7 +34,7 @@ public class OrganizerExceptions {
      * @param eventDescription description of event
      * @param eventDate date of event
      * @param geolocationRequired true if we require geolocation of user, else false
-     * @param geolocationRequirement max distance
+//     * @param geolocationRequirement max distance
      * @param waitlistCapacityRequired true if we have a max waitlist capacity, else false
      * @param waitlistCapacity maximum number of registrants that can join the waitlist
      * @param numberOfAttendees max number of entrants who can participate in the event
@@ -47,7 +47,7 @@ public class OrganizerExceptions {
             String eventDescription,
             String eventDate,
             boolean geolocationRequired,
-            String geolocationRequirement,
+//            String geolocationRequirement,
             boolean waitlistCapacityRequired,
             String waitlistCapacity,
             String numberOfAttendees
@@ -81,13 +81,13 @@ public class OrganizerExceptions {
             validEvent = false;
         }
 
-        // validate geolocation requirement
-        if (geolocationRequired) {
-            if (!validateGeolocationRequirement(geolocationRequirement)) {
-                warningMessage.append("\n- The geolocation requirement cannot be blank and must be a positive number.");
-                validEvent = false;
-            }
-        }
+//        // validate geolocation requirement
+//        if (geolocationRequired) {
+//            if (!validateGeolocationRequirement(geolocationRequirement)) {
+//                warningMessage.append("\n- The geolocation requirement cannot be blank and must be a positive number.");
+//                validEvent = false;
+//            }
+//        }
 
         // validate number of attendees
         if (!validateNumberOfAttendees(numberOfAttendees)) {
@@ -179,26 +179,26 @@ public class OrganizerExceptions {
         return true;
     }
 
-    /**
-     * Ensures the geolocation requirement is valid, max distance >0
-     * @param geolocationRequirement max distance allowed
-     * @return true if valid, else false
-     */
-    private boolean validateGeolocationRequirement(String geolocationRequirement) {
-        if (geolocationRequirement.isEmpty()) {
-            return false;
-        } else {
-            try {
-                radius = Integer.parseInt(geolocationRequirement);
-                if (radius < 0) {
-                    return false;
-                }
-            } catch (NumberFormatException e) {
-                return false;
-            }
-        }
-        return true;
-    }
+//    /**
+//     * Ensures the geolocation requirement is valid, max distance >0
+//     * @param geolocationRequirement max distance allowed
+//     * @return true if valid, else false
+//     */
+//    private boolean validateGeolocationRequirement(String geolocationRequirement) {
+//        if (geolocationRequirement.isEmpty()) {
+//            return false;
+//        } else {
+//            try {
+//                radius = Integer.parseInt(geolocationRequirement);
+//                if (radius < 0) {
+//                    return false;
+//                }
+//            } catch (NumberFormatException e) {
+//                return false;
+//            }
+//        }
+//        return true;
+//    }
 
     /**
      * Ensure the number of attendees is an integer greater than zero

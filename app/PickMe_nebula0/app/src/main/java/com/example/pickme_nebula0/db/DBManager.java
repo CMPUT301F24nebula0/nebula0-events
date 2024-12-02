@@ -432,7 +432,7 @@ public class DBManager {
         eventData.put("eventDescription", event.getEventDescription());
         eventData.put("eventDate", event.getEventDate());
         eventData.put("geolocationRequired", event.getGeolocationRequired());
-        eventData.put("geolocationRequirement", event.getGeolocationMaxDistance());
+//        eventData.put("geolocationRequirement", event.getGeolocationMaxDistance());
         eventData.put("waitlistCapacityRequired", event.getWaitlistCapacityRequired());
         eventData.put("waitlistCapacity", event.getWaitlistCapacity());
         eventData.put("createdDateTime", new Date());
@@ -512,7 +512,7 @@ public class DBManager {
         updateField(eventDocRef,"eventDescription", event.getEventDescription());
         updateField(eventDocRef,"eventDate", event.getEventDate());
         updateField(eventDocRef,"geolocationRequired", event.getGeolocationRequired());
-        updateField(eventDocRef,"geolocationRequirement", event.getGeolocationMaxDistance());
+//        updateField(eventDocRef,"geolocationRequirement", event.getGeolocationMaxDistance());
         updateField(eventDocRef,"waitlistCapacityRequired", event.getWaitlistCapacityRequired());
         updateField(eventDocRef,"waitlistCapacity", event.getWaitlistCapacity());
         updateField(eventDocRef,"numberOfAttendees", event.getEventCapacity());
