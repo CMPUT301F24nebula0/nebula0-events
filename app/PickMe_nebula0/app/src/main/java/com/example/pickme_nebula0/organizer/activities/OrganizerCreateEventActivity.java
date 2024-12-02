@@ -227,7 +227,7 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         // Check if any fields are filled before cancelling
         eventCreationCancelButton.setOnClickListener(v -> {
             v.startAnimation(buttonClickAnimation); // Start animation
-            if (isAnyFieldFilled(eventNameField, eventDescriptionField, eventDateField, geolocationRequirementField, waitlistCapacityField, numberOfAttendeesField)) {
+            if (isAnyFieldFilled(eventNameField, eventDescriptionField, eventDateField, waitlistCapacityField, numberOfAttendeesField)) {
 
                 new AlertDialog.Builder(OrganizerCreateEventActivity.this)
                         .setTitle("Cancel Event Creation")
