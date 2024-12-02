@@ -78,8 +78,7 @@ public class FacilityInfoActivity extends AppCompatActivity {
                 }
 
                 Facility facility = new Facility(name,address);
-                dbManager.addUpdateFacility(facility);
-                finish();
+                dbManager.addUpdateFacility(facility,()->finish());
             }
         });
 
