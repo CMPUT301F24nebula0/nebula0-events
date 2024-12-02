@@ -18,6 +18,7 @@ import com.example.pickme_nebula0.organizer.fragments.OrganizerOngoingFragment;
 import com.example.pickme_nebula0.organizer.fragments.OrganizerPastFragment;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+
 /**
  * Activity for the organizer's home screen.
  *
@@ -31,6 +32,8 @@ import com.google.android.material.tabs.TabLayoutMediator;
 public class OrganizerHomeActivity extends AppCompatActivity {
     private final String[] tabTitles = new String[]{"Past", "Ongoing"};
     private Button createEventButton;
+    private Button refreshButton;
+
     /**
      * Initializes the activity, sets up the tabbed interface, and configures button functionality.
      *
@@ -44,12 +47,12 @@ public class OrganizerHomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_organizer_home); // attach components to layout
-        Animation buttonClickAnimation = AnimationUtils.loadAnimation(this, R.anim.button_click_animation);
 
         tabToggling(tabTitles);
 
         backButton();
         createEventButton();
+        refreshButton();
     }
 
     /**
@@ -108,7 +111,13 @@ public class OrganizerHomeActivity extends AppCompatActivity {
         });
     }
 
+    private void refreshButton(){
+        Animation buttonClickAnimation = AnimationUtils.loadAnimation(this, R.anim.button_click_animation);
 
+        refreshButton = findViewById(R.id.buttonRefreshOrgEvents);
+
+        refreshButton.setOnClickListener(view-> onResume());
+    }
 
     /**
      * Configures the "Create Event" button to navigate to the event creation activity.
@@ -136,6 +145,7 @@ public class OrganizerHomeActivity extends AppCompatActivity {
         Intent intent = new Intent(OrganizerHomeActivity.this, OrganizerCreateEventActivity.class);
         startActivity(intent);
     }
+
     /**
      * Adapter for managing fragments in the tabbed interface.
      *
@@ -150,6 +160,7 @@ public class OrganizerHomeActivity extends AppCompatActivity {
         public ScreensSlidePagerAdapter(AppCompatActivity fa) {
             super(fa);
         }
+
         /**
          * Creates a fragment for the specified tab position.
          *
@@ -164,12 +175,12 @@ public class OrganizerHomeActivity extends AppCompatActivity {
             // ongoing tab selected
             else { return new OrganizerOngoingFragment(); }
         }
+
         /**
          * Returns the number of tabs in the interface.
          *
          * @return the total number of tabs
          */
-
         @Override
         public int getItemCount() {
             return tabTitles.length;
