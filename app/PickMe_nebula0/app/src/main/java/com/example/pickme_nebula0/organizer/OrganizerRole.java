@@ -259,56 +259,44 @@ public class OrganizerRole extends User {
      * Notifies users they have been selected for an event
      * @param event event of interest
      * @param user user to notify
-     * @return true if that user had notifications enabled, else false
      */
-    public static boolean notifyEntrantChosen(Event event, User user) {
-        if (!user.getNotificationsEnabled()) {return false;}
+    public static void notifyEntrantChosen(Event event, User user) {
         String title = "Selected For Event";
         String message = "You have been selected to join the following event: " + event.getEventName();
         dbm.createNotification(title, message, user.getUserID(), event.getEventID());
-        return true;
     }
 
     /**
      * Notifies entrant they have been selected for an event due to resampling
      * @param event event of interest
      * @param user user to notify
-     * @return true if that user had notifications enabled, else false
      */
-    public static boolean notifyEntrantResampled(Event event, User user) {
-        if (!user.getNotificationsEnabled()) {return false;}
+    public static void notifyEntrantResampled(Event event, User user) {
         String title = "Selected For Event";
         String message = "You have been selected to join the following event, since some have declined their invite: " + event.getEventName();
         dbm.createNotification(title, message, user.getUserID(), event.getEventID());
-        return true;
     }
 
     /**
      * Notifies entrant that they have not been chosen for an event
      * @param event event of interest
      * @param user user to notify
-     * @return true if that user had notifications enabled, else false
      */
-    public static boolean notifyEntrantNotChosen(Event event, User user) {
-        if (!user.getNotificationsEnabled()) {return false;}
+    public static void notifyEntrantNotChosen(Event event, User user) {
         String title = "Not Selected For Event";
         String message = "You have not been sampled for the following event, but you will remain waitlisted in case a spot opens up: " + event.getEventName();
         dbm.createNotification(title, message, user.getUserID(), event.getEventID());
-        return true;
     }
 
     /**
-     * Notifies entrant that they're invitation had been canceled
+     * Notifies entrant that their invitation had been canceled
      * @param event event of interest
      * @param user user to notify
-     * @return true if that user had notifications enabled, else false
      */
-    public static boolean notifyEntrantCancelled(Event event, User user) {
-        if (!user.getNotificationsEnabled()) {return false;}
+    public static void notifyEntrantCancelled(Event event, User user) {
         String title = "Cancelled Event Invite";
         String message = "Your invitation to join the following event has been cancelled: " + event.getEventName();
         dbm.createNotification(title, message, user.getUserID(), event.getEventID());
-        return true;
     }
 
     // -------------- UTILITY FUNCTIONS
