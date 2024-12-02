@@ -124,7 +124,7 @@ public class OrganizerRole extends User {
         // get waitlist capacity first via event
         dbManager.getEvent(eventID, (eventObj) -> {
             Event event = (Event) eventObj;
-            int eventCapacity = event.getEventCapacity();
+            int eventCapacity = event.getNumberOfAttendees();
 
             // get random sample of users
             sampleUsers(eventID, eventCapacity, (sampleResultsObj) -> {
@@ -170,7 +170,7 @@ public class OrganizerRole extends User {
         // get event capacity
         dbManager.getEvent(eventID, (eventObj) -> {
             Event event = (Event) eventObj;
-            int eventCapacity = event.getEventCapacity();
+            int eventCapacity = event.getNumberOfAttendees();
             if (eventCapacity == -1) {return;}
 
             // get number of entrants who are selected and confirmed
