@@ -113,7 +113,7 @@ public class UserDetailActivity extends AppCompatActivity {
         // check if userID and eventID got passed from the intent
 //        Log.d("UserDetailActivity", "userID: " + userID + ", eventID: " + eventID);
 
-        if(!getIntent().getBooleanExtra("organizer", true)){
+        if(!getIntent().getBooleanExtra("organizer", false)){
             mapButton.setVisibility(View.GONE);
         } else {
             // hide mapButton if geolocation requirement is off
