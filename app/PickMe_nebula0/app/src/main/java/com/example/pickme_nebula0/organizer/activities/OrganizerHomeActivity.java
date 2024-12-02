@@ -17,11 +17,29 @@ import com.example.pickme_nebula0.organizer.fragments.OrganizerPastFragment;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
+/**
+ * Activity for the organizer's home screen.
+ *
+ * Displays a tabbed interface with two categories: "Past" and "Ongoing" events. Provides functionality
+ * for navigating to the "Create Event" activity and toggling between event categories.
+ *
+ * @see OrganizerPastFragment
+ * @see OrganizerOngoingFragment
+ * @see OrganizerCreateEventActivity
+ */
 public class OrganizerHomeActivity extends AppCompatActivity {
     private final String[] tabTitles = new String[]{"Past", "Ongoing"};
     private Button createEventButton;
     private Button refreshButton;
 
+    /**
+     * Initializes the activity, sets up the tabbed interface, and configures button functionality.
+     *
+     * Attaches the UI layout, configures tabs for "Past" and "Ongoing" events, and sets up the
+     * "Create Event" and "Back" buttons.
+     *
+     * @param savedInstanceState the previously saved state of the activity, if any
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,9 +54,12 @@ public class OrganizerHomeActivity extends AppCompatActivity {
     }
 
     /**
-     * Function to toggle between tabs
+     * Configures the tabbed interface for toggling between "Past" and "Ongoing" events.
      *
-     * @param tabTitles array of tab titles
+     * Sets up the `ViewPager2` with fragments for each tab and synchronizes it with the `TabLayout`.
+     * Ensures the "Create Event" button is visible for all tabs.
+     *
+     * @param tabTitles an array of tab titles ("Past" and "Ongoing")
      */
     private void tabToggling(String[] tabTitles) {
         ViewPager2 viewPager = findViewById(R.id.view_pager); // display tabs: "past" and "ongoing"
@@ -70,7 +91,9 @@ public class OrganizerHomeActivity extends AppCompatActivity {
     }
 
     /**
-     * Function for back button
+     * Configures the back button to navigate to the previous activity.
+     *
+     * Attaches a click listener to the back button that triggers the system's back press dispatcher.
      */
     private void backButton() {
         Button backButton = findViewById(R.id.backButton);
@@ -83,7 +106,9 @@ public class OrganizerHomeActivity extends AppCompatActivity {
     }
 
     /**
-     * Function for create event button
+     * Configures the "Create Event" button to navigate to the event creation activity.
+     *
+     * Attaches a click listener to the button that calls the `navigateTo` method.
      */
     private void createEventButton() {
         createEventButton = findViewById(R.id.createEventButton);
@@ -91,18 +116,36 @@ public class OrganizerHomeActivity extends AppCompatActivity {
     }
 
     /**
-     * Function to navigate to the create event activity
+     * Navigates to the "Create Event" activity.
+     *
+     * Starts the `OrganizerCreateEventActivity` when the "Create Event" button is clicked.
      */
     private void navigateTo() {
         Intent intent = new Intent(OrganizerHomeActivity.this, OrganizerCreateEventActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * Adapter for managing fragments in the tabbed interface.
+     *
+     * Provides fragments for the "Past" and "Ongoing" event categories.
+     */
     private class ScreensSlidePagerAdapter extends FragmentStateAdapter {
+        /**
+         * Constructs the adapter for managing fragments in `ViewPager2`.
+         *
+         * @param fa the parent activity where this adapter is used
+         */
         public ScreensSlidePagerAdapter(AppCompatActivity fa) {
             super(fa);
         }
 
+        /**
+         * Creates a fragment for the specified tab position.
+         *
+         * @param position the position of the tab
+         * @return the fragment corresponding to the tab
+         */
         @NonNull
         @Override
         public Fragment createFragment(int position) {
@@ -112,6 +155,11 @@ public class OrganizerHomeActivity extends AppCompatActivity {
             else { return new OrganizerOngoingFragment(); }
         }
 
+        /**
+         * Returns the number of tabs in the interface.
+         *
+         * @return the total number of tabs
+         */
         @Override
         public int getItemCount() {
             return tabTitles.length;

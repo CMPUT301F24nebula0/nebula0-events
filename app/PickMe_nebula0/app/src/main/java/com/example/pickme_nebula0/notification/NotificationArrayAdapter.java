@@ -21,10 +21,28 @@ import java.util.ArrayList;
  */
 public class NotificationArrayAdapter extends ArrayAdapter<Notification> {
 
+    /**
+     * Constructs a new `NotificationArrayAdapter` for displaying notifications.
+     *
+     * @param context           the context in which the adapter is used
+     * @param textViewResourceId the resource ID of the text view to use
+     * @param notifs            the list of notifications to be displayed
+     */
     public NotificationArrayAdapter(Context context,int textViewResourceId, ArrayList<Notification> notifs){
         super(context,textViewResourceId,notifs);
     }
 
+    /**
+     * Provides a view for each notification in the ListView.
+     *
+     * Inflates a custom layout for displaying a notification if no reusable view is available.
+     * Sets the title and message of the notification in the respective text views.
+     *
+     * @param position    the position of the notification in the list
+     * @param convertView the recycled view to reuse, if available
+     * @param parent      the parent view group that this view will be attached to
+     * @return the view corresponding to the notification at the specified position
+     */
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {

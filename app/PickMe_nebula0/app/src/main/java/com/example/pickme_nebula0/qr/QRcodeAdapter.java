@@ -16,15 +16,38 @@ import com.example.pickme_nebula0.event.Event;
 import java.util.ArrayList;
 
 /**
- * Array adapter for displaying QR code
+ * Array adapter for displaying QR code data.
+ *
+ * This adapter is responsible for converting a list of `Event` objects into
+ * views that display their QR code data or event name.
+ *
+ * @see Event
  */
 public class QRcodeAdapter extends ArrayAdapter<Event> {
 
+    /**
+     * Constructs a new QRcodeAdapter.
+     *
+     * @param context The current context, used to inflate the layout file.
+     * @param textViewResourceId The resource ID for a layout file containing a TextView to use when instantiating views.
+     * @param events The list of `Event` objects to be displayed.
+     */
     public QRcodeAdapter(Context context, int textViewResourceId, ArrayList<Event> events){
         super(context,textViewResourceId, events);
 
     }
-    // convert each User into a View
+
+    /**
+     * Converts an `Event` object into a view for display in the adapter.
+     *
+     * This method inflates a layout for each `Event` and populates it with the
+     * event's QR code data or its name if no QR code data is available.
+     *
+     * @param position The position of the `Event` in the list.
+     * @param convertView The recycled view to populate, or null if a new view needs to be created.
+     * @param parent The parent view group that this view will be attached to.
+     * @return A view corresponding to the data at the specified position.
+     */
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {

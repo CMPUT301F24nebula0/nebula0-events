@@ -25,7 +25,14 @@ import java.util.List;
 
 
 /**
- * OrganizerRole
+ * Represents the role of an organizer in the application.
+ *
+ * This class extends the `User` class and provides functionalities specific to organizers,
+ * such as event management, sampling and selecting users for events, and sending notifications.
+ *
+ * @see User
+ * @see DBManager
+ * @see EventManager
  */
 public class OrganizerRole extends User {
     private String organizerID;
@@ -37,7 +44,9 @@ public class OrganizerRole extends User {
     private static FirebaseFirestore db = dbm.db;
 
     /**
-     * Constructor
+     * Default constructor for the `OrganizerRole` class.
+     *
+     * Initializes the organizer with a null organizer ID.
      */
     public OrganizerRole() {
         organizerID = null;
@@ -331,7 +340,12 @@ public class OrganizerRole extends User {
         });
     }
 
-    // for resampling users
+    /**
+     * Counts the number of users with `CONFIRMED` or `SELECTED` status for an event.
+     *
+     * @param eventID             the ID of the event
+     * @param onSuccessCallback   function to call with the count upon success
+     */
     private static void countConfirmedAndSelected(String eventID, DBManager.Obj2VoidCallback onSuccessCallback) {
 
         // reference to EventRegistrants subcollection

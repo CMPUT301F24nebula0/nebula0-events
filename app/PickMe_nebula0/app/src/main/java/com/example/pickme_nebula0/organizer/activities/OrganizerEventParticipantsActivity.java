@@ -19,9 +19,17 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 /**
- * Class for the Organizer Event Participants Activity
+ * Activity for organizers to view participants of an event by category.
  *
- * @Author: Taekwan Yoon
+ * This class displays a tabbed interface with four categories: Waitlisted, Selected, Confirmed, and Cancelled.
+ * Each tab shows participants in the respective category using fragments.
+ *
+ * @see OrganizerWaitlistedFragment
+ * @see OrganizerSelectedFragment
+ * @see OrganizerConfirmedFragment
+ * @see OrganizerCancelledFragment
+ *
+ * @author Taekwan Yoon
  */
 public class OrganizerEventParticipantsActivity extends AppCompatActivity {
 
@@ -35,6 +43,14 @@ public class OrganizerEventParticipantsActivity extends AppCompatActivity {
     Button backButton;
     String eventID;
 
+    /**
+     * Initializes the activity, sets up the ViewPager2 with tabbed categories, and handles user interactions.
+     *
+     * Retrieves the event ID from the intent, configures tabs for participant categories, and implements
+     * back button functionality.
+     *
+     * @param savedInstanceState the previously saved state of the activity, if any
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,15 +89,21 @@ public class OrganizerEventParticipantsActivity extends AppCompatActivity {
     }
 
     /**
-     * Class for the Screens Slide Pager Adapter
+     * Adapter for managing fragments displayed in the tabbed interface.
      *
-     * @author Taekwan Yoon
+     * Dynamically loads the appropriate fragment for each tab in the participant categories.
      */
     private class ScreensSlidePagerAdapter extends FragmentStateAdapter {
         public ScreensSlidePagerAdapter(AppCompatActivity fa) {
             super(fa);
         }
 
+        /**
+         * Creates a fragment for the specified position.
+         *
+         * @param position the position of the tab
+         * @return the fragment corresponding to the tab
+         */
         @NonNull
         @Override
         public Fragment createFragment(int position) {
@@ -96,6 +118,11 @@ public class OrganizerEventParticipantsActivity extends AppCompatActivity {
             return new OrganizerWaitlistedFragment(eventID);
         }
 
+        /**
+         * Returns the number of tabs/categories.
+         *
+         * @return the total number of tabs
+         */
         @Override
         public int getItemCount() {
             return tabTitles.length;

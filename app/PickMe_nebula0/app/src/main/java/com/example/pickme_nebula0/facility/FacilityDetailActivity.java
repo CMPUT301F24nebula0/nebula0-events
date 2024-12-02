@@ -14,7 +14,11 @@ import com.example.pickme_nebula0.db.DBManager;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
- * Activity for viewing facility detail and deleting the facility for admin
+ * Activity for viewing and managing facility details for admin users.
+ *
+ * This activity allows the admin to view the details of a facility and delete it if necessary.
+ * The facility ID is retrieved from the intent, and facility information is fetched from Firestore.
+ * Includes options to go back to the previous screen or delete the facility.
  */
 public class FacilityDetailActivity extends AppCompatActivity {
 
@@ -23,6 +27,14 @@ public class FacilityDetailActivity extends AppCompatActivity {
 
     private TextView facilityDetails;
 
+    /**
+     * Initializes the activity, retrieves the facility ID from the intent, and sets up UI components.
+     *
+     * Validates the facility ID, sets up button click listeners for navigation and deletion,
+     * and triggers fetching facility details from the database.
+     *
+     * @param savedInstanceState the previously saved state of the activity, if any
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,8 +72,9 @@ public class FacilityDetailActivity extends AppCompatActivity {
     }
 
     /**
-     * Retrieves facility details from DB and sets info on screen
-     * @param facilityID ID of facility to fetch details of
+     * Fetches the details of a facility from Firestore and displays them on the screen.
+     *
+     * @param facilityID the ID of the facility whose details are to be fetched
      */
     private void fetchFacilityDetails(String facilityID) {
         db.collection("Facilities").document(facilityID)

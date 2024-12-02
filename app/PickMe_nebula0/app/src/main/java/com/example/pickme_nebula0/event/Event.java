@@ -43,11 +43,23 @@ public class Event {
     protected ArrayList<EntrantRole> entrantsEnrolled = new ArrayList<EntrantRole>();
     protected ArrayList<EntrantRole> entrantsToResample = new ArrayList<EntrantRole>();
 
-    public Event() {
-
-    }
     /**
-     * Constructor
+     * Default constructor for creating an empty event object.
+     */
+    public Event() { }
+
+
+    /**
+     * Constructor for creating an event with specified attributes.
+     *
+     * @param eventName                 the name of the event
+     * @param eventDescription          the description of the event
+     * @param eventDate                 the date of the event
+     * @param geolocationRequired       whether geolocation is required
+     * @param geolocationMaxDistance    the maximum distance for geolocation (-1 if no limit)
+     * @param waitlistCapacityRequired  whether a waitlist capacity is required
+     * @param waitlistCapacity          the maximum capacity of the waitlist (-1 if no limit)
+     * @param eventCapacity             the maximum capacity of the event (-1 if no limit)
      */
     public Event(String eventName, String eventDescription, Date eventDate, boolean geolocationRequired, int geolocationMaxDistance,
                  boolean waitlistCapacityRequired, int waitlistCapacity,
@@ -66,6 +78,20 @@ public class Event {
         this.eventCapacity = eventCapacity;
     }
 
+    /**
+     * Constructor for creating an event with specified attributes, including event ID and organizer ID.
+     *
+     * @param eventID                   the unique identifier for the event
+     * @param organizerID               the ID of the organizer creating the event
+     * @param eventName                 the name of the event
+     * @param eventDescription          the description of the event
+     * @param eventDate                 the date of the event
+     * @param geolocationRequired       whether geolocation is required
+     * @param geolocationMaxDistance    the maximum distance for geolocation (-1 if no limit)
+     * @param waitlistCapacityRequired  whether a waitlist capacity is required
+     * @param waitlistCapacity          the maximum capacity of the waitlist (-1 if no limit)
+     * @param eventCapacity             the maximum capacity of the event (-1 if no limit)
+     */
     public Event(String eventID,String organizerID, String eventName, String eventDescription, Date eventDate, boolean geolocationRequired, int geolocationMaxDistance,
                  boolean waitlistCapacityRequired, int waitlistCapacity,
                  int eventCapacity) {
@@ -281,7 +307,12 @@ public class Event {
         return true;
     }
 
-    // can be done by organizer or entrant who removes themselves
+    /**
+     * Removes an entrant from the waitlist.
+     *
+     * @param entrant the entrant to be removed from the waitlist
+     * @return true if the entrant was successfully removed, false otherwise
+     */
     public boolean removeEntrantFromWaitlist(EntrantRole entrant) {
         boolean entrantRemoved = this.entrantsInWaitlist.remove(entrant);
         // check if entrant exists in DB
@@ -304,9 +335,9 @@ public class Event {
      */
 
     /**
-     * Randomly sample n entrants from the waiting list,
-     * where n = eventCapacity.
+     * Randomly samples entrants from the waitlist to fill the event's capacity.
      *
+     * Entrants not chosen may be added to the resample list if they opted in for resampling.
      */
     public void sampleEntrants() {
         // eventCapacity == -1 means no limit
@@ -345,8 +376,9 @@ public class Event {
     }
 
     /**
-     * Replaces cancelled/declined entrants with
-     * unselected entrants who opted in to being resampled.
+     * Resamples entrants to fill unfilled spots in the chosen list.
+     *
+     * Entrants are randomly selected from the resample list until all unfilled spots are filled.
      */
     public void resampleEntrants() {
         if (this.unfilledSpots == 0) { return; }
@@ -365,7 +397,12 @@ public class Event {
         this.entrantsToResample = entrantsToResample;
     }
 
-    // should only be done when sampling waiting entrants or resampling entrants
+    /**
+     * Adds an entrant to the chosen list.
+     *
+     * @param entrant the entrant to be added to the chosen list
+     * @return true if the entrant was successfully added, false otherwise
+     */
     public boolean addEntrantToChosen(EntrantRole entrant) {
         if (entrantChosen(entrant)) { return false; }
         this.entrantsChosen.add(entrant);
@@ -378,9 +415,9 @@ public class Event {
 
     /**
      * Removes an entrant from the chosen list.
-     * CALL THIS FROM:
-     *  EntrantRole - if declining invite.
-     * Updates DB.
+     *
+     * @param entrant the entrant to be removed
+     * @return true if the entrant was successfully removed, false otherwise
      */
     public boolean removeChosenEntrant(EntrantRole entrant) {
         boolean entrantRemoved = this.entrantsChosen.remove(entrant);
@@ -395,9 +432,10 @@ public class Event {
     }
 
     /**
-     * Removes an entrant from the chosen list.
-     * CALL THIS FROM:
-     *  OrganizerRole - if cancelling chosen entrant.
+     * Cancels an entrant from the chosen list, adding them to the cancelled list and updating unfilled spots.
+     *
+     * @param entrant the entrant to be cancelled
+     * @return true if the entrant was successfully cancelled, false otherwise
      */
     public boolean cancelEntrant(EntrantRole entrant) {
 
@@ -413,15 +451,33 @@ public class Event {
         return entrantRemoved;
     }
 
-    //-------------- UTILITY FUNCTIONS
+    /**
+     * Checks if an entrant is in the waitlist.
+     *
+     * @param entrant the entrant to check
+     * @return true if the entrant is in the waitlist, false otherwise
+     */
     public boolean entrantInWaitlist(EntrantRole entrant) {
         return entrantInList(entrant, this.entrantsInWaitlist);
     }
 
+    /**
+     * Checks if an entrant is in the chosen list.
+     *
+     * @param entrant the entrant to check
+     * @return true if the entrant is in the chosen list, false otherwise
+     */
     public boolean entrantChosen(EntrantRole entrant) {
         return entrantInList(entrant, this.entrantsChosen);
     }
 
+    /**
+     * Utility method to check if an entrant exists in a given list.
+     *
+     * @param entrant      the entrant to check
+     * @param entrantList  the list to search
+     * @return true if the entrant exists in the list, false otherwise
+     */
     private boolean entrantInList(EntrantRole entrant, ArrayList<EntrantRole> entrantList) {
         // FETCH FROM DB
         boolean found_entrant = false;
