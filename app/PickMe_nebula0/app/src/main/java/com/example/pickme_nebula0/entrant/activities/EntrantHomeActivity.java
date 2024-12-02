@@ -30,7 +30,7 @@ public class EntrantHomeActivity extends AppCompatActivity {
     private FragmentStateAdapter pagerAdapter;
 
     // buttons
-    private Button scanQRButton, backButton;
+    private Button scanQRButton, backButton,refreshButton;
 
     // fragments for each tab
     EntrantEventsFragment waitlistFrag, selectedFrag, confirmedFrag, cancelledFrag;
@@ -56,6 +56,7 @@ public class EntrantHomeActivity extends AppCompatActivity {
         // Initialize buttons
         scanQRButton = findViewById(R.id.ScanQRButton);
         backButton = findViewById(R.id.backButton);
+        refreshButton = findViewById(R.id.buttonRefresh);
 
         viewPager.setAdapter(pagerAdapter);
 
@@ -72,6 +73,9 @@ public class EntrantHomeActivity extends AppCompatActivity {
 
         // back Button
         backButton.setOnClickListener(view -> getOnBackPressedDispatcher().onBackPressed());
+
+        // refresh button
+        refreshButton.setOnClickListener(view -> onResume());
     }
 
     // Adapter for ViewPager2

@@ -40,8 +40,9 @@
             android:layout_marginEnd="24dp"
             android:text="Event Details"
             android:textSize="24sp"
+            app:layout_constraintBottom_toBottomOf="@+id/button_edu_back"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="@+id/button_edu_back" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -58,6 +59,7 @@
             android:id="@+id/textView_edu_details"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="Event details are currently unavailable."
             app:layout_constraintStart_toStartOf="parent"
@@ -67,6 +69,7 @@
             android:id="@+id/textFacilityDetails"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:text="Facility information is currently unavailable"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView_edu_details" />
@@ -86,6 +89,7 @@
             android:id="@+id/textView_your_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:text="Your Status: "
             android:textSize="16sp"
             app:layout_constraintStart_toStartOf="parent"

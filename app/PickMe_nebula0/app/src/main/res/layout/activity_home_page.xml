@@ -35,7 +35,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
         android:background="@drawable/rounded_button"
-        android:text="Registered Activities"
+        android:text="Registered Events"
 
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -46,8 +46,8 @@
         android:layout_width="260dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Organized Activities"
         android:background="@drawable/rounded_button"
+        android:text="Organized Events"
 
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

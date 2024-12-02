@@ -20,6 +20,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 public class OrganizerHomeActivity extends AppCompatActivity {
     private final String[] tabTitles = new String[]{"Past", "Ongoing"};
     private Button createEventButton;
+    private Button refreshButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +32,7 @@ public class OrganizerHomeActivity extends AppCompatActivity {
 
         backButton();
         createEventButton();
+        refreshButton();
     }
 
     /**
@@ -73,6 +75,11 @@ public class OrganizerHomeActivity extends AppCompatActivity {
     private void backButton() {
         Button backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
+    }
+
+    private void refreshButton(){
+        refreshButton = findViewById(R.id.buttonRefreshOrgEvents);
+        refreshButton.setOnClickListener(view-> onResume());
     }
 
     /**
