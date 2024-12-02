@@ -219,7 +219,6 @@ public class EventDetailActivity extends AppCompatActivity {
 
         newPosterButton.setOnClickListener(view -> {
             view.startAnimation(buttonClickAnimation);
-        // TODO if the anamation didnot worked check this part
             view.postDelayed(this::openImagePicker, 200);
         });
 
