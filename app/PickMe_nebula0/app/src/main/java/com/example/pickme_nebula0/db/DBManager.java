@@ -314,6 +314,68 @@ public class DBManager {
     }
 
     /**
+     * Notifies all entrants who have "notificationsEnabled" set to true.
+     * If status is given, filter by registration status.
+     *
+     * For NotificationCreationActivity to use.
+     *
+     * @param title
+     * @param message
+     * @param eventID
+     * @param entrantNotifFailed
+     */
+    public void notifyEntrantsIfOptedIn(RegistrantStatus status, String title, String message, String eventID, DBManager.Void2VoidCallback entrantNotifFailed) {
+
+        Query registrantsReceivingNotifs = db.collection(eventsCollection)
+                .document(eventID)
+                .collection(eventRegistrantsCollection);
+
+        if (status != null) {
+            registrantsReceivingNotifs = registrantsReceivingNotifs.whereEqualTo(eventStatusKey, status);
+        }
+
+
+        registrantsReceivingNotifs.get().addOnCompleteListener(task -> {
+            // event registrants does not contain info on whether entrants are opted in to notifs
+            // filter here
+            if (task.isSuccessful()) {
+                if (task.getResult().isEmpty()) { Log.w("DBManager", "No entrants to notify based on filters"); }
+
+                // filter for users with notifications enabled
+                for (QueryDocumentSnapshot document : task.getResult()) {
+
+                    if (document == null) {continue;}
+                    String userID = document.getId();
+                    db.collection(usersCollection).document(userID).get().addOnCompleteListener(userTask -> {
+                        if (userTask.isSuccessful()) {
+                            DocumentSnapshot userDoc = userTask.getResult();
+                            if (userDoc != null && userDoc.exists()) {
+                                Object notifsEnabled = userDoc.get("notificationsEnabled");
+                                Log.d("DBManager", "notifs enabled " + notifsEnabled);
+
+                                if (notifsEnabled != null) {
+                                    if ((Boolean) notifsEnabled) {
+                                        Log.d("DBManager", "Notified entrant " + document.getId());
+                                        createNotification(title, message ,document.getId(), eventID);
+
+                                    } else { Log.d("DBManager", "Entrant is opted out: " + document.getId()); }
+                                } else { Log.w("DBManager", "notificationsEnabled is not defined for this user"); }
+                            }
+                        }});
+                }
+            } else {
+                Log.d("DBManager", "Error getting entrants who receive notifications: ", task.getException());
+                entrantNotifFailed.run();
+            }
+        });
+
+    }
+
+    public void notifyEntrantsIfOptedIn(String title, String message, String eventID, DBManager.Void2VoidCallback entrantNotifFailed) {
+        notifyEntrantsIfOptedIn(null, title, message, eventID, entrantNotifFailed);
+    }
+
+    /**
      * Create a notification for a given user.
      *
      * @param title subject line displayed in notification
@@ -534,7 +596,7 @@ public class DBManager {
         eventDocRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
-                if (document.exists()) {
+                if (document != null && document.exists()) {
                     Event event = document.toObject(Event.class);
                     onSuccessCallback.run(event);
                 }

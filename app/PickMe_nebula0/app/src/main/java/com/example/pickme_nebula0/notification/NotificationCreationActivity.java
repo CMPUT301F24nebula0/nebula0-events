@@ -170,14 +170,11 @@ public class NotificationCreationActivity extends AppCompatActivity {
             return false;
         }
 
-        if(status == null){
-            dbManager.notifyAllEntrants(subject,msg,eventID);
-            Toast.makeText(NotificationCreationActivity.this, "Message Sent", Toast.LENGTH_SHORT).show();
-
-        } else{
-            dbManager.notifyEntrantsOfStatus(subject,msg,eventID,status);
-            Toast.makeText(NotificationCreationActivity.this, "Message Sent", Toast.LENGTH_SHORT).show();
-        }
+        // notifies all entrants if status is null
+        // otherwise filters for entrants by the specified status
+        // only sends notifications to entrants who opted in to notifications
+        dbManager.notifyEntrantsIfOptedIn(status, subject, msg, eventID, () -> {});
+        Toast.makeText(NotificationCreationActivity.this, "Message Sent", Toast.LENGTH_SHORT).show();
 
         return true;
     }
