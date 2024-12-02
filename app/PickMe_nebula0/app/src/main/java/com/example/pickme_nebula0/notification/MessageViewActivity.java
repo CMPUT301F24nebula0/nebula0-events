@@ -2,7 +2,6 @@ package com.example.pickme_nebula0.notification;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -21,7 +20,6 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 
 /**
  * Activity that lets all users view the messages they've received.
@@ -37,6 +35,15 @@ public class MessageViewActivity extends AppCompatActivity {
     private ListView notifsList;
     private NotificationArrayAdapter notifAdapter;
 
+    /**
+     * Initializes the activity, sets up the message list, and configures button click listeners.
+     *
+     * Sets up the list view to display notifications with an adapter, allowing users to click on
+     * individual messages to navigate to the event details page. A back button is also provided to
+     * navigate back to the previous screen.
+     *
+     * @param savedInstanceState the previously saved state of the activity, if any
+     */
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_msg_view);
@@ -46,6 +53,7 @@ public class MessageViewActivity extends AppCompatActivity {
         dbManager = new DBManager();
 
         final Button backBtn = findViewById(R.id.button_mv_back);
+        final Button refreshBtn = findViewById(R.id.buttonRefreshMessages);
 
         notifs = new ArrayList<Notification>();
         notifsList = findViewById(R.id.listView_mv_messages);
@@ -76,9 +84,21 @@ public class MessageViewActivity extends AppCompatActivity {
                 v.postDelayed(() -> finish(), 200);            }
         });
 
+        refreshBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onResume();
+            }
+        });
+
 
     }
 
+    /**
+     * Called when the activity resumes.
+     *
+     * Triggers reloading of messages to ensure the displayed list is up-to-date.
+     */
     @Override
     public void onResume(){
         super.onResume();
@@ -86,7 +106,11 @@ public class MessageViewActivity extends AppCompatActivity {
     }
 
     /**
-     * Updates the list of messages with all messages stored for this user in the data base
+     * Loads messages for the current user from the database.
+     *
+     * Clears the existing notification list and fetches messages from the "Notifications" collection.
+     * Validates whether each notification should exist, adds valid notifications to the list,
+     * and deletes invalid ones. The messages are displayed in descending order by timestamp.
      */
     private void loadMessages(){
         notifs.clear();

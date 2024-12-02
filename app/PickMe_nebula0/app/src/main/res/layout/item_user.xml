@@ -11,6 +11,7 @@
         android:id="@+id/imageView"
         android:layout_width="60dp"
         android:layout_height="60dp"
+        android:contentDescription="Profile Image"
         app:srcCompat="@drawable/error_image" />
 
     <TextView

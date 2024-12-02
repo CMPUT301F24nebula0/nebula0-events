@@ -18,7 +18,24 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 /**
- * Activity for displaying events the user has signed up for
+ * EntrantHomeActivity
+ *
+ * This activity serves as the main screen for entrants, allowing them to view events they have signed up for.
+ *
+ * Key Features:
+ * - Tab-based navigation using `ViewPager2` and `TabLayout` for different event statuses:
+ *   - Waitlist
+ *   - Selected
+ *   - Confirmed
+ *   - Cancelled
+ * - QR Code scanning functionality for checking event details.
+ * - Back navigation to exit the activity.
+ * - Dynamic event loading for each tab when the activity resumes.
+ *
+ * Dependencies:
+ * - `EntrantEventsFragment` for displaying event lists based on their status.
+ * - `TabLayoutMediator` for linking `TabLayout` and `ViewPager2`.
+ * - `QRCodeActivity` for scanning QR codes.
  */
 public class EntrantHomeActivity extends AppCompatActivity {
 
@@ -30,11 +47,21 @@ public class EntrantHomeActivity extends AppCompatActivity {
     private FragmentStateAdapter pagerAdapter;
 
     // buttons
-    private Button scanQRButton, backButton;
+    private Button scanQRButton, backButton,refreshButton;
 
     // fragments for each tab
     EntrantEventsFragment waitlistFrag, selectedFrag, confirmedFrag, cancelledFrag;
 
+    /**
+     * Initializes the activity and sets up UI components.
+     *
+     * - Sets up the layout and initializes fragments for different event statuses.
+     * - Configures `ViewPager2` with a custom `ScreenSlidePagerAdapter`.
+     * - Links `TabLayout` with `ViewPager2` using `TabLayoutMediator`.
+     * - Adds click listeners for the "Scan QR" and "Back" buttons.
+     *
+     * @param savedInstanceState The saved instance state for restoring the activity.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +83,7 @@ public class EntrantHomeActivity extends AppCompatActivity {
         // Initialize buttons
         scanQRButton = findViewById(R.id.ScanQRButton);
         backButton = findViewById(R.id.backButton);
+        refreshButton = findViewById(R.id.buttonRefresh);
 
         viewPager.setAdapter(pagerAdapter);
 
@@ -72,14 +100,32 @@ public class EntrantHomeActivity extends AppCompatActivity {
 
         // back Button
         backButton.setOnClickListener(view -> getOnBackPressedDispatcher().onBackPressed());
+
+        // refresh button
+        refreshButton.setOnClickListener(view -> onResume());
     }
 
-    // Adapter for ViewPager2
+    /**
+     * Adapter for managing fragments in ViewPager2.
+     *
+     * - Maps each tab position to the corresponding fragment.
+     */
     private class ScreenSlidePagerAdapter extends FragmentStateAdapter {
+        /**
+         * Constructor for the adapter.
+         *
+         * @param fa The parent activity hosting the ViewPager2.
+         */
         public ScreenSlidePagerAdapter(AppCompatActivity fa) {
             super(fa);
         }
 
+        /**
+         * Creates the fragment for a given tab position.
+         *
+         * @param position The position of the tab (0 = Waitlist, 1 = Selected, etc.).
+         * @return The fragment corresponding to the given position.
+         */
         @NonNull
         @Override
         public Fragment createFragment(int position) {
@@ -95,12 +141,22 @@ public class EntrantHomeActivity extends AppCompatActivity {
             }
         }
 
+        /**
+         * Returns the number of tabs (fragments) in the adapter.
+         *
+         * @return The total number of tabs.
+         */
         @Override
         public int getItemCount() {
             return tabTitles.length;
         }
     }
 
+    /**
+     * Called when the activity is resumed.
+     *
+     * - Reloads events for each fragment if it has been added to the activity.
+     */
     @Override
     public void onResume(){
         super.onResume();

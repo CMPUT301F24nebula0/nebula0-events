@@ -22,17 +22,52 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 /**
- * Array adapter for displaying list of users
+ * UserArrayAdapter
+ *
+ * Custom ArrayAdapter for displaying a list of `User` objects in a `ListView`.
+ *
+ * Key Features:
+ * - Maps each `User` object to a corresponding view (`item_user`) in the list.
+ * - Dynamically loads and displays user profile pictures using Picasso.
+ * - Provides fallback options with placeholder images for missing or invalid profile pictures.
+ *
+ * Dependencies:
+ * - Picasso for image loading and rendering.
+ * - `FBStorageManager` for handling profile picture URIs.
+ *
+ * Use Cases:
+ * - Populating a list view with user details in apps that manage users.
+ *
+ * @see User
+ * @see com.squareup.picasso.Picasso
  */
 public class UserArrayAdapter extends ArrayAdapter<User> {
 
     private ImageView profilePicImgView;
 
+    /**
+     * Constructs a `UserArrayAdapter` to handle and display a list of `User` objects.
+     *
+     * @param context The context of the activity or fragment where the adapter is used.
+     * @param textViewResourceId The resource ID of the layout to use for each item in the list.
+     * @param events The list of `User` objects to be displayed.
+     */
     public UserArrayAdapter(Context context, int textViewResourceId, ArrayList<User> events){
         super(context,textViewResourceId,events);
     }
 
-    // convert each User into a View
+    /**
+     * Converts a `User` object into a `View` to be displayed in the `ListView`.
+     *
+     * - Inflates the `item_user` layout if no reusable view is provided (`convertView` is null).
+     * - Sets the user's name in the `TextView` component.
+     * - Dynamically loads and displays the user's profile picture using Picasso.
+     *
+     * @param position The position of the item in the data set.
+     * @param convertView The old view to reuse, if possible.
+     * @param parent The parent view group that this view will be attached to.
+     * @return A `View` representing the `User` at the specified position.
+     */
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -60,6 +95,15 @@ public class UserArrayAdapter extends ArrayAdapter<User> {
         return view;
     };
 
+    /**
+     * Renders a user's profile picture into the `ImageView` component.
+     *
+     * - Uses Picasso to load the image from a given URI.
+     * - Applies a placeholder image while loading.
+     * - Displays an error image if the URI is invalid or fails to load.
+     *
+     * @param uri The URI of the profile picture to load.
+     */
     public void renderProfilePicture(Uri uri){
         try {
             Picasso.get()

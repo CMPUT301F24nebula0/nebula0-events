@@ -28,10 +28,15 @@ import com.example.pickme_nebula0.user.activities.UserInfoActivity;
 
 
 /**
- * Home page activity for the app
- * Allows user to navigate to different parts of the app
- * such as profile, admin, entrant, organizer, and messages
- * Also checks for notification permission
+ * Activity for the home page of the app.
+ *
+ * This activity serves as the main navigation hub, allowing users to:
+ * - Access their profile
+ * - Navigate to admin, entrant, or organizer functionalities
+ * - View messages
+ * - Refresh the visibility of buttons based on user roles
+ *
+ * Additionally, it ensures that necessary permissions for notifications and media access are requested.
  *
  * @Author Taekwan Yoon
  */
@@ -49,12 +54,25 @@ public class HomePageActivity extends AppCompatActivity {
     Button messagesButton;
     Button refreshButton;
 
+    /**
+     * Called when the activity is visible to the user.
+     * Updates button visibility based on the user's role.
+     */
     @Override
     protected void onResume(){
         super.onResume();
         updateButtonVisibility();
     }
 
+    /**
+     * Initializes the activity, setting up UI components and requesting permissions.
+     *
+     * - Attaches UI components to their respective views.
+     * - Sets up button click listeners for navigation.
+     * - Requests notification and media permissions if not already granted.
+     *
+     * @param savedInstanceState The saved instance state for restoring the activity.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,14 +142,21 @@ public class HomePageActivity extends AppCompatActivity {
     }
 
     /**
-     * Navigate to the target activity
-     * @param targetActivity
+     * Navigates to the specified target activity.
+     *
+     * @param targetActivity The class of the activity to navigate to.
      */
     private void navigateTo(Class<?> targetActivity ) {
         Intent intent = new Intent(HomePageActivity.this, targetActivity);
         startActivity(intent);
     }
 
+    /**
+     * Updates the visibility of admin and organizer buttons based on the user's role.
+     *
+     * Uses `DBManager` to check if the current user is an admin or organizer
+     * and updates the visibility of the corresponding buttons.
+     */
     private void updateButtonVisibility(){
         String userID = DeviceManager.getDeviceId();
         dbManager.doIfAdmin(userID,()->{adminButton.setVisibility(View.VISIBLE);},()->{adminButton.setVisibility(View.GONE);});

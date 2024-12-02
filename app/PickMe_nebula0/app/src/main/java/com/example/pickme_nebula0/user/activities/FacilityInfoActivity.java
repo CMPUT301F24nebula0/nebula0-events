@@ -16,15 +16,34 @@ import com.example.pickme_nebula0.db.DBManager;
 import com.example.pickme_nebula0.facility.Facility;
 
 /**
- * Activity for organizer to create/update their facility information.
+ * FacilityInfoActivity
  *
- * @author Stephine Yearley
+ * This activity allows organizers to create or update their facility information.
+ *
+ * Features:
+ * - Provides input fields for facility name and address.
+ * - Validates user input to ensure non-blank fields.
+ * - Integrates with the database to save or update facility information.
+ * - Populates existing facility information if available.
+ *
+ * Author: Stephine Yearley
+ *
  * @see Facility
  */
 public class FacilityInfoActivity extends AppCompatActivity {
     private DBManager dbManager;
     EditText nameField, adrField;
 
+    /**
+     * Called when the activity is first created.
+     *
+     * - Initializes the database manager.
+     * - Sets up the layout and UI components.
+     * - Defines actions for cancel and confirm buttons.
+     * - Retrieves existing facility data from the database to populate fields.
+     *
+     * @param savedInstanceState The saved instance state for restoring the activity.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         dbManager = new DBManager();
@@ -80,7 +99,16 @@ public class FacilityInfoActivity extends AppCompatActivity {
 
     }
 
-
+    /**
+     * Validates the facility information entered by the user.
+     *
+     * - Ensures that the facility name and address are not blank.
+     * - Provides a warning message if validation fails.
+     *
+     * @param name The name of the facility.
+     * @param address The address of the facility.
+     * @return A warning message if validation fails; otherwise, an empty string.
+     */
     public static String validateFacilityInfo(String name, String address){
         String warning = "";
 
@@ -117,7 +145,4 @@ public class FacilityInfoActivity extends AppCompatActivity {
     private void failedToPopulateFieldsFromDB(){
         SharedDialogue.showInvalidDataAlert("Fields could not be populated from DB, the data shown may not match what is in the DB",FacilityInfoActivity.this);
     }
-
-
-
 }

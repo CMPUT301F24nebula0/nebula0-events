@@ -22,16 +22,37 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 
 /**
- * Fragments for viewing past events
+ * Fragment for displaying a list of past events for an organizer.
+ *
+ * This fragment initializes a RecyclerView with a `PastEventsAdapter` to display past events
+ * and dynamically loads data from the database based on the organizer's role and event status.
+ *
+ * @see PastEventsAdapter
+ * @see Event
+ * @see Fragment
  */
 public class OrganizerPastFragment extends Fragment {
     private FirebaseFirestore db;
     ArrayList<Event> pastEvents = new ArrayList<Event>();
     private PastEventsAdapter adapter;
 
-    public OrganizerPastFragment() {
-    }
+    /**
+     * Default constructor for `OrganizerPastFragment`.
+     *
+     * Required for fragment instantiation.
+     */
+    public OrganizerPastFragment() { }
 
+    /**
+     * Creates and initializes the view for the fragment.
+     *
+     * Sets up the RecyclerView with a `PastEventsAdapter` to display past events.
+     *
+     * @param inflater           the LayoutInflater object used to inflate views
+     * @param container          the parent view that this fragment's UI is attached to
+     * @param savedInstanceState the previously saved state of the fragment, if any
+     * @return the initialized view for the fragment
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -47,12 +68,25 @@ public class OrganizerPastFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Invoked when the fragment becomes visible to the user.
+     *
+     * Calls `loadPastEvents` to populate the RecyclerView with updated data.
+     */
     @Override
     public void onResume() {
         super.onResume();
         loadPastEvents();
     }
 
+    /**
+     * Loads the list of past events from the database and updates the RecyclerView.
+     *
+     * Retrieves past events based on the organizer's device ID and event status.
+     * Clears the current list of events, updates it with new data, and notifies the adapter.
+     *
+     * Logs an error message if the data cannot be loaded.
+     */
     @SuppressLint("NotifyDataSetChanged")
     private void loadPastEvents() {
         OrganizerRole.get_event_by_status(DeviceManager.getDeviceId(), EventManager.EventStatus.PAST, (pastEventsObj) -> {
@@ -64,22 +98,5 @@ public class OrganizerPastFragment extends Fragment {
                 adapter.notifyDataSetChanged();
             });
         }, () -> Log.d(this.getClass().getSimpleName(), "Could not load past events"));
-
-
-//        pastEvents.clear();
-//        db.collection("Events")
-//                .whereEqualTo("organizerID", DeviceManager.getDeviceId())
-//                .get()
-//                .addOnCompleteListener(task -> {
-//                    if (task.isSuccessful()) {
-//                        for (QueryDocumentSnapshot document : task.getResult()) {
-//                            Event event = document.toObject(Event.class);
-//                            if (event.getEventDate() != null && event.getEventDate().before(new Date())) {
-//                                pastEvents.add(event);
-//                            }
-//                        }
-//                        adapter.notifyDataSetChanged();
-//                    }
-//                });
     }
 }

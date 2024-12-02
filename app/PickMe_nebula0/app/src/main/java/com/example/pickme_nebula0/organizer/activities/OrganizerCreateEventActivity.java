@@ -31,8 +31,15 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * Class for OrganizerCreateEventActivity
- * This class is used to create an event as an organizer.
+ * Activity for organizers to create events.
+ *
+ * This class allows organizers to input event details, configure settings like geolocation and waitlist capacity,
+ * and optionally upload a poster image. Includes validation for user inputs and backend integration for storing events.
+ *
+ * @see Event
+ * @see DBManager
+ * @see SharedDialogue
+ * @see OrganizerExceptions
  *
  * @author Taekwan Yoon
  */
@@ -87,6 +94,14 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
     // Firestore Instance
     FirebaseFirestore db;
 
+    /**
+     * Initializes the activity, sets up UI components, and defines logic for user interactions.
+     *
+     * Includes handlers for switches, date picker dialog, and event creation submission.
+     * Validates user input before attempting to create and store an event.
+     *
+     * @param savedInstanceState the previously saved state of the activity, if any
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -229,8 +244,9 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
     }
 
     /**
-     * Show date picker dialog
-     * This method is used to show the date picker dialog when the user clicks on the date field.
+     * Displays a date picker dialog for the user to select the event date.
+     *
+     * Prevents the selection of past dates and updates the event date field upon selection.
      */
     private void showDatePickerDialog() {
         final Calendar calendar = Calendar.getInstance();
@@ -246,10 +262,10 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
     }
 
     /**
-     * Check if switch is on/off and enable/disable EditText accordingly
+     * Toggles the enabled state of an EditText field based on a switch's state.
      *
-     * @param editText EditText to enable/disable
-     * @param isChecked boolean value of switch
+     * @param editText the EditText field to toggle
+     * @param isChecked the state of the switch
      */
     private void SwitchToggleEditText(EditText editText, boolean isChecked)
     {
@@ -292,6 +308,9 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Launches an image picker for the user to select a poster image for the event.
+     */
     private void openImagePicker() {
         pickMedia.launch(new PickVisualMediaRequest.Builder()
                 .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)

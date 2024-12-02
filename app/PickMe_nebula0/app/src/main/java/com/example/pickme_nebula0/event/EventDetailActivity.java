@@ -32,7 +32,26 @@ import com.example.pickme_nebula0.notification.NotificationCreationActivity;
 import com.example.pickme_nebula0.organizer.activities.OrganizerEventParticipantsActivity;
 
 /**
- * Activity for viewing details of an event from an organizer perspective
+ * EventDetailActivity
+ *
+ * This activity provides a detailed view of an event from the organizer's perspective.
+ *
+ * Key Features:
+ * - Displays event details, QR codes, and poster images.
+ * - Allows organizers to manage entrants (sample, resample) and message them.
+ * - Provides functionality to view or upload event posters.
+ * - Integrates with Firestore and Firebase Storage for event data and images.
+ *
+ * Dependencies:
+ * - `DBManager` for database operations.
+ * - `FBStorageManager` for Firebase Storage operations.
+ * - `SharedDialogue` for common UI components like poster popups.
+ * - `OrganizerRole` for managing entrants.
+ *
+ * @author Taekwan Yoon
+ * @see DBManager
+ * @see FBStorageManager
+ * @see OrganizerRole
  */
 public class EventDetailActivity extends AppCompatActivity {
 
@@ -46,17 +65,32 @@ public class EventDetailActivity extends AppCompatActivity {
     private Button viewPosterButton;
     private Button newPosterButton;
     ActivityResultLauncher<PickVisualMediaRequest> pickMedia;
+    private boolean isPast;
 
     private String eventID;
 
     private DBManager dbManager;
 
+    /**
+     * Called when the activity resumes.
+     *
+     * - Updates the visibility of poster-related buttons.
+     */
     @Override
     protected void onResume(){
         super.onResume();
         renderPosterButtons();
     }
 
+    /**
+     * Called when the activity is created.
+     *
+     * - Initializes the UI components and sets up event listeners.
+     * - Registers a media picker for uploading event posters.
+     * - Retrieves event details and updates the UI.
+     *
+     * @param savedInstanceState Saved state for restoring the activity.
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,6 +114,9 @@ public class EventDetailActivity extends AppCompatActivity {
 
         // Retrieve eventID from intent
         eventID = getIntent().getStringExtra("eventID");
+        isPast = getIntent().getBooleanExtra("isPast", false);
+
+
 
         if (eventID == null || eventID.trim().isEmpty()) {
             Toast.makeText(this, "Invalid Event ID.", Toast.LENGTH_SHORT).show();
@@ -196,6 +233,14 @@ public class EventDetailActivity extends AppCompatActivity {
 
         renderPosterButtons();
 
+
+        if (isPast)
+        {
+            msgEntrantsButton.setVisibility(View.GONE);
+            sampleEntrantsButton.setVisibility(View.GONE);
+            newPosterButton.setVisibility(View.GONE);
+            viewPosterButton.setVisibility(View.GONE);
+        }
     }
 
     /**
@@ -321,7 +366,10 @@ public class EventDetailActivity extends AppCompatActivity {
      */
     private void showButtonsIfNoPoster(){
         viewPosterButton.setVisibility(View.GONE);
-        newPosterButton.setVisibility(View.VISIBLE);
+        if (!isPast)
+        {
+            newPosterButton.setVisibility(View.VISIBLE);
+        }
     }
 
     /**
@@ -330,7 +378,9 @@ public class EventDetailActivity extends AppCompatActivity {
      */
     private void showButtonsIfPoster(Uri uri){
         viewPosterButton.setVisibility(View.VISIBLE);
-        newPosterButton.setVisibility(View.VISIBLE);
+        if (!isPast) {
+            newPosterButton.setVisibility(View.VISIBLE);
+        }
     }
 
 }

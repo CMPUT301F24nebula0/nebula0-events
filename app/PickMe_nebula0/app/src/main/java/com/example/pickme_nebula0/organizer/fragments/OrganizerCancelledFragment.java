@@ -19,7 +19,14 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 
 /**
- * Fragment for viewing cancelled entrants
+ * Fragment for displaying a list of cancelled entrants for a specific event.
+ *
+ * This fragment initializes a RecyclerView with a `CancelledAdapter` to display
+ * cancelled users and dynamically loads data from the database.
+ *
+ * @see CancelledAdapter
+ * @see User
+ * @see Fragment
  */
 public class OrganizerCancelledFragment extends Fragment {
     private final DBManager dbManager = new DBManager();
@@ -27,9 +34,24 @@ public class OrganizerCancelledFragment extends Fragment {
     private CancelledAdapter adapter;
     String eventID;
 
-    public OrganizerCancelledFragment() {
-    }
+    /**
+     * Default constructor for `OrganizerCancelledFragment`.
+     *
+     * Required for fragment instantiation.
+     */
+    public OrganizerCancelledFragment() { }
 
+    /**
+     * Creates and initializes the view for the fragment.
+     *
+     * Sets up the RecyclerView with a `CancelledAdapter` and retrieves the event ID
+     * from the parent activity's intent.
+     *
+     * @param inflater           the LayoutInflater object used to inflate views
+     * @param container          the parent view that this fragment's UI is attached to
+     * @param savedInstanceState the previously saved state of the fragment, if any
+     * @return the initialized view for the fragment
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_organizer_cancelled, container, false);
@@ -44,12 +66,23 @@ public class OrganizerCancelledFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Invoked when the fragment becomes visible to the user.
+     *
+     * Calls `loadCancelledUsers` to populate the RecyclerView with updated data.
+     */
     @Override
     public void onResume() {
         super.onResume();
         loadCancelledUsers();
     }
 
+    /**
+     * Loads the list of cancelled users from the database and updates the RecyclerView.
+     *
+     * Clears the current list of cancelled users, retrieves updated data based on the event ID
+     * and registrant status, and dynamically updates the adapter to reflect the new data.
+     */
     @SuppressLint("NotifyDataSetChanged")
     private void loadCancelledUsers() {
         cancelledUsers.clear();
