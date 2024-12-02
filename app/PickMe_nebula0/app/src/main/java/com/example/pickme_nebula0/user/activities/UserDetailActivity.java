@@ -18,6 +18,7 @@ import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.db.DBManager;
 
 import com.example.pickme_nebula0.db.FBStorageManager;
+import com.example.pickme_nebula0.event.Event;
 import com.example.pickme_nebula0.facility.Facility;
 import com.example.pickme_nebula0.organizer.fragments.OrganizerSelectedFragment;
 
@@ -115,35 +116,54 @@ public class UserDetailActivity extends AppCompatActivity {
         if(!getIntent().getBooleanExtra("organizer", true)){
             mapButton.setVisibility(View.GONE);
         } else {
-            mapButton.setVisibility(View.VISIBLE);
-            mapButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    db.collection("Events")
+            // hide mapButton if geolocation requirement is off
+            // means geolocation data was not stored for entrants and
+            // geolocation will fail assertion check
+            dbManager.getEvent(eventID, (eventObj) -> {
+                Event event = (Event) eventObj;
+                if (!event.getGeolocationRequired()) {
+                    mapButton.setVisibility(View.GONE);
+                } else {
+                    mapButton.setVisibility(View.VISIBLE);
+
+                    mapButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            db.collection("Events")
                                     .document(eventID)
-                                            .collection("EventRegistrants")
-                                                    .document(userID)
-                                                            .get()
-                                                                    .addOnCompleteListener(task -> {
-                                                                        if (task.isSuccessful()) {
-                                                                            DocumentSnapshot document = task.getResult();
-                                                                            if (document.exists()) {
-                                                                                GeoPoint geolocation = document.getGeoPoint("geolocation");
-                                                                                assert geolocation != null;
+                                    .collection("EventRegistrants")
+                                    .document(userID)
+                                    .get()
+                                    .addOnCompleteListener(task -> {
+                                        if (task.isSuccessful()) {
+                                            DocumentSnapshot document = task.getResult();
+                                            if (document.exists()) {
+                                                GeoPoint geolocation = document.getGeoPoint("geolocation");
+                                                assert geolocation != null;
 
-                                                                                double latitude = geolocation.getLatitude();
-                                                                                double longitude = geolocation.getLongitude();
+                                                double latitude = geolocation.getLatitude();
+                                                double longitude = geolocation.getLongitude();
 
-                                                                                Log.d("UserDetailActivity", "Latitude: " + latitude + ", Longitude: " + longitude);
-                                                                                Intent intent = new Intent(UserDetailActivity.this, GoogleMapActivity.class);
-                                                                                intent.putExtra("latitude", latitude);
-                                                                                intent.putExtra("longitude", longitude);
-                                                                                startActivity(intent);
-                                                                            }
-                                                                        }
-                                                                    });
+                                                Log.d("UserDetailActivity", "Latitude: " + latitude + ", Longitude: " + longitude);
+                                                Intent intent = new Intent(UserDetailActivity.this, GoogleMapActivity.class);
+                                                intent.putExtra("latitude", latitude);
+                                                intent.putExtra("longitude", longitude);
+                                                startActivity(intent);
+                                            }
+                                        }
+                                    });
+                        }
+                    });
+
                 }
-            });
+
+
+            }, () -> {
+                // could not retrieve event
+                Log.d("UserDetailActivity", "Could not retrieve event to set mapButton");
+                mapButton.setVisibility(View.GONE);
+                Toast.makeText(UserDetailActivity.this,"Could not retrieve this user's registered event",Toast.LENGTH_SHORT).show();
+             });
         }
 
         delImgButton.setOnClickListener(new View.OnClickListener(){
