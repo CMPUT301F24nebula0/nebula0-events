@@ -87,6 +87,7 @@ public class OrganizerHomeActivity extends AppCompatActivity {
         });
     }
 
+
     /**
      * Function for create event button
      */
