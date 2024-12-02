@@ -3,6 +3,8 @@ package com.example.pickme_nebula0.organizer.activities;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Switch;
@@ -121,6 +123,8 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
         eventCreationCancelButton = findViewById(R.id.event_creation_cancel_button);
         selectPosterButton = findViewById(R.id.buttonSelectPoster);
         previewPosterButton = findViewById(R.id.buttonPreviewPoster);
+        Animation buttonClickAnimation = AnimationUtils.loadAnimation(this, R.anim.button_click_animation);
+
 
         // Get device ID
         deviceID = DeviceManager.getDeviceId();
@@ -159,14 +163,17 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
                     }
                 });
         selectPosterButton.setOnClickListener(view -> {
-            openImagePicker();
+            view.startAnimation(buttonClickAnimation); // Start animation
+            openImagePicker(); // Perform action
         });
-        previewPosterButton.setOnClickListener(view->{
-            SharedDialogue.displayPosterPopup(this,posterUri);
+        previewPosterButton.setOnClickListener(view -> {
+            view.startAnimation(buttonClickAnimation); // Start animation
+            SharedDialogue.displayPosterPopup(this, posterUri); // Perform action
         });
-
         // Submit button logic
         eventCreationSubmitButton.setOnClickListener(v -> {
+            v.startAnimation(buttonClickAnimation); // Start animation
+
             eventName = eventNameField.getText().toString();
             eventDescription = eventDescriptionField.getText().toString();
             eventDate = eventDateField.getText().toString();
@@ -219,7 +226,9 @@ public class OrganizerCreateEventActivity extends AppCompatActivity {
 
         // Check if any fields are filled before cancelling
         eventCreationCancelButton.setOnClickListener(v -> {
-            if (isAnyFieldFilled(eventNameField, eventDescriptionField, eventDateField, waitlistCapacityField, numberOfAttendeesField)) {
+            v.startAnimation(buttonClickAnimation); // Start animation
+            if (isAnyFieldFilled(eventNameField, eventDescriptionField, eventDateField, geolocationRequirementField, waitlistCapacityField, numberOfAttendeesField)) {
+
                 new AlertDialog.Builder(OrganizerCreateEventActivity.this)
                         .setTitle("Cancel Event Creation")
                         .setMessage("Are you sure you want to cancel? All input will be lost.")

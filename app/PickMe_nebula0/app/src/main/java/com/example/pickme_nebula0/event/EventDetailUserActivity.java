@@ -3,6 +3,8 @@ package com.example.pickme_nebula0.event;
 import android.Manifest;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -126,12 +128,15 @@ public class EventDetailUserActivity extends AppCompatActivity {
 
         // this may take a split second to query db, so set invisible at first
         facilityDetailsTextView.setVisibility(View.INVISIBLE); // show details or default (warning)
+        Animation buttonClickAnimation = AnimationUtils.loadAnimation(this, R.anim.button_click_animation);
 
 
         posterViewButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedDialogue.displayPosterPopup(EventDetailUserActivity.this,eventID);
+                v.startAnimation(buttonClickAnimation);
+
+                v.postDelayed(() -> SharedDialogue.displayPosterPopup(EventDetailUserActivity.this, eventID), 200);
             }
         });
 
@@ -139,13 +144,16 @@ public class EventDetailUserActivity extends AppCompatActivity {
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
-            }
+                v.startAnimation(buttonClickAnimation);
+
+                // Perform action after animation
+                v.postDelayed(() -> finish(), 200);            }
         });
 
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                v.startAnimation(buttonClickAnimation);
                 EventManager.checkWaitlistFull(eventID, (eventDocSnapshotObj) -> {
                     DocumentSnapshot eventDocSnapshot = (DocumentSnapshot) eventDocSnapshotObj;
 
@@ -201,12 +209,14 @@ public class EventDetailUserActivity extends AppCompatActivity {
                                 // Firestore query failed
                                 Exception e = task.getException();
                                 Toast.makeText(EventDetailUserActivity.this, "Failed to fetch event details: " + (e != null ? e.getMessage() : "Unknown error"), Toast.LENGTH_LONG).show();
+
                             }
                         });
 
                 // waitlist capacity full
                 }, () -> {
                     Toast.makeText(EventDetailUserActivity.this, "Waitlist is full.", Toast.LENGTH_SHORT).show();
+
                 });
 
             }
@@ -217,8 +227,13 @@ public class EventDetailUserActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // TODO - we can change this later to fully remove them if we don't want a user of leaves of their own volition CANCELLED
-                dbManager.setRegistrantStatus(eventID,userID,DBManager.RegistrantStatus.CANCELLED);
-                renderUserStatus();
+                v.startAnimation(buttonClickAnimation);
+
+                // Perform action after animation
+                v.postDelayed(() -> {
+                    dbManager.setRegistrantStatus(eventID, userID, DBManager.RegistrantStatus.CANCELLED);
+                    renderUserStatus();
+                }, 200);
             }
         });
 
@@ -226,8 +241,14 @@ public class EventDetailUserActivity extends AppCompatActivity {
         acceptButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dbManager.setRegistrantStatus( eventID, userID, DBManager.RegistrantStatus.CONFIRMED);
-                renderUserStatus(); // status has changed so re-render
+                // Start animation
+                v.startAnimation(buttonClickAnimation);
+
+                // Perform action after animation
+                v.postDelayed(() -> {
+                    dbManager.setRegistrantStatus(eventID, userID, DBManager.RegistrantStatus.CONFIRMED);
+                    renderUserStatus();
+                }, 200); // status has changed so re-render
             }
         });
 
@@ -236,8 +257,14 @@ public class EventDetailUserActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // TODO - we can change this later to fully remove them if we don't want a user of leaves of their own volition CANCELLED
-                dbManager.setRegistrantStatus(eventID,userID,DBManager.RegistrantStatus.CANCELLED);
-                renderUserStatus();
+                // Start animation
+                v.startAnimation(buttonClickAnimation);
+
+                // Perform action after animation
+                v.postDelayed(() -> {
+                    dbManager.setRegistrantStatus(eventID, userID, DBManager.RegistrantStatus.CANCELLED);
+                    renderUserStatus();
+                }, 200);
             }
         });
         // START TY

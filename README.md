@@ -1,2 +1,6 @@
-For part 3 deliverables please see the ProjectPart3 branch and the wiki.<br>
-The wiki contains a new page with a UML diagram, and the UI section has been updated to reflect feedback and changes.
+This repo contains the code for our android app, PickMe.
+
+This app allows users to create and register for events with limited capacity by providing a selection lottery system.<br>
+Administrator functionality for monitoring and removing inappropriate content is also provided.
+
+For additional information and documentation, please see the wiki.
