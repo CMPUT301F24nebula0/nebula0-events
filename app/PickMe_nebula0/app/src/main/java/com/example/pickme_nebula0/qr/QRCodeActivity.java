@@ -3,6 +3,8 @@ package com.example.pickme_nebula0.qr;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -52,12 +54,19 @@ public class QRCodeActivity extends AppCompatActivity {
         } else {
             initQRCodeScanner();
         }
+        Animation buttonClickAnimation = AnimationUtils.loadAnimation(this, R.anim.button_click_animation);
 
         homeButton.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
-               active = false;
-               finish();
+               // Start animation
+               v.startAnimation(buttonClickAnimation);
+
+               // Perform action after animation
+               v.postDelayed(() -> {
+                   active = false;
+                   finish();
+               }, 200); // Delay matches animation duration
            }
         });
     }

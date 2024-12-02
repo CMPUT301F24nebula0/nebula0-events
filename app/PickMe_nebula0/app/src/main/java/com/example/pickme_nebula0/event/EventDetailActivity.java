@@ -9,6 +9,8 @@ import android.util.Base64;
 import android.util.Log;
 import java.util.ArrayList;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -116,24 +118,37 @@ public class EventDetailActivity extends AppCompatActivity {
      * @param eventID The ID of the event.
      */
     private void setupButtons(String eventID) {
+        Animation buttonClickAnimation = AnimationUtils.loadAnimation(this, R.anim.button_click_animation);
+
         // Back Button
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getOnBackPressedDispatcher().onBackPressed();
-            }
-        });
+                // Start animation
+                v.startAnimation(buttonClickAnimation);
+
+                // Perform action after animation
+                v.postDelayed(() -> getOnBackPressedDispatcher().onBackPressed(), 200); // Delay matches animation duration
+            }        });
 
         // Message Entrants Button
         msgEntrantsButton.setOnClickListener(v -> {
-            Intent intent = new Intent(EventDetailActivity.this, NotificationCreationActivity.class);
-            intent.putExtra("eventID", eventID);
-            startActivity(intent);
+            // Start animation
+            v.startAnimation(buttonClickAnimation);
+
+            // Perform action after animation
+            v.postDelayed(() -> {
+                Intent intent = new Intent(EventDetailActivity.this, NotificationCreationActivity.class);
+                intent.putExtra("eventID", eventID);
+                startActivity(intent);
+            }, 200);
         });
 
         // Sample Entrants Button
         sampleEntrantsButton.setOnClickListener(v -> {
-            OrganizerRole.sampledEntrantsExist(eventID, () -> {
+            v.startAnimation(buttonClickAnimation);
+            v.postDelayed(() ->
+                    OrganizerRole.sampledEntrantsExist(eventID, () -> {
                 Log.d("EventDetailActivity", "RESAMPLING USERS");
                 // sampled entrants exist
                 // do resampling instead
@@ -149,22 +164,34 @@ public class EventDetailActivity extends AppCompatActivity {
                         Log.d("EventDetailActivity", "sampled user "+user.getUserID());
                     }
                 });
-            });
+            }), 200);
         });
 
         // Participants Button
         participantsButton.setOnClickListener(view -> {
-            Intent intent = new Intent(EventDetailActivity.this, OrganizerEventParticipantsActivity.class);
-            intent.putExtra("eventID", eventID);
-            startActivity(intent);
+            // Start animation
+            view.startAnimation(buttonClickAnimation);
+
+            // Perform action after animation
+            view.postDelayed(() -> {
+                Intent intent = new Intent(EventDetailActivity.this, OrganizerEventParticipantsActivity.class);
+                intent.putExtra("eventID", eventID);
+                startActivity(intent);
+            }, 200);
         });
 
         newPosterButton.setOnClickListener(view -> {
-            openImagePicker();
+            view.startAnimation(buttonClickAnimation);
+        // TODO if the anamation didnot worked check this part
+            view.postDelayed(this::openImagePicker, 200);
         });
 
         viewPosterButton.setOnClickListener(view -> {
-            SharedDialogue.displayPosterPopup(this,eventID);
+            // Start animation
+            view.startAnimation(buttonClickAnimation);
+
+            // Perform action after animation
+            view.postDelayed(() -> SharedDialogue.displayPosterPopup(this, eventID), 200);
         });
 
         renderPosterButtons();

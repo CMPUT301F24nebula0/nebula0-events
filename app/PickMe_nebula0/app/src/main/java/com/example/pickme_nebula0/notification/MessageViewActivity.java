@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
@@ -49,6 +51,8 @@ public class MessageViewActivity extends AppCompatActivity {
         notifsList = findViewById(R.id.listView_mv_messages);
         notifAdapter = new NotificationArrayAdapter(this,R.id.element_list_notif, notifs);
         notifsList.setAdapter(notifAdapter);
+        Animation buttonClickAnimation = AnimationUtils.loadAnimation(this, R.anim.button_click_animation);
+
 
         notifsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -65,8 +69,11 @@ public class MessageViewActivity extends AppCompatActivity {
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    finish();
-            }
+                // Start animation
+                v.startAnimation(buttonClickAnimation);
+
+                // Perform action after animation
+                v.postDelayed(() -> finish(), 200);            }
         });
 
 

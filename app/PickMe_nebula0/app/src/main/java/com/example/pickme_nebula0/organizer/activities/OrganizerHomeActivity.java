@@ -3,6 +3,8 @@ package com.example.pickme_nebula0.organizer.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 
 import androidx.annotation.NonNull;
@@ -21,6 +23,7 @@ public class OrganizerHomeActivity extends AppCompatActivity {
     private final String[] tabTitles = new String[]{"Past", "Ongoing"};
     private Button createEventButton;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,6 +31,7 @@ public class OrganizerHomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_organizer_home); // attach components to layout
 
         tabToggling(tabTitles);
+
 
         backButton();
         createEventButton();
@@ -72,7 +76,16 @@ public class OrganizerHomeActivity extends AppCompatActivity {
      */
     private void backButton() {
         Button backButton = findViewById(R.id.backButton);
-        backButton.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
+        Animation buttonClickAnimation = AnimationUtils.loadAnimation(this, R.anim.button_click_animation);
+
+        backButton.setOnClickListener(view -> {
+            // Start animation
+            view.startAnimation(buttonClickAnimation);
+            // Perform back action after animation
+            view.postDelayed(() -> getOnBackPressedDispatcher().onBackPressed(), 200);
+        });
+
+
     }
 
     /**
@@ -80,7 +93,14 @@ public class OrganizerHomeActivity extends AppCompatActivity {
      */
     private void createEventButton() {
         createEventButton = findViewById(R.id.createEventButton);
-        createEventButton.setOnClickListener(view -> navigateTo());
+        Animation buttonClickAnimation = AnimationUtils.loadAnimation(this, R.anim.button_click_animation);
+        createEventButton.setOnClickListener(view -> {
+            // Start the animation
+            view.startAnimation(buttonClickAnimation);
+
+            // Perform the action after the animation completes
+            view.postDelayed(this::navigateTo, 200);
+        });
     }
 
     /**
