@@ -11,6 +11,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -123,58 +125,81 @@ public class UserInfoActivity extends AppCompatActivity {
         profilePicImageView = findViewById(R.id.imageViewProfilePic);
         changeProfilePicButton = findViewById(R.id.buttonChangePicture);
         removeProfilePicButton = findViewById(R.id.buttonRemovePicture);
+        Animation buttonClickAnimation = AnimationUtils.loadAnimation(this, R.anim.button_click_animation);
 
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // do NOT update db with new info
-                finish();
+                // Start the animation
+                v.startAnimation(buttonClickAnimation);
+
+                // Perform the action after animation
+                v.postDelayed(() -> {
+                    // Do NOT update the database
+                    finish();
+                }, 200);
             }
         });
 
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                v.startAnimation(buttonClickAnimation);
+                v.postDelayed(() -> {
 
-                String name = nameField.getText().toString();
-                String email = emailField.getText().toString();
-                String phone = phoneField.getText().toString().replaceAll("[^0-9]", "");
-                boolean notifEnabled = enableNotifBox.isChecked();
+                    String name = nameField.getText().toString();
+                    String email = emailField.getText().toString();
+                    String phone = phoneField.getText().toString().replaceAll("[^0-9]", "");
+                    boolean notifEnabled = enableNotifBox.isChecked();
 
-                String warning = validateUserInfo(name,email,phone);
-                if (!warning.isBlank()){
-                    // user had entered invalid data, warn them about it and don't update DB
-                    SharedDialogue.showInvalidDataAlert(warning,UserInfoActivity.this);
-                    return;
-                }
+                    String warning = validateUserInfo(name, email, phone);
+                    if (!warning.isBlank()) {
+                        // user had entered invalid data, warn them about it and don't update DB
+                        SharedDialogue.showInvalidDataAlert(warning, UserInfoActivity.this);
+                        return;
+                    }
 
-                User u = new User(deviceID,name,email,phone,notifEnabled);
-                dbManager.addUpdateUserProfile(u,()->{
-                    conditionalPicUpload(name,newUser);});
-                finish();
+                    User u = new User(deviceID, name, email, phone, notifEnabled);
+                    dbManager.addUpdateUserProfile(u, () -> {
+                        conditionalPicUpload(name, newUser);
+                    });
+                    finish();
+                },200);
             }
         });
 
         facilityButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(UserInfoActivity.this, FacilityInfoActivity.class);
-                startActivity(intent);
-                finish();
+                v.startAnimation(buttonClickAnimation);
+                v.postDelayed(() -> {
+
+                    Intent intent = new Intent(UserInfoActivity.this, FacilityInfoActivity.class);
+                    startActivity(intent);
+                    finish();
+                },200);
             }
         });
 
         changeProfilePicButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openImagePicker();
+                // Start the animation
+                v.startAnimation(buttonClickAnimation);
+
+                // Perform the action after animation
+                v.postDelayed(() -> openImagePicker(), 200);
             }
         });
 
         removeProfilePicButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setAutoProfilePic();
+                // Start the animation
+                v.startAnimation(buttonClickAnimation);
+
+                // Perform the action after animation
+                v.postDelayed(() -> setAutoProfilePic(), 200);
             }
         });
 

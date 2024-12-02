@@ -3,6 +3,8 @@ package com.example.pickme_nebula0.organizer.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 
 import androidx.annotation.NonNull;
@@ -97,11 +99,23 @@ public class OrganizerHomeActivity extends AppCompatActivity {
      */
     private void backButton() {
         Button backButton = findViewById(R.id.backButton);
-        backButton.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
+        Animation buttonClickAnimation = AnimationUtils.loadAnimation(this, R.anim.button_click_animation);
+
+        // Back Button Logic with Animation
+        backButton.setOnClickListener(v -> {
+            // Start animation
+            v.startAnimation(buttonClickAnimation);
+
+            // Perform action after animation
+            v.postDelayed(() -> getOnBackPressedDispatcher().onBackPressed(), 200); // Delay matches animation duration
+        });
     }
 
     private void refreshButton(){
+        Animation buttonClickAnimation = AnimationUtils.loadAnimation(this, R.anim.button_click_animation);
+
         refreshButton = findViewById(R.id.buttonRefreshOrgEvents);
+
         refreshButton.setOnClickListener(view-> onResume());
     }
 
@@ -112,8 +126,15 @@ public class OrganizerHomeActivity extends AppCompatActivity {
      */
     private void createEventButton() {
         createEventButton = findViewById(R.id.createEventButton);
-        createEventButton.setOnClickListener(view -> navigateTo());
-    }
+        Animation buttonClickAnimation = AnimationUtils.loadAnimation(this, R.anim.button_click_animation);
+
+        createEventButton.setOnClickListener(view -> {
+            // Start animation
+            view.startAnimation(buttonClickAnimation);
+
+            // Perform action after animation
+            view.postDelayed(this::navigateTo, 200); // Delay matches animation duration
+        });    }
 
     /**
      * Navigates to the "Create Event" activity.

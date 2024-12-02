@@ -2,6 +2,8 @@ package com.example.pickme_nebula0.notification;
 
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -54,6 +56,8 @@ public class NotificationCreationActivity extends AppCompatActivity {
         Button msgUnconfirmedBtn = findViewById(R.id.button_nc_notifUnconfirmed);
         Button msgCancelledBtn = findViewById(R.id.button_nc_notfiCancelled);
         Button cancelBtn = findViewById(R.id.button_nc_cancel);
+        Animation buttonClickAnimation = AnimationUtils.loadAnimation(this, R.anim.button_click_animation);
+
 
         eventID = getIntent().getStringExtra("eventID");
         if (eventID == null || eventID.isEmpty()) {
@@ -63,53 +67,86 @@ public class NotificationCreationActivity extends AppCompatActivity {
 
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) { finish(); }
-        });
+            public void onClick(View v) {
+                // Start animation
+                v.startAnimation(buttonClickAnimation);
+
+                // Perform action after animation
+                v.postDelayed(() -> finish(), 200); // Delay matches animation duration
+            }        });
 
         msgAllBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (getFieldsAndAttemptNotification(null)){
-                    finish();
-                }
+                // Start animation
+                v.startAnimation(buttonClickAnimation);
+
+                // Perform action after animation
+                v.postDelayed(() -> {
+                    if (getFieldsAndAttemptNotification(null)) {
+                        finish();
+                    }
+                }, 200);
             }
         });
 
         msgUnconfirmedBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(getFieldsAndAttemptNotification(DBManager.RegistrantStatus.SELECTED)){
-                    finish();
-                }
+                // Start animation
+                v.startAnimation(buttonClickAnimation);
 
+                // Perform action after animation
+                v.postDelayed(() -> {
+                    if (getFieldsAndAttemptNotification(DBManager.RegistrantStatus.SELECTED)) {
+                        finish();
+                    }
+                }, 200);
             }
         });
 
         msgConfirmedBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(getFieldsAndAttemptNotification(DBManager.RegistrantStatus.CONFIRMED)){
-                    finish();
-                }
+                // Start animation
+                v.startAnimation(buttonClickAnimation);
+
+                // Perform action after animation
+                v.postDelayed(() -> {
+                    if (getFieldsAndAttemptNotification(DBManager.RegistrantStatus.CONFIRMED)) {
+                        finish();
+                    }
+                }, 200);
             }
         });
 
         msgCancelledBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(getFieldsAndAttemptNotification(DBManager.RegistrantStatus.CANCELLED)){
-                    finish();
+                // Start animation
+                v.startAnimation(buttonClickAnimation);
 
-                }
+                // Perform action after animation
+                v.postDelayed(() -> {
+                    if (getFieldsAndAttemptNotification(DBManager.RegistrantStatus.CANCELLED)) {
+                        finish();
+                    }
+                }, 200);
             }
         });
 
         msgWaitlistedBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(getFieldsAndAttemptNotification(DBManager.RegistrantStatus.WAITLISTED)){
-                    finish();
-                }
+                // Start animation
+                v.startAnimation(buttonClickAnimation);
+
+                // Perform action after animation
+                v.postDelayed(() -> {
+                    if (getFieldsAndAttemptNotification(DBManager.RegistrantStatus.WAITLISTED)) {
+                        finish();
+                    }
+                }, 200);
             }
         });
     }

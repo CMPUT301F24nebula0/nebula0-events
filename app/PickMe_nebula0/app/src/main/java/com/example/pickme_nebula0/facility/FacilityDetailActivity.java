@@ -2,6 +2,8 @@ package com.example.pickme_nebula0.facility;
 
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,18 +54,26 @@ public class FacilityDetailActivity extends AppCompatActivity {
         facilityDetails = findViewById(R.id.textView_fda_info);
         final Button backBtn = findViewById(R.id.button_fda_back);
         final Button delBtn = findViewById(R.id.button_fda_delete);
+        Animation buttonClickAnimation = AnimationUtils.loadAnimation(this, R.anim.button_click_animation);
 
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               finish();
-            }
+                // Start animation
+                v.startAnimation(buttonClickAnimation);
+
+                // Perform action after animation
+                v.postDelayed(() -> finish(), 200);            }
         });
 
         delBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dbManager.deleteFacility(facilityID,()->{finish();});
+                // Start animation
+                v.startAnimation(buttonClickAnimation);
+
+                // Perform action after animation
+                v.postDelayed(() -> dbManager.deleteFacility(facilityID, () -> finish()), 200); // Delay matches animation duration
             }
         });
 

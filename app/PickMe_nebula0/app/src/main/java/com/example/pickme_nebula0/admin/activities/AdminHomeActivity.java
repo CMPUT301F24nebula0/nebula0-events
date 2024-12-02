@@ -6,6 +6,8 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
@@ -130,13 +132,19 @@ public class AdminHomeActivity extends AppCompatActivity {
         QRCodesList =findViewById(R.id.QRcodeListView);
         QRAdapter=new QRcodeAdapter(AdminHomeActivity.this,R.id.item_qrcode, eventsWithQR);
         QRCodesList.setAdapter(QRAdapter);
+        Animation buttonClickAnimation = AnimationUtils.loadAnimation(this, R.anim.button_click_animation);
 
-        btnBack.setOnClickListener(v -> finish());
-
+        btnBack.setOnClickListener(v -> {
+            // Start animation
+            v.startAnimation(buttonClickAnimation);
+            // Perform action after animation
+            v.postDelayed(() -> finish(), 200); // Delay to match animation duration
+        });
 
         // upon clicking the manage events button, show the manage events layout
         btnManageEvents.setOnClickListener(v -> {
             // Show Manage Events layout
+
             viewFlipper.setDisplayedChild(0);
             updateEvents();
 

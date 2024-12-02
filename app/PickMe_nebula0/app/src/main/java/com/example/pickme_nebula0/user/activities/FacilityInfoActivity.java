@@ -2,6 +2,8 @@ package com.example.pickme_nebula0.user.activities;
 
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -54,18 +56,27 @@ public class FacilityInfoActivity extends AppCompatActivity {
 
         Button cancelButton = findViewById(R.id.button_fi_cancel);
         Button confirmButton = findViewById(R.id.button_fi_confirm);
+        Animation buttonClickAnimation = AnimationUtils.loadAnimation(this, R.anim.button_click_animation);
+
 
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // do NOT update db with new info
-                finish();
+                v.startAnimation(buttonClickAnimation);
+
+                // Perform the action after animation
+                v.postDelayed(() -> {
+                    // Do NOT update the database
+                    finish();
+                }, 200);
             }
         });
 
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                v.startAnimation(buttonClickAnimation);
+
 
                 String name = nameField.getText().toString();
                 String address = adrField.getText().toString();

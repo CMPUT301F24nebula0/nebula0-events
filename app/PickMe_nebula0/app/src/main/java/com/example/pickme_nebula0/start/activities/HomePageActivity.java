@@ -5,6 +5,8 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 
 import androidx.annotation.NonNull;
@@ -90,13 +92,38 @@ public class HomePageActivity extends AppCompatActivity {
         adminButton.setVisibility(View.GONE);
         organizerButton.setVisibility(View.GONE);
 
+        Animation buttonClickAnimation = AnimationUtils.loadAnimation(this, R.anim.button_click_animation);
+
         // actions once buttons are pressed
-        profileButton.setOnClickListener(view -> navigateTo(UserInfoActivity.class));
-        adminButton.setOnClickListener(view -> navigateTo(AdminHomeActivity.class));
-        entrantButton.setOnClickListener(view -> navigateTo(EntrantHomeActivity.class));
-        organizerButton.setOnClickListener(view -> navigateTo(OrganizerHomeActivity.class));
-        messagesButton.setOnClickListener(view -> navigateTo(MessageViewActivity.class));
-        refreshButton.setOnClickListener(view -> updateButtonVisibility());
+        profileButton.setOnClickListener(view -> {
+            view.startAnimation(buttonClickAnimation);
+            navigateTo(UserInfoActivity.class);
+        });
+
+        adminButton.setOnClickListener(view -> {
+            view.startAnimation(buttonClickAnimation);
+            navigateTo(AdminHomeActivity.class);
+        });
+
+        entrantButton.setOnClickListener(view -> {
+            view.startAnimation(buttonClickAnimation);
+            navigateTo(EntrantHomeActivity.class);
+        });
+
+        organizerButton.setOnClickListener(view -> {
+            view.startAnimation(buttonClickAnimation);
+            navigateTo(OrganizerHomeActivity.class);
+        });
+
+        messagesButton.setOnClickListener(view -> {
+            view.startAnimation(buttonClickAnimation);
+            navigateTo(MessageViewActivity.class);
+        });
+
+        refreshButton.setOnClickListener(view -> {
+            view.startAnimation(buttonClickAnimation);
+            updateButtonVisibility();
+        });
 
         // Check if notification permission is granted
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
