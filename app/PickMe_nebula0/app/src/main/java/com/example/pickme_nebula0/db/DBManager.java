@@ -766,9 +766,9 @@ public class DBManager {
      *
      * @param facility instance of Facility containing attributes to store in database
      */
-    public void addUpdateFacility(Facility facility){
+    public void addUpdateFacility(Facility facility, Void2VoidCallback onComplete){
         String userID = DeviceManager.getDeviceId();
-        performIfFieldPopulated(db.collection(usersCollection).document(userID),"facilityID",(facilityID)-> updateOldFacility(facilityID,facility),()->createNewFacility(facility));
+        performIfFieldPopulated(db.collection(usersCollection).document(userID),"facilityID",(facilityID)-> updateOldFacility(facilityID,facility,onComplete),()->createNewFacility(facility,onComplete));
     }
 
     /**
@@ -777,11 +777,12 @@ public class DBManager {
      * @param facilityID facilityID of facility to update
      * @param facility instance of Facility class containing attributes to update database with
      */
-    public void updateOldFacility(Object facilityID,Facility facility){
+    public void updateOldFacility(Object facilityID,Facility facility, Void2VoidCallback onFinish){
         // update facilities collection
         DocumentReference docRefFacilities = db.collection(facilitiesCollection).document(facilityID.toString());
         updateField(docRefFacilities,"name",facility.getName());
         updateField(docRefFacilities,"address",facility.getAddress());
+        onFinish.run();
       }
 
     /**
@@ -790,7 +791,7 @@ public class DBManager {
      *
      * @param facility instance of Facility class containing attributes to upload to the database
      */
-    public void createNewFacility(Facility facility){
+    public void createNewFacility(Facility facility, Void2VoidCallback onFinish){
         // create new document in facilities collection
         String facilityID = createIDForDocumentIn(facilitiesCollection);
         Map<String, Object> facilityData = new HashMap<>();
@@ -802,6 +803,7 @@ public class DBManager {
 
         // update user in users collection
         updateField(db.collection(usersCollection).document(DeviceManager.getDeviceId()),"facilityID",facilityID);
+        onFinish.run();
     }
 
     /**
