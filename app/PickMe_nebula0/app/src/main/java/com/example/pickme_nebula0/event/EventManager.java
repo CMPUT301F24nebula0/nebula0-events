@@ -20,21 +20,43 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 
 /**
- * static class for Event-related DB functionality
+ * EventManager
+ *
+ * A static utility class for managing event-related database functionality.
+ *
+ * Key Features:
+ * - Query event details and waitlist information.
+ * - Fetch all events for admin purposes.
+ * - Remove or update event posters.
+ * - Convert Firestore documents to `Event` objects with error handling.
+ *
+ * Dependencies:
+ * - `DBManager` for database operations.
+ * - `FBStorageManager` for Firebase Storage operations.
+ * - `Event` class representing event entities.
  */
 public class EventManager {
     private static DBManager dbm = new DBManager();
     private static FirebaseFirestore db = dbm.db;
     private static String event_manager_tag = "EventManager";
 
+    /**
+     * Represents the status of an event.
+     */
     public enum EventStatus {
         PAST, ONGOING
     }
 
+    /**
+     * Callback interface for operations that return an Event object.
+     */
     public interface Event2VoidCallback {
         void run(Event event);
     }
 
+    /**
+     * Callback interface for operations that return a String.
+     */
     public interface String2VoidCallback {
         void run(String event);
     }

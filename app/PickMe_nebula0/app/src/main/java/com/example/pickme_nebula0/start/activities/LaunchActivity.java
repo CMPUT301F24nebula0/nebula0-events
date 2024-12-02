@@ -17,10 +17,17 @@ import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.user.activities.UserInfoActivity;
 
 /**
- * Activity when user first opens app.
- * Checks if they are registered.
- * If yes, sends them to home screen.
- * If no, sends to user info screen.
+ * LaunchActivity
+ *
+ * This activity is displayed when the user first opens the app. It determines whether the user is
+ * registered in the database.
+ *
+ * - If the user is registered, they are redirected to the HomePageActivity.
+ * - If the user is not registered, they are redirected to the UserInfoActivity for registration.
+ *
+ * Features:
+ * - Supports edge-to-edge UI.
+ * - Handles user registration status dynamically.
  *
  * @author Stephine Yearley
  */
@@ -30,6 +37,15 @@ public class LaunchActivity extends AppCompatActivity {
     private boolean returning = false;
     private String deviceID;
 
+    /**
+     * Called when the activity is first created.
+     *
+     * - Sets up edge-to-edge UI with padding for system bars.
+     * - Retrieves the device ID.
+     * - Checks if the user is registered in the database.
+     *
+     * @param savedInstanceState The saved instance state for restoring the activity.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +70,11 @@ public class LaunchActivity extends AppCompatActivity {
         dbManager.checkUserRegistration(deviceID,this::registeredCallback,this::unregisteredCallback);
     }
 
+    /**
+     * Called when the activity is visible to the user.
+     *
+     * If the user has returned from the registration screen, redirects them to the home screen.
+     */
     @Override
     protected void onResume() {
         super.onResume();

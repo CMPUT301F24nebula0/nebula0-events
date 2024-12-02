@@ -18,10 +18,17 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 /**
- * Activity for scanning a QR code
+ * Activity for scanning a QR code.
+ *
+ * This activity allows users to scan QR codes to retrieve event details and navigate
+ * to the event details page. It handles permissions for the camera and processes QR
+ * code scanning results.
+ *
+ * @see IntentIntegrator
+ * @see EventDetailUserActivity
  */
 public class QRCodeActivity extends AppCompatActivity {
-    
+
     // QR code scanner
     private static final int PERMISSION_REQUEST_CAMERA = 1;
 
@@ -31,6 +38,16 @@ public class QRCodeActivity extends AppCompatActivity {
     // check if activity is active
     boolean active = false;
 
+    /**
+     * Initializes the QR code scanning activity.
+     *
+     * This method sets up the UI components, checks for camera permissions,
+     * and initializes the QR code scanner if permissions are granted.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after
+     *                           previously being shut down, this Bundle contains
+     *                           the most recently saved data.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +80,10 @@ public class QRCodeActivity extends AppCompatActivity {
     }
 
     /**
-     * Initialize QR code scanner
+     * Initializes and starts the QR code scanner.
+     *
+     * This method sets up the scanner with the desired QR code format,
+     * locks the orientation, and starts scanning.
      */
     private void initQRCodeScanner() {
         // Initialize QR code scanner here
@@ -75,12 +95,15 @@ public class QRCodeActivity extends AppCompatActivity {
     }
 
     /**
-     * Callback for the result from requesting permissions. This method
-     * @param requestCode The request code passed in requestPermissions
-     * @param permissions The requested permissions. Never null.
-     * @param grantResults The grant results for the corresponding permissions
-     *     which is either {@link android.content.pm.PackageManager#PERMISSION_GRANTED}
-     *     or {@link android.content.pm.PackageManager#PERMISSION_DENIED}. Never null.
+     * Callback for handling the result of a permission request.
+     *
+     * This method handles the response to the camera permission request. If permission
+     * is granted, it initializes the QR code scanner. Otherwise, it shows a warning
+     * and finishes the activity.
+     *
+     * @param requestCode The request code passed in requestPermissions.
+     * @param permissions The requested permissions.
+     * @param grantResults The grant results for the requested permissions.
      */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

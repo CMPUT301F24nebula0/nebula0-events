@@ -27,10 +27,24 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This activity show the user event details and conditionally rendered elements based on their
- * registration status in this event.
+ * EventDetailUserActivity
  *
- * @author Stephine Yearley
+ * This activity allows a user to view event details and interact with the event based on their registration status.
+ *
+ * Key Features:
+ * - Displays event details including facilities and registration status.
+ * - Allows registration and unregistration for events.
+ * - Handles geolocation-based registration if required by the event.
+ * - Integrates with Firestore for event and user data.
+ * - Supports QR code-based navigation to events.
+ * - Provides a notification interface for selected users.
+ *
+ * Dependencies:
+ * - `DBManager` for Firestore operations.
+ * - `GeolocationManager` for handling location permissions and geolocation data.
+ * - `SharedDialogue` for reusable UI elements like poster popups.
+ *
+ * Author: Stephine Yearley
  */
 public class EventDetailUserActivity extends AppCompatActivity {
     private String eventID;
@@ -56,7 +70,16 @@ public class EventDetailUserActivity extends AppCompatActivity {
 
     private boolean fromQR;
 
-
+    /**
+     * Called when the activity is created.
+     *
+     * - Initializes UI components and Firebase references.
+     * - Retrieves event information based on the provided event ID.
+     * - Sets up buttons and handlers for user actions.
+     * - Configures geolocation permissions if required by the event.
+     *
+     * @param savedInstanceState Saved state for restoring the activity.
+     */
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -242,13 +265,16 @@ public class EventDetailUserActivity extends AppCompatActivity {
         renderAll();
     }
 
+    /**
+     * Called when the activity resumes.
+     *
+     * Re-renders the event and user details to ensure the UI is updated.
+     */
     @Override
     public void onResume(){
         super.onResume();
         renderAll();
     }
-
-    // START TY
 
     /**
      * Save's user's geolocation data

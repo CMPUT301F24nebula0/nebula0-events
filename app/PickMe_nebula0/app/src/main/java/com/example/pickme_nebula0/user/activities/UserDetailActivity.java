@@ -18,6 +18,7 @@ import com.example.pickme_nebula0.R;
 import com.example.pickme_nebula0.db.DBManager;
 
 import com.example.pickme_nebula0.db.FBStorageManager;
+import com.example.pickme_nebula0.facility.Facility;
 import com.example.pickme_nebula0.organizer.fragments.OrganizerSelectedFragment;
 
 import com.example.pickme_nebula0.user.User;
@@ -29,7 +30,22 @@ import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 /**
- * Activity for admin or organizer to view details about a user
+ * UserDetailActivity
+ *
+ * This activity allows admins or organizers to view detailed information about a user.
+ *
+ * Features:
+ * - Displays user details such as ID, name, email, and profile picture.
+ * - Provides actions for deleting the user, canceling their event registration,
+ *   and displaying their geolocation on a map.
+ * - Allows deletion and replacement of the user's profile image.
+ *
+ * Author: Taekwan Yoon
+ *
+ * @see User
+ * @see Facility
+ * @see DBManager
+ * @see FBStorageManager
  */
 public class UserDetailActivity extends AppCompatActivity {
     private FirebaseFirestore db;
@@ -40,6 +56,15 @@ public class UserDetailActivity extends AppCompatActivity {
     private String userName;
     private String userID;
 
+    /**
+     * Initializes the activity.
+     *
+     * - Sets up UI components and event listeners for buttons.
+     * - Fetches user details from Firestore.
+     * - Configures conditional visibility and actions based on user role (admin/organizer).
+     *
+     * @param savedInstanceState The saved instance state for restoring the activity.
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -160,6 +185,14 @@ public class UserDetailActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Fetches the details of a user from Firestore and updates the UI.
+     *
+     * - Retrieves user data and displays their details in the UI.
+     * - Handles cases where the user is not found or retrieval fails.
+     *
+     * @param userID The ID of the user whose details are to be fetched.
+     */
     private void fetchUserDetails(String userID) {
         dbManager.getUser(userID, userObj -> {
             if (userObj instanceof User) {
@@ -185,6 +218,14 @@ public class UserDetailActivity extends AppCompatActivity {
         }));
     }
 
+    /**
+     * Loads a user's profile image from Firebase Storage and displays it in the UI.
+     *
+     * - Uses Picasso for image loading.
+     * - Handles cases where the image does not exist or fails to load.
+     *
+     * @param userID The ID of the user whose profile image is to be loaded.
+     */
     private void loadProfileImageFromFirebase(String userID) {
         FirebaseStorage storage = FirebaseStorage.getInstance("gs://pickme-c2fb3.firebasestorage.app");
         storageRef = storage.getReference();
@@ -202,6 +243,14 @@ public class UserDetailActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Deletes and replaces a user's profile image.
+     *
+     * - Generates a placeholder profile image.
+     * - Updates the profile image in the UI and Firebase Storage.
+     *
+     * @param name The name of the user for generating a placeholder image.
+     */
     private void deleteAndReplaceProfileImage(String name){
         Uri newPicUri = UserInfoActivity.genProfilePic(this,name);
         Picasso.get()

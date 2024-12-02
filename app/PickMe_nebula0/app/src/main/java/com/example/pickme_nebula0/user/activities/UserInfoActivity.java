@@ -39,10 +39,21 @@ import java.util.Arrays;
 import java.util.Random;
 
 /**
- * Activity allowing user to register or update their profile information or navigate to FacilityInfoActivity
+ * UserInfoActivity
  *
- * @author Stephine Yearley
+ * This activity allows users to register, update their profile information, or navigate to manage their facility information.
+ *
+ * Key Features:
+ * - Register or update user profile information (name, email, phone number, notification preferences).
+ * - Manage profile picture (upload, auto-generate, or remove).
+ * - Navigate to FacilityInfoActivity for additional management options.
+ * - Includes validation for user inputs.
+ *
+ * Author: Stephine Yearley
+ *
  * @see User
+ * @see DBManager
+ * @see FBStorageManager
  */
 public class UserInfoActivity extends AppCompatActivity {
     private String deviceID;
@@ -72,6 +83,15 @@ public class UserInfoActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Initializes the activity.
+     *
+     * - Sets up UI components and event listeners for user actions.
+     * - Handles different layouts for new users and returning users.
+     * - Registers a media picker for profile picture selection.
+     *
+     * @param savedInstanceState The saved instance state for restoring the activity.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

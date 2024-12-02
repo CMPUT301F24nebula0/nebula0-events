@@ -20,15 +20,39 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 /**
- * Array adapter for displaying images
+ * ArrayAdapter for displaying event images.
+ *
+ * This adapter is used to bind a list of `Event` objects to a view, displaying each event's
+ * poster image and optionally the event name if the image fails to load.
+ *
+ * @see Event
+ * @see ArrayAdapter
  */
 public class ImageAdapter extends ArrayAdapter<Event> {
 
+    /**
+     * Constructs an `ImageAdapter` for displaying event images.
+     *
+     * @param context the context in which the adapter is used
+     * @param textViewResourceId the resource ID for a layout file containing a TextView
+     * @param events the list of `Event` objects to display
+     */
     public ImageAdapter (Context context, int textViewResourceId, ArrayList<Event> events){
         super(context,textViewResourceId, events);
 
     }
-    // convert each User into a View
+
+    /**
+     * Converts each `Event` into a `View` for display in a list or grid.
+     *
+     * This method inflates the layout for each item, loads the event's poster image into an `ImageView`,
+     * and displays the event name if the image fails to load.
+     *
+     * @param position the position of the item within the adapter's data set
+     * @param convertView the old view to reuse, if possible
+     * @param parent the parent view that this view will be attached to
+     * @return a `View` representing the event
+     */
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -60,11 +84,16 @@ public class ImageAdapter extends ArrayAdapter<Event> {
 
 
     /**
-     * Loads an image into the view
-     * @param img_uri the uri for the image we want to load
-     * @param imgView image view we want to load the image into
-     * @param onSuccessCallback function to call if successful
-     * @param onFailureCallback function to call if unsuccessful
+     * Loads an image from a URI into an `ImageView`.
+     *
+     * Uses the Picasso library to load the image. If the image is successfully loaded,
+     * the provided success callback is executed. If the image fails to load,
+     * the failure callback is executed.
+     *
+     * @param img_uri the URI of the image to load
+     * @param imgView the `ImageView` into which the image should be loaded
+     * @param onSuccessCallback the callback to execute if the image loads successfully
+     * @param onFailureCallback the callback to execute if the image fails to load
      */
     private void loadImage(String img_uri, ImageView imgView, DBManager.Void2VoidCallback onSuccessCallback, DBManager.Void2VoidCallback onFailureCallback) {
         if (img_uri != null && !img_uri.isEmpty()) {
