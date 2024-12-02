@@ -113,12 +113,13 @@ public class UserDetailActivity extends AppCompatActivity {
         // check if userID and eventID got passed from the intent
 //        Log.d("UserDetailActivity", "userID: " + userID + ", eventID: " + eventID);
 
-        if(!getIntent().getBooleanExtra("organizer", true)){
+        if(!getIntent().getBooleanExtra("organizer", false)){
             mapButton.setVisibility(View.GONE);
         } else {
             // hide mapButton if geolocation requirement is off
             // means geolocation data was not stored for entrants and
             // geolocation will fail assertion check
+            if (eventID != null){
             dbManager.getEvent(eventID, (eventObj) -> {
                 Event event = (Event) eventObj;
                 if (!event.getGeolocationRequired()) {
@@ -163,7 +164,7 @@ public class UserDetailActivity extends AppCompatActivity {
                 Log.d("UserDetailActivity", "Could not retrieve event to set mapButton");
                 mapButton.setVisibility(View.GONE);
                 Toast.makeText(UserDetailActivity.this,"Could not retrieve this user's registered event",Toast.LENGTH_SHORT).show();
-             });
+             });}
         }
 
         delImgButton.setOnClickListener(new View.OnClickListener(){
